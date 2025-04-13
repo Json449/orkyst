@@ -1,12 +1,5 @@
 {
   "pages": {
-    "/api/addCollaborator/route": [
-      "static/chunks/webpack-d672284dbedcd20a.js",
-      "static/chunks/4bd1b696-43e1261adbc6da01.js",
-      "static/chunks/517-d7404029684bd5f8.js",
-      "static/chunks/main-app-27731a4343b229ba.js",
-      "static/chunks/app/api/addCollaborator/route-6b141395e2054f80.js"
-    ],
     "/api/calendarDetails/route": [
       "static/chunks/webpack-d672284dbedcd20a.js",
       "static/chunks/4bd1b696-43e1261adbc6da01.js",
@@ -14,19 +7,19 @@
       "static/chunks/main-app-27731a4343b229ba.js",
       "static/chunks/app/api/calendarDetails/route-8289a2c4167d48af.js"
     ],
+    "/api/addCollaborator/route": [
+      "static/chunks/webpack-d672284dbedcd20a.js",
+      "static/chunks/4bd1b696-43e1261adbc6da01.js",
+      "static/chunks/517-d7404029684bd5f8.js",
+      "static/chunks/main-app-27731a4343b229ba.js",
+      "static/chunks/app/api/addCollaborator/route-6b141395e2054f80.js"
+    ],
     "/api/calendarList/route": [
       "static/chunks/webpack-d672284dbedcd20a.js",
       "static/chunks/4bd1b696-43e1261adbc6da01.js",
       "static/chunks/517-d7404029684bd5f8.js",
       "static/chunks/main-app-27731a4343b229ba.js",
       "static/chunks/app/api/calendarList/route-246a6a90f7e46afb.js"
-    ],
-    "/api/cloudinary/upload/route": [
-      "static/chunks/webpack-d672284dbedcd20a.js",
-      "static/chunks/4bd1b696-43e1261adbc6da01.js",
-      "static/chunks/517-d7404029684bd5f8.js",
-      "static/chunks/main-app-27731a4343b229ba.js",
-      "static/chunks/app/api/cloudinary/upload/route-6410500272c1c014.js"
     ],
     "/api/calendarSuggestions/route": [
       "static/chunks/webpack-d672284dbedcd20a.js",
@@ -41,6 +34,13 @@
       "static/chunks/517-d7404029684bd5f8.js",
       "static/chunks/main-app-27731a4343b229ba.js",
       "static/chunks/app/api/events/content/route-370fe0b8081ce9ae.js"
+    ],
+    "/api/cloudinary/upload/route": [
+      "static/chunks/webpack-d672284dbedcd20a.js",
+      "static/chunks/4bd1b696-43e1261adbc6da01.js",
+      "static/chunks/517-d7404029684bd5f8.js",
+      "static/chunks/main-app-27731a4343b229ba.js",
+      "static/chunks/app/api/cloudinary/upload/route-6410500272c1c014.js"
     ],
     "/api/events/details/route": [
       "static/chunks/webpack-d672284dbedcd20a.js",
@@ -150,20 +150,6 @@
       "static/chunks/245-458ddd4f7c8f6dab.js",
       "static/chunks/app/page-5dc70b1cdcdf220f.js"
     ],
-    "/account_verification/layout": [
-      "static/chunks/webpack-d672284dbedcd20a.js",
-      "static/chunks/4bd1b696-43e1261adbc6da01.js",
-      "static/chunks/517-d7404029684bd5f8.js",
-      "static/chunks/main-app-27731a4343b229ba.js",
-      "static/chunks/app/account_verification/layout-9614684b189dbe71.js"
-    ],
-    "/account_verification/page": [
-      "static/chunks/webpack-d672284dbedcd20a.js",
-      "static/chunks/4bd1b696-43e1261adbc6da01.js",
-      "static/chunks/517-d7404029684bd5f8.js",
-      "static/chunks/main-app-27731a4343b229ba.js",
-      "static/chunks/app/account_verification/page-b42a2b071288e10a.js"
-    ],
     "/dashboard/layout": [
       "static/chunks/webpack-d672284dbedcd20a.js",
       "static/chunks/4bd1b696-43e1261adbc6da01.js",
@@ -183,6 +169,20 @@
       "static/chunks/874-a47d4e48f7d957a2.js",
       "static/chunks/472-4dd37c2506905518.js",
       "static/chunks/app/dashboard/page-d418e7ea60fd25d8.js"
+    ],
+    "/account_verification/layout": [
+      "static/chunks/webpack-d672284dbedcd20a.js",
+      "static/chunks/4bd1b696-43e1261adbc6da01.js",
+      "static/chunks/517-d7404029684bd5f8.js",
+      "static/chunks/main-app-27731a4343b229ba.js",
+      "static/chunks/app/account_verification/layout-9614684b189dbe71.js"
+    ],
+    "/account_verification/page": [
+      "static/chunks/webpack-d672284dbedcd20a.js",
+      "static/chunks/4bd1b696-43e1261adbc6da01.js",
+      "static/chunks/517-d7404029684bd5f8.js",
+      "static/chunks/main-app-27731a4343b229ba.js",
+      "static/chunks/app/account_verification/page-b42a2b071288e10a.js"
     ],
     "/eventDetails/layout": [
       "static/chunks/webpack-d672284dbedcd20a.js",
