@@ -7,14 +7,25 @@ import { ValidationPipe } from '@nestjs/common';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // Set global prefix
-  app.setGlobalPrefix('backend');
+  // Enable CORS with proper configuration
+  app.enableCors({
+    origin: [
+      'http://localhost:3000', // Local development
+      'https://your-frontend-domain.com', // Your production frontend
+      process.env.FRONTEND_URL, // Environment variable
+    ],
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    allowedHeaders: 'Content-Type, Authorization',
+    credentials: true, // Required for cookies/sessions
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
+  });
 
-  // Your existing middleware
+  // Your existing configuration
+  app.setGlobalPrefix('backend');
   app.use(cookieParser());
   app.use(express.json({ limit: '50mb' }));
   app.use(express.urlencoded({ limit: '50mb', extended: true }));
-
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
