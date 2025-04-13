@@ -3,13 +3,17 @@ import { NextConfig } from "next";
 const nextConfig: NextConfig = {
   reactStrictMode: true, // Example config
   swcMinify: true, // Enable SWC minification (faster than Terser)
+  optimizeFonts: false,
   images: {
+    unoptimized: true,
     domains: [
       "oaidalleapiprodscus.blob.core.windows.net",
       // You can add more domains here if necessary
     ],
   },
   experimental: {
+    optimizeCss: false,
+    optimizeServerReact: false,
     serverActions: {
       bodySizeLimit: "10mb", // Set a specific body size limit for server actions
       allowedOrigins: ["*"], // Allow all origins (you can customize this as needed)
