@@ -1,0 +1,27 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 224 224" width="224" height="224" fill="none">
+  <g opacity="100%">
+    <rect filter="url(#filter_dshadow_15_0_10_0000001a)" x="0" y="0" width="224" height="224" fill="#7a0860" stroke="#e5e7eb" stroke-width="0" rx="112"></rect>
+    <text x="77.5" y="136.5" font-family="Inter" font-size="18" fill="#fff" letter-spacing="0" font-weight="800" font-style="normal">
+      <tspan>Agency</tspan>
+    </text>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="#fff" x="98.5" y="83.5" width="27" height="27">
+      <path d="M320 336c0 8.84-7.16 16-16 16h-96c-8.84 0-16-7.16-16-16v-48H0v144c0 25.6 22.4 48 48 48h416c25.6 0 48-22.4 48-48V288H320v48zm144-208h-80V80c0-25.6-22.4-48-48-48H176c-25.6 0-48 22.4-48 48v48H48c-25.6 0-48 22.4-48 48v80h512v-80c0-25.6-22.4-48-48-48zm-144 0H192V96h128v32z"></path>
+    </svg>
+  </g>
+  <defs>
+    <filter id="filter_dshadow_15_0_10_0000001a" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse">
+      <feFlood flood-opacity="0" result="bg-fix"></feFlood>
+      <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="alpha"></feColorMatrix>
+      <feOffset dx="0" dy="10"></feOffset>
+      <feGaussianBlur stdDeviation="7.5"></feGaussianBlur>
+      <feComposite in2="alpha" operator="out"></feComposite>
+      <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.1 0"></feColorMatrix>
+      <feBlend mode="normal" in2="bg-fix" result="bg-fix-filter_dshadow_15_0_10_0000001a"></feBlend>
+      <feBlend in="SourceGraphic" in2="bg-fix-filter_dshadow_15_0_10_0000001a" result="shape"></feBlend>
+    </filter>
+    <style id="google">@import url(https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900&amp;display=swap);
+</style>
+    <style id="brand"></style>
+  </defs>
+</svg>

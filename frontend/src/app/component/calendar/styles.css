@@ -1,0 +1,32 @@
+.rbc-time-gutter {
+    color: black !important;
+    /* Set the text color to black */
+}
+
+.rbc-header {
+    color: black !important;
+    /* Set the text color to black */
+}
+
+/* Change the color of the day numbers in the calendar grid to black */
+.rbc-toolbar-label {
+    color: black !important;
+    /* Set the date text color to black */
+}
+
+.rbc-date-cell {
+    color: black !important;
+}
+
+.rbc-agenda-time-cell {
+    color: black !important;
+}
+
+.rbc-agenda-date-cell {
+    color: black !important;
+}
+
+.rbc-event {
+    background-color: transparent !important;
+    cursor: pointer;
+}
