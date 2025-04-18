@@ -1,26 +1,84 @@
 "use client";
-import React, { useState, Suspense } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Image from "next/image";
 
-// Move the content that uses useSearchParams to a separate component
 function VerificationContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [code, setCode] = useState("");
+  const [digits, setDigits] = useState(["", "", "", "", "", ""]);
+  const [activeIndex, setActiveIndex] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const serializedEvent = searchParams.get("access_token");
   const accessToken = serializedEvent
     ? JSON.parse(decodeURIComponent(serializedEvent))
     : null;
 
+  useEffect(() => {
+    // Focus the first input on mount
+    if (inputRefs.current[0]) {
+      inputRefs.current[0].focus();
+    }
+  }, []);
+
+  useEffect(() => {
+    // Check if all digits are filled
+    const isComplete = digits.every((digit) => digit !== "");
+    if (isComplete) {
+      handleVerifyEmail();
+    }
+  }, [digits]);
+
+  const handleChange = (index: number, value: string) => {
+    if (/^\d*$/.test(value)) {
+      const newDigits = [...digits];
+      newDigits[index] = value;
+      setDigits(newDigits);
+
+      // Move to next input if a digit was entered and there's space
+      if (value && index < 5) {
+        setActiveIndex(index + 1);
+        setTimeout(() => inputRefs.current[index + 1]?.focus(), 10);
+      }
+    }
+  };
+
+  const handleKeyDown = (
+    index: number,
+    e: React.KeyboardEvent<HTMLInputElement>
+  ) => {
+    if (e.key === "Backspace" && !digits[index] && index > 0) {
+      // Move to previous input on backspace if current is empty
+      setActiveIndex(index - 1);
+      setTimeout(() => inputRefs.current[index - 1]?.focus(), 10);
+    }
+  };
+
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    const pasteData = e.clipboardData.getData("text/plain").slice(0, 6);
+    if (/^\d+$/.test(pasteData)) {
+      const newDigits = [...digits];
+      for (let i = 0; i < pasteData.length && i < 6; i++) {
+        newDigits[i] = pasteData[i];
+      }
+      setDigits(newDigits);
+      const lastFilledIndex = Math.min(pasteData.length - 1, 5);
+      setActiveIndex(lastFilledIndex);
+      setTimeout(() => inputRefs.current[lastFilledIndex]?.focus(), 10);
+    }
+  };
+
   const handleVerifyEmail = async () => {
+    const verificationCode = digits.join("");
     const url = "/api/verifyemail";
     setIsLoading(true);
     setError(null);
 
     const body = {
-      code,
+      code: verificationCode,
       access_token: accessToken?.access_token,
     };
 
@@ -55,6 +113,10 @@ function VerificationContent() {
       setError(
         err instanceof Error ? err.message : "An unknown error occurred"
       );
+      // Reset all digits on error
+      setDigits(["", "", "", "", "", ""]);
+      setActiveIndex(0);
+      setTimeout(() => inputRefs.current[0]?.focus(), 10);
     } finally {
       setIsLoading(false);
     }
@@ -62,42 +124,63 @@ function VerificationContent() {
 
   return (
     <div className="flex w-full flex-col items-center justify-center bg-white h-[100vh]">
-      <div className="w-[600px] p-[32px] bg-white rounded-3xl shadow-lg p-6">
-        <div className="w-full bg-gray-200 rounded-full h-2.5 mb-6">
-          <div
-            className="bg-[#7a0860] h-2.5 rounded-full"
-            style={{ width: "66%" }}
-          ></div>
-        </div>
+      <Image
+        src="/logo.svg"
+        alt="Login Banner"
+        width={228}
+        height={76}
+        priority
+      />
+      <div className="w-[600px] mt-[60px]">
+        <p className="text-[#080a0b] text-center text-[36px] font-bold leading-8 mb-6">
+          {isLoading ? "Verifying your code..." : "Check your email for a code"}
+        </p>
 
-        <p className="text-[#080a0b] text-[24px] font-bold leading-8 mb-4">
-          Account Verification
-        </p>
-        <p className="font-inter text-[#080a0b] text-base font-medium leading-6 mb-6">
-          Please enter the verification code sent to your email to verify your
-          account
-        </p>
-        <input
-          type="number"
-          name="code"
-          value={code}
-          placeholder="Enter verification code"
-          onChange={(e) => {
-            const value = e.target.value;
-            if (value.length <= 6) {
-              setCode(value);
-            }
-          }}
-          className="text-sm text-[#080a0b] border rounded-xl border-[#EEEEEE] h-[52px] py-3 px-4 w-full focus:outline-none"
-        />
-        {error && <p className="text-sm text-red-600 mt-4">{error}</p>}
-        <button
-          disabled={isLoading}
-          className="text-base rounded-xl w-full p-3.5 font-medium bg-[#7a0860] text-white mt-6 disabled:opacity-70"
-          onClick={handleVerifyEmail}
-        >
-          {isLoading ? "Loading..." : "Verify account"}
-        </button>
+        {isLoading ? (
+          <div className="flex justify-center mb-8">
+            <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        ) : (
+          <>
+            <p className="font-inter text-center text-[#080a0b] text-base font-medium leading-6 mb-6">
+              We've sent a 6-digit character code to your email address. The
+              code expires shortly, so please enter it soon.
+            </p>
+
+            <div className="flex justify-between mb-6">
+              {digits.map((digit, index) => (
+                <input
+                  key={index}
+                  ref={(el) => (inputRefs.current[index] = el)}
+                  type="text"
+                  inputMode="numeric"
+                  maxLength={1}
+                  value={digit}
+                  onChange={(e) => handleChange(index, e.target.value)}
+                  onKeyDown={(e) => handleKeyDown(index, e)}
+                  onPaste={handlePaste}
+                  className={`w-16 h-16 text-[black] text-center text-2xl font-bold border rounded-lg bg-[#D9D9D9] focus:outline-none focus:ring-2 focus:ring-primary transition-all ${
+                    activeIndex === index
+                      ? "border-primary"
+                      : "border-[#D9D9D9]"
+                  } ${isLoading ? "opacity-50 cursor-not-allowed" : ""}`}
+                  autoFocus={index === activeIndex}
+                  disabled={isLoading}
+                />
+              ))}
+            </div>
+
+            <p className="font-inter text-center text-[#080a0b] text-base font-medium leading-6 mb-6">
+              Can't find your code? Check your spam folder.
+            </p>
+          </>
+        )}
+
+        {error && (
+          <p className="text-sm text-red-600 mb-4 text-center animate-shake">
+            {error}
+          </p>
+        )}
       </div>
     </div>
   );
@@ -105,8 +188,14 @@ function VerificationContent() {
 
 export default function AccountVerification() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <React.Suspense
+      fallback={
+        <div className="flex w-full h-screen items-center justify-center">
+          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      }
+    >
       <VerificationContent />
-    </Suspense>
+    </React.Suspense>
   );
 }

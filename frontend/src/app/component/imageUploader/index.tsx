@@ -25,7 +25,6 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
   onCloudinaryUpload,
 }) => {
   const [mode, setMode] = useState<"upload" | "generate">("upload");
-  console.log("sss", imageUrl);
   const [prompt, setPrompt] = useState("");
   const [dragActive, setDragActive] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -82,11 +81,11 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
   }, [mode]);
 
   return (
-    <div className="mx-auto bg-white rounded-xl shadow-2xl overflow-hidden">
+    <div className="mx-auto bg-white overflow-hidden mx-6 rounded-xl border-4 border-bg-primarygrey">
       {/* Header with glossy tabs */}
       <div className="flex border-b border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100">
         <button
-          className={`flex-1 py-2 px-4 font-semibold text-lg transition-all duration-300 flex items-center justify-center gap-2 ${
+          className={`bg-primarygrey border-r-2 border-r-[grey] flex-1 py-2 px-4 font-semibold text-lg transition-all duration-300 flex items-center justify-center gap-2 ${
             mode === "upload"
               ? "text-blue-600 border-b-2 border-blue-600 bg-white shadow-sm"
               : "text-gray-500 hover:text-gray-700"
@@ -97,7 +96,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
           Upload Image
         </button>
         <button
-          className={`flex-1 py-2 px-4 font-semibold text-lg transition-all duration-300 flex items-center justify-center gap-2 ${
+          className={`bg-primarygrey flex-1 py-2 px-4 font-semibold text-lg transition-all duration-300 flex items-center justify-center gap-2 ${
             mode === "generate"
               ? "text-purple-600 border-b-2 border-purple-600 bg-white shadow-sm"
               : "text-gray-500 hover:text-gray-700"
@@ -114,13 +113,13 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
         {mode === "upload" ? (
           <>
             {imageUrl ? (
-              <div className="relative group rounded-xl overflow-hidden shadow-lg">
+              <div className="relative group overflow-hidden shadow-lg">
                 <Image
                   src={imageUrl}
                   alt="Uploaded"
                   width={800}
                   height={500}
-                  className="w-full h-[44vh] object-cover transition-transform duration-500 group-hover:scale-105"
+                  className="w-full h-[34vh] object-cover transition-transform duration-500 group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
                   <button
@@ -134,7 +133,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
               </div>
             ) : (
               <div
-                className={`h-[44vh] rounded-xl border-2 ${
+                className={`h-[34vh] border-2 ${
                   dragActive
                     ? "border-blue-400 bg-blue-50"
                     : "border-dashed border-gray-300"
@@ -234,7 +233,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
                 </button>
               </div>
             </div>
-            <div className="relative group rounded-xl overflow-hidden shadow-lg bg-gradient-to-br from-gray-100 to-gray-50 h-[29vh] flex items-center justify-center">
+            <div className="relative group rounded-xl overflow-hidden shadow-lg bg-gradient-to-br from-gray-100 to-gray-50 h-[26vh] flex items-center justify-center">
               <div className="text-center p-8">
                 <div className="mx-auto w-28 h-28 bg-gradient-to-r from-purple-100 to-pink-100 rounded-full flex items-center justify-center mb-6">
                   <AutoAwesomeIcon className="text-4xl text-purple-500" />

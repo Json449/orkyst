@@ -46,13 +46,17 @@ const Header = ({ profile, editor, handleApproveChanges }: HeaderProps) => {
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-gray-100 shadow-sm">
+    <header className="sticky top-0 z-40 bg-primarygrey backdrop-blur-md border-b border-bg-primarygrey shadow-sm">
       <div className="mx-auto px-6 py-3 flex items-center justify-between">
         {/* Logo and Title Section */}
         <div className="flex items-center space-x-4">
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-            Orkyst
-          </h1>
+          <Image
+            src="/logo.svg"
+            alt="Login Banner"
+            width={144}
+            height={54}
+            priority
+          />
           {editor && (
             <span className="hidden md:inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
               Artwork Editor

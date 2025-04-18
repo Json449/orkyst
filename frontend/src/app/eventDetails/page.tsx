@@ -9,6 +9,8 @@ import { FullScreenLoader } from "../component/FullScreenLoader";
 import { VersionSaveModal } from "../component/VersionControlModal";
 import { useEventDetailsMutation } from "../hooks/useEventDetails";
 import TinyMCEEditor from "../component/TinyMiceEditor";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 interface Version {
   eventId: number;
@@ -212,25 +214,19 @@ const FeedbackSection = ({
   loading: boolean;
 }) => (
   <div className="flex flex-col h-full">
-    {/* Header with action button */}
-    <div className="p-4 border-b border-gray-100 flex justify-between items-center">
-      <h3 className="text-xl font-bold text-gray-800">Feedback & Revisions</h3>
-      <button className="p-2 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 transition">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-5 w-5"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-        >
-          <path
-            fillRule="evenodd"
-            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z"
-            clipRule="evenodd"
-          />
-        </svg>
-      </button>
+    <div className="p-4 flex bg-primary items-center justify-between mb-4">
+      <h3 className="text-xl font-bold text-white flex items-center">
+        <Image
+          alt="Version icon"
+          src="/images/feedback.svg"
+          width={24}
+          height={24}
+          priority
+          className="mr-3"
+        />
+        Feedback
+      </h3>
     </div>
-
     {/* Feedback list with better scrolling */}
     <div className="flex-1 overflow-y-auto p-4 space-y-4">
       {loading ? (
@@ -327,7 +323,7 @@ const FeedbackSection = ({
         <input
           type="text"
           placeholder="Add your feedback..."
-          className="w-full p-3 pr-12 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+          className="text-black w-full p-3 pr-12 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
         />
         <button className="absolute right-3 top-3 text-blue-500 hover:text-blue-700">
           <svg
@@ -360,6 +356,7 @@ function DetailForm() {
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [pendingChanges, setPendingChanges] = useState<PendingChanges>();
   const { mutate: eventDetailMutate } = useEventDetailsMutation();
+  const router = useRouter();
 
   const eventId = searchParams.get("eventId");
   useEffect(() => {
@@ -525,18 +522,21 @@ function DetailForm() {
     }
   };
 
-  // Add loading state
   if (!eventDetails) {
-    return <div>Loading event details...</div>;
+    return <div> {loading && <FullScreenLoader />}</div>;
   }
+
+  const goBack = () => {
+    router.replace("/dashboard");
+  };
 
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <div className="bg-white w-full">
         <Header
           handleApproveChanges={handleApproveChanges}
-          editor={true}
-          contentType={eventDetails?.type}
+          // editor={true}
+          // contentType={eventDetails?.type}
           profile={profile}
         />
         <VersionSaveModal
@@ -547,67 +547,43 @@ function DetailForm() {
         />
         {loading && <FullScreenLoader />}
         <div className="flex w-full bg-white">
-          <div className="w-[22%] bg-white border-r border-gray-100 flex flex-col">
-            {/* Header with subtle gradient */}
-            <div className="p-4 border-b border-gray-100 bg-gradient-to-b from-white to-gray-50">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-purple-50 text-purple-600">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold text-gray-900">
-                    Version History
-                  </h3>
-                  <p className="text-xs text-gray-500 mt-0.5">
-                    Track all document changes
-                  </p>
-                </div>
-              </div>
-
-              {/* Version filter/search (optional) */}
-              <div className="mt-3 relative">
-                <input
-                  type="text"
-                  placeholder="Search versions..."
-                  className="w-full pl-8 pr-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:ring-1 focus:ring-purple-300 focus:border-purple-300"
+          <div className="w-[22%] bg-primarygrey border-r border-gray-100 flex flex-col">
+            <div className="flex gap-2 items-center px-4 py-6 text-2xl">
+              <span className="cursor-pointer" onClick={goBack}>
+                <Image
+                  alt="Version icon"
+                  src="/images/back.svg"
+                  width={19}
+                  height={38}
+                  priority
+                  className="mr-3"
                 />
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="absolute left-2.5 top-2 h-3.5 w-3.5 text-gray-400"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                  />
-                </svg>
-              </div>
+              </span>
+              <span className="font-bold text-black">{eventDetails?.type}</span>
+            </div>
+            <div className="p-4 flex bg-primary items-center justify-between mb-4">
+              <h3 className="text-xl font-bold text-white flex items-center">
+                <Image
+                  alt="Version icon"
+                  src="/images/version.svg"
+                  width={24}
+                  height={24}
+                  priority
+                  className="mr-3"
+                />
+                Version History
+              </h3>
             </div>
 
             {/* Version list with subtle pattern */}
-            <div className="flex-1 overflow-hidden bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2IiBoZWlnaHQ9IjYiPgo8cmVjdCB3aWR0aD0iNiIgaGVpZ2h0PSI2IiBmaWxsPSIjZmZmIj48L3JlY3Q+CjxwYXRoIGQ9Ik0wIDBMNiA2IiBzdHJva2U9IiNlZGVkZWQiIHN0cm9rZS13aWR0aD0iMC41Ij48L3BhdGg+CjxwYXRoIGQ9Ik02IDBMMCA2IiBzdHJva2U9IiNlZGVkZWQiIHN0cm9rZS13aWR0aD0iMC41Ij48L3BhdGg+Cjwvc3ZnPg==')]">
+            <div className="flex-1 overflow-hidden bg-primarygrey">
               <VersionHistory
                 versionHistory={eventDetails?.versionHistory || []}
               />
             </div>
 
             {/* Footer with current version */}
-            <div className="p-3 border-t border-gray-100 bg-white text-center">
+            <div className="p-3 border-t bg-primarygrey bg-white text-center">
               <div className="inline-flex items-center px-3 py-1 rounded-full bg-purple-50 border border-purple-100">
                 <span className="text-xs font-medium text-purple-700">
                   Current: v{eventDetails?.version || 1}
@@ -616,6 +592,24 @@ function DetailForm() {
             </div>
           </div>
           <div className="h-[86vh] flex-1 shadow-lg">
+            <div className="flex justify-between gap-5 py-3 px-6">
+              <p className="p-2 rounded-xl bg-primarygrey text-black font-bold">
+                v 1.1
+              </p>
+              <div className="flex gap-2">
+                <button className="w-[157px] h-[40px] bg-[#7a0860] text-white text-[16px] font-medium rounded-xl hover:bg-[#5c0648] transition-colors disabled:opacity-70">
+                  <span className="flex items-center justify-center">
+                    Approve
+                  </span>
+                </button>
+                <button
+                  onClick={handleApproveChanges}
+                  className="w-[157px] h-[40px] bg-white text-[#7a0860] text-[16px] font-medium rounded-xl border-2 border-[#7a0860] hover:bg-[#F8F7F7] transition-colors"
+                >
+                  Save Changes
+                </button>
+              </div>
+            </div>
             {!loading && eventDetails?.type != "Blog Post" && (
               <ImageUploader
                 generateImageLoading={generateImageLoading}

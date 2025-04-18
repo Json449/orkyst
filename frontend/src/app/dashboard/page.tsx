@@ -234,23 +234,19 @@ export default function CalendarPage() {
         profile={profile}
       />
       <div className="flex w-full bg-white">
-        <div className="w-[22%] h-[86vh] p-4 bg-gradient-to-b from-gray-50 to-gray-100 shadow-xl flex flex-col justify-between border-r border-gray-200">
+        <div className="w-[22%] h-[86vh] bg-primarygrey from-gray-50 to-gray-100 shadow-xl flex flex-col justify-between border-r border-gray-200">
           {/* AI Tips Section */}
           <div className="mb-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-bold text-gray-800 flex items-center">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5 mr-2 text-purple-600"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"
-                    clipRule="evenodd"
-                  />
-                </svg>
+            <div className="flex p-4 bg-primary items-center justify-between mb-4">
+              <h3 className="text-xl font-bold text-white flex items-center">
+                <Image
+                  alt="Calendar icon"
+                  src="/images/tips.svg"
+                  width={24}
+                  height={24}
+                  priority
+                  className="mr-3"
+                />
                 AI Tips
               </h3>
               <span className="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded-full">
@@ -308,20 +304,16 @@ export default function CalendarPage() {
 
           {/* Brand Calendars Section */}
           <div>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-bold text-gray-800 flex items-center">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5 mr-2 text-blue-600"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
-                    clipRule="evenodd"
-                  />
-                </svg>
+            <div className="flex p-4 bg-primary items-center justify-between mb-4">
+              <h3 className="text-xl font-bold text-white flex items-center">
+                <Image
+                  alt="Calendar icon"
+                  src="/images/calendar.svg"
+                  width={24}
+                  height={24}
+                  priority
+                  className="mr-3"
+                />
                 Brand Calendars
               </h3>
               <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
@@ -408,7 +400,11 @@ export default function CalendarPage() {
               )}
             </div>
           </div>
-
+          <div className="bg-primary rounded-xl flex items-center justify-center h-full px-5 py-2.5">
+            <span className="text-white font-semibold tracking-wide text-sm uppercase flex items-center">
+              Add New Calendar
+            </span>
+          </div>
           {/* Custom Scrollbar Styles */}
           <style jsx>{`
             .custom-scrollbar::-webkit-scrollbar {
@@ -532,24 +528,6 @@ export default function CalendarPage() {
           <div className="absolute inset-0 rounded-full bg-[length:200%_200%] bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-0 group-hover:opacity-100 group-hover:animate-[shine_1.5s_ease-in-out_infinite]"></div>
 
           {/* Content container */}
-          <div className="relative z-10 flex items-center justify-center h-full w-full px-5 py-2.5">
-            <span className="text-white font-semibold tracking-wide text-sm uppercase flex items-center">
-              {/* Plus icon with animation */}
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5 mr-2 transition-transform duration-300 group-hover:rotate-90"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              Add New Calendar
-            </span>
-          </div>
 
           {/* Ripple effect container */}
           <div className="absolute inset-0 overflow-hidden rounded-full">

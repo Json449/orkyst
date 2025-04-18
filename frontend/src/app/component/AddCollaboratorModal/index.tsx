@@ -102,7 +102,7 @@ export default function AddCollaboratorModal({
                   id="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="text-black w-full px-3 py-2 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-[#7a0860]"
+                  className="text-black w-full px-3 py-2 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                   placeholder="user@example.com"
                   required
                 />
@@ -118,7 +118,7 @@ export default function AddCollaboratorModal({
                   id="role"
                   value={role}
                   onChange={(e) => setRole(e.target.value as Role)}
-                  className="text-black w-full px-3 py-2 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-[#7a0860]"
+                  className="text-black w-full px-3 py-2 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                 >
                   <option value={Role.EDITOR}>Editor</option>
                   <option value={Role.OWNER}>Viewer</option>
@@ -138,7 +138,7 @@ export default function AddCollaboratorModal({
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-[#7a0860] text-white rounded-md hover:bg-[#5d064a] disabled:opacity-50"
+                  className="px-4 py-2 bg-primary text-white rounded-md hover:bg-[#5d064a] disabled:opacity-50"
                   disabled={isLoading}
                 >
                   {isLoading ? "Adding..." : "Add Collaborator"}
