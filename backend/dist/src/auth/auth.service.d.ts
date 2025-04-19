@@ -1,6 +1,8 @@
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import { CreateUserDto } from './dto/create-user-dto';
+import { UpdateUserDto } from '@/users/dto/update-user-dto';
+import { UserDocument } from '@/users/schemas/user.schema';
 export declare class AuthService {
     private readonly usersService;
     private readonly jwtService;
@@ -27,4 +29,5 @@ export declare class AuthService {
         email: any;
         sub: any;
     }>;
+    updateUser(userId: string, updateUserDto: Partial<UpdateUserDto>): Promise<UserDocument>;
 }

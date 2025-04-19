@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 
@@ -23,7 +23,55 @@ function VerificationContent() {
     }
   }, []);
 
-  const handleVerifyEmail = useCallback(async () => {
+  useEffect(() => {
+    // Check if all digits are filled
+    const isComplete = digits.every((digit) => digit !== "");
+    if (isComplete) {
+      handleVerifyEmail();
+    }
+  }, [digits]);
+
+  const handleChange = (index: number, value: string) => {
+    if (/^\d*$/.test(value)) {
+      const newDigits = [...digits];
+      newDigits[index] = value;
+      setDigits(newDigits);
+
+      // Move to next input if a digit was entered and there's space
+      if (value && index < 5) {
+        setActiveIndex(index + 1);
+        setTimeout(() => inputRefs.current[index + 1]?.focus(), 10);
+      }
+    }
+  };
+
+  const handleKeyDown = (
+    index: number,
+    e: React.KeyboardEvent<HTMLInputElement>
+  ) => {
+    if (e.key === "Backspace" && !digits[index] && index > 0) {
+      // Move to previous input on backspace if current is empty
+      setActiveIndex(index - 1);
+      setTimeout(() => inputRefs.current[index - 1]?.focus(), 10);
+    }
+  };
+
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    const pasteData = e.clipboardData.getData("text/plain").slice(0, 6);
+    if (/^\d+$/.test(pasteData)) {
+      const newDigits = [...digits];
+      for (let i = 0; i < pasteData.length && i < 6; i++) {
+        newDigits[i] = pasteData[i];
+      }
+      setDigits(newDigits);
+      const lastFilledIndex = Math.min(pasteData.length - 1, 5);
+      setActiveIndex(lastFilledIndex);
+      setTimeout(() => inputRefs.current[lastFilledIndex]?.focus(), 10);
+    }
+  };
+
+  const handleVerifyEmail = async () => {
     const verificationCode = digits.join("");
     const url = "/api/verifyemail";
     setIsLoading(true);
@@ -71,53 +119,6 @@ function VerificationContent() {
       setTimeout(() => inputRefs.current[0]?.focus(), 10);
     } finally {
       setIsLoading(false);
-    }
-  }, [digits, accessToken, router]);
-
-  useEffect(() => {
-    const isComplete = digits.every((digit) => digit !== "");
-    if (isComplete) {
-      handleVerifyEmail();
-    }
-  }, [digits, handleVerifyEmail]);
-
-  const handleChange = (index: number, value: string) => {
-    if (/^\d*$/.test(value)) {
-      const newDigits = [...digits];
-      newDigits[index] = value;
-      setDigits(newDigits);
-
-      // Move to next input if a digit was entered and there's space
-      if (value && index < 5) {
-        setActiveIndex(index + 1);
-        setTimeout(() => inputRefs.current[index + 1]?.focus(), 10);
-      }
-    }
-  };
-
-  const handleKeyDown = (
-    index: number,
-    e: React.KeyboardEvent<HTMLInputElement>
-  ) => {
-    if (e.key === "Backspace" && !digits[index] && index > 0) {
-      // Move to previous input on backspace if current is empty
-      setActiveIndex(index - 1);
-      setTimeout(() => inputRefs.current[index - 1]?.focus(), 10);
-    }
-  };
-
-  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
-    e.preventDefault();
-    const pasteData = e.clipboardData.getData("text/plain").slice(0, 6);
-    if (/^\d+$/.test(pasteData)) {
-      const newDigits = [...digits];
-      for (let i = 0; i < pasteData.length && i < 6; i++) {
-        newDigits[i] = pasteData[i];
-      }
-      setDigits(newDigits);
-      const lastFilledIndex = Math.min(pasteData.length - 1, 5);
-      setActiveIndex(lastFilledIndex);
-      setTimeout(() => inputRefs.current[lastFilledIndex]?.focus(), 10);
     }
   };
 
@@ -170,7 +171,7 @@ function VerificationContent() {
             </div>
 
             <p className="font-inter text-center text-[#080a0b] text-base font-medium leading-6 mb-6">
-              {" Can't find your code? Check your spam folder."}
+            {" Can't find your code? Check your spam folder."}
             </p>
           </>
         )}

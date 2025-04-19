@@ -8,11 +8,13 @@ import {
   Headers,
   HttpStatus,
   HttpException,
+  Patch,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { CreateUserDto } from './dto/create-user-dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { UpdateUserDto } from '@/users/dto/update-user-dto';
 
 @Controller('auth')
 export class AuthController {
@@ -121,5 +123,21 @@ export class AuthController {
         status: 401,
       };
     }
+  }
+
+  @UseGuards(JwtAuthGuard) // Protect this route with JWT authentication
+  @Patch('update_user')
+  async updateUser(@Request() req, @Body() updateUserDto: UpdateUserDto) {
+    console.log('fetched', updateUserDto);
+    const userId = req.user?.userId;
+    const updatedUser = await this.authService.updateUser(
+      userId,
+      updateUserDto,
+    );
+    return {
+      message: 'User updated successfully',
+      status: 200,
+      result: updatedUser,
+    };
   }
 }

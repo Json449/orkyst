@@ -18,6 +18,7 @@ const auth_service_1 = require("./auth.service");
 const local_auth_guard_1 = require("./guards/local-auth.guard");
 const create_user_dto_1 = require("./dto/create-user-dto");
 const jwt_auth_guard_1 = require("./guards/jwt-auth.guard");
+const update_user_dto_1 = require("../users/dto/update-user-dto");
 let AuthController = class AuthController {
     constructor(authService) {
         this.authService = authService;
@@ -105,6 +106,16 @@ let AuthController = class AuthController {
             };
         }
     }
+    async updateUser(req, updateUserDto) {
+        console.log('fetched', updateUserDto);
+        const userId = req.user?.userId;
+        const updatedUser = await this.authService.updateUser(userId, updateUserDto);
+        return {
+            message: 'User updated successfully',
+            status: 200,
+            result: updatedUser,
+        };
+    }
 };
 exports.AuthController = AuthController;
 __decorate([
@@ -138,6 +149,15 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "refreshToken", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.Patch)('update_user'),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, update_user_dto_1.UpdateUserDto]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "updateUser", null);
 exports.AuthController = AuthController = __decorate([
     (0, common_1.Controller)('auth'),
     __metadata("design:paramtypes", [auth_service_1.AuthService])

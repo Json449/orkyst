@@ -52,8 +52,8 @@ export const useCalendarDetails = () => {
       }
       return res.json();
     },
-    onSuccess: (response) => {
-      queryClient.setQueryData(["calendar", response?.data?._id], response); // Cache the response
+    onSuccess: (response, calendarId) => {
+      queryClient.setQueryData(["calendar", calendarId], response); // Cache the response
     },
     onError: (error) => {
       console.error("Error fetching calendar details:", error);

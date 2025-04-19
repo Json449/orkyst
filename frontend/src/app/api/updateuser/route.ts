@@ -16,7 +16,7 @@ export async function POST(request: Request) {
       );
     }
     delete body.access_token;
-    const url = `${process.env.BASE_URL}/users/update`;
+    const url = `${process.env.BASE_URL}/auth/update_user`;
 
     // Make the PATCH request with Authorization header
     const rawResponse = await axios.patch(url, body, {
@@ -25,11 +25,16 @@ export async function POST(request: Request) {
         "Content-Type": "application/json",
       },
     });
-
     const { data, status } = rawResponse;
-    _cookies.set("access_token", data?.result, {
-      maxAge: 30 * 86400, // Same expiration as the session
-      // httpOnly: true, // Ensure the cookie is not accessible from JavaScript for security
+    console.log(
+      "yahooo now update user check",
+      data?.result,
+      data?.result.access_token
+    );
+    _cookies.set("access_token", data?.result.access_token, {
+      maxAge: 30 * 86400,
+      path: "/",
+      sameSite: "strict",
     });
 
     return NextResponse.json({ success: true, data }, { status });

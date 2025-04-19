@@ -58,4 +58,5 @@ export interface UserDocument extends Document {
     isVerified?: boolean;
     createdAt?: Date;
     updatedAt?: Date;
+    access_token?: string;
 }

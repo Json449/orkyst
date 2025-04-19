@@ -143,7 +143,7 @@ export default function LoginForm() {
           <div
             className={`${errors ? "block" : "hidden"} text-center m-auto py-3`}
           >
-            <p className="text-sm text-red-600">Invalid Email and Password</p>
+            <p className="text-sm text-red-600">Please check your Username or Password</p>
           </div>
           <button
             className="text-base rounded-xl w-full p-3.5 font-medium bg-primary text-white"

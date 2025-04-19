@@ -9,6 +9,8 @@ import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcrypt';
 import { CreateUserDto } from './dto/create-user-dto';
+import { UpdateUserDto } from '@/users/dto/update-user-dto';
+import { UserDocument } from '@/users/schemas/user.schema';
 
 @Injectable()
 export class AuthService {
@@ -72,7 +74,6 @@ export class AuthService {
       secret: 'your_secret_key', // Ensure this matches the secret in the strategy
       expiresIn: '2h', // Access token expires in 2 hours
     });
-
     return {
       result: { access_token: accessToken }, // Return the access token
       status: 201, // Status code for successful creation
@@ -88,7 +89,6 @@ export class AuthService {
       if (!currentUser) {
         throw new HttpException('User not found', HttpStatus.NOT_FOUND);
       }
-
       // Check if code matches
       if (code !== currentUser.verificationCode) {
         throw new HttpException(
@@ -139,5 +139,19 @@ export class AuthService {
     } catch (error) {
       throw new UnauthorizedException('Invalid refresh token');
     }
+  }
+
+  async updateUser(
+    userId: string,
+    updateUserDto: Partial<UpdateUserDto>,
+  ): Promise<UserDocument> {
+    const user = await this.usersService.updateUser(userId, updateUserDto);
+    const payload = { email: user.email, sub: user._id }; // JWT payload
+    const accessToken = this.jwtService.sign(payload, {
+      secret: 'your_secret_key', // Ensure this matches the secret in the strategy
+      expiresIn: '2h', // Access token expires in 2 hours
+    });
+    const result: any = { ...user, access_token: accessToken };
+    return result;
   }
 }
