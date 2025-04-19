@@ -39,7 +39,7 @@ function FormData() {
       });
 
       const result = await response.json();
-
+      console.log("check now", result);
       if (result.success) {
         router.replace("/dashboard");
       } else {
@@ -47,7 +47,7 @@ function FormData() {
       }
     } catch (error: any) {
       console.log("err", error);
-      setErrors("An unexpected error occurred");
+      setErrors(error);
     } finally {
       setIsLoading(false);
     }
