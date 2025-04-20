@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
 import axios from "axios";
-import { cookies } from "next/headers";
+// import { cookies } from "next/headers";
 
 export async function POST(request: Request) {
   try {
     const body = await request.json(); // Get request body
     // Retrieve the access token from cookies
     const access_token = body.access_token;
-    const _cookies = await cookies();
+    // const _cookies = await cookies();
 
     if (!access_token.access_token) {
       return NextResponse.json(

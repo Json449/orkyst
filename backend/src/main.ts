@@ -22,7 +22,7 @@ async function bootstrap() {
   });
 
   // Your existing configuration
-  app.setGlobalPrefix('backend');
+  app.setGlobalPrefix('api');
   app.use(cookieParser());
   app.use(express.json({ limit: '50mb' }));
   app.use(express.urlencoded({ limit: '50mb', extended: true }));
