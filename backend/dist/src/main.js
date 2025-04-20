@@ -19,7 +19,7 @@ async function bootstrap() {
         preflightContinue: false,
         optionsSuccessStatus: 204,
     });
-    app.setGlobalPrefix('api');
+    app.setGlobalPrefix('backend');
     app.use(cookieParser());
     app.use(express.json({ limit: '50mb' }));
     app.use(express.urlencoded({ limit: '50mb', extended: true }));
@@ -30,7 +30,7 @@ async function bootstrap() {
     }));
     const port = process.env.PORT || 3000;
     await app.listen(port);
-    console.log(`Application is running on: http://localhost:${port}/api`);
+    console.log(`Application is running on: http://localhost:${port}/backend`);
 }
 bootstrap();
 //# sourceMappingURL=main.js.map
