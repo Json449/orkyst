@@ -4,39 +4,52 @@ import { CollaboratorDocument } from './collaborator.schema';
 
 const CalendarInputsSchema = new mongoose.Schema(
   {
-    category: {
+    whoIsThisFor: {
       type: String,
       default: '',
     },
-    audience: {
+    businessType: {
       type: String,
       default: '',
     },
-    theme: {
+    targetAudience: {
       type: String,
       default: '',
     },
-    contentTypes: {
-      type: String,
-      default: '',
+    marketingGoals: {
+      type: [String],
+      default: [],
     },
-    posting: {
-      type: String,
-      default: '',
+    domains: {
+      type: [String],
+      default: [],
+    },
+    postingFrequency: {
+      type: [String],
+      default: [],
+    },
+    preferredContentType: {
+      type: [String],
+      default: [],
     },
   },
   { _id: false },
 );
 
+// Update your CalendarSchema to match your data structure
 export const CalendarSchema = new mongoose.Schema(
   {
     month: {
       type: String,
       required: true,
     },
+    contentStrategy: {
+      type: String,
+      default: '',
+    },
     theme: {
       type: String,
-      required: true,
+      default: '',
     },
     events: [
       {
@@ -71,16 +84,19 @@ export const CalendarSchema = new mongoose.Schema(
 );
 
 export interface ICalendarInputs {
-  category?: string;
-  audience?: string;
-  theme?: string;
-  contentTypes?: string;
-  posting?: string;
+  whoIsThisFor?: string;
+  businessType?: string;
+  targetAudience?: string;
+  marketingGoals?: string[];
+  domains?: string[];
+  postingFrequency?: string[];
+  preferredContentType?: string[];
 }
 
 export interface CalendarDocument extends Document {
   month: string;
-  theme: string;
+  contentStrategy: string;
+  theme: string; // Changed from 'theme'
   events: mongoose.Types.ObjectId[];
   suggestions?: string;
   collaborators: CollaboratorDocument[] | mongoose.Types.ObjectId[];

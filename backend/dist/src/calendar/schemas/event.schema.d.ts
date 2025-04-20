@@ -10,10 +10,10 @@ export declare const EventSchema: mongoose.Schema<any, mongoose.Model<any, any, 
     date: NativeDate;
     type: string;
     version: number;
-    theme: string;
     calendarId: mongoose.Types.ObjectId;
     title: string;
     audienceFocus: string;
+    theme: string;
     feedback: mongoose.Types.ObjectId[];
     versionHistory: mongoose.Types.ObjectId[];
     description?: string | null | undefined;
@@ -25,10 +25,10 @@ export declare const EventSchema: mongoose.Schema<any, mongoose.Model<any, any, 
     date: NativeDate;
     type: string;
     version: number;
-    theme: string;
     calendarId: mongoose.Types.ObjectId;
     title: string;
     audienceFocus: string;
+    theme: string;
     feedback: mongoose.Types.ObjectId[];
     versionHistory: mongoose.Types.ObjectId[];
     description?: string | null | undefined;
@@ -40,10 +40,10 @@ export declare const EventSchema: mongoose.Schema<any, mongoose.Model<any, any, 
     date: NativeDate;
     type: string;
     version: number;
-    theme: string;
     calendarId: mongoose.Types.ObjectId;
     title: string;
     audienceFocus: string;
+    theme: string;
     feedback: mongoose.Types.ObjectId[];
     versionHistory: mongoose.Types.ObjectId[];
     description?: string | null | undefined;

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.imageGenerationPrompt = exports.calendarSuggestionPrompt = exports.eventSuggestionPrompt = exports.generateCalendarPrompt = exports.defaultPrompt = exports.linkedInPrompt = exports.blogPostPrompt = exports.twitterPrompt = void 0;
+exports.imageGenerationPrompt = exports.calendarSuggestionPrompt = exports.eventSuggestionPrompt = exports.generateCalendarPrompt = exports.generateAdvancedCalendarPrompt = exports.defaultPrompt = exports.linkedInPrompt = exports.blogPostPrompt = exports.twitterPrompt = void 0;
 const twitterPrompt = (title, audienceFocus, theme, date) => {
     return `
       You are tasked with creating a concise and engaging Twitter post titled *"${title}"*. The post should educate and inspire ${audienceFocus} about the benefits and relevance of ${theme}. The content must be tailored to Twitter's platform, focusing on brevity, hashtags, mentions, and a strong call-to-action. Ensure the following:
@@ -204,67 +204,176 @@ Here is the input data:
 `;
 };
 exports.defaultPrompt = defaultPrompt;
+const generateAdvancedCalendarPrompt = (input, currentMonth, currentYear) => {
+    return `
+    You are a **world-class content strategist and calendar planning expert**. Based on the user's detailed inputs, generate a **highly-targeted content calendar** for ${currentMonth} ${currentYear} with **engaging, platform-optimized content ideas**. Here are the user's specifications:
+    
+    ### Business Profile:
+    1. **Who is this for?** 
+       ${input.whoIsThisFor || 'Not specified'}
+    
+    2. **Business Type:** 
+       ${input.businessType || 'Not specified'}
+    
+    3. **Target Audience:** 
+       ${input.targetAudience || 'Not specified'}
+    
+    ### Marketing Strategy:
+    4. **Primary Marketing Goals:** 
+       ${input.marketingGoals?.join(', ') || 'Not specified'}
+    
+    5. **Content Platforms:** 
+       ${input.domains?.join(', ') || 'Not specified'}
+    
+    6. **Posting Frequency:** 
+       ${input.postingFrequency?.join(', ') || 'Not specified'}
+    
+    7. **Preferred Content Types:** 
+       ${input.preferredContentType?.join(', ') || 'Not specified'}
+    
+    ### Content Strategy Framework:
+    Develop content themes that combine:
+    - **Business objectives** with **audience needs**
+    - **Platform best practices** for each specified channel
+    - **Cultural relevance** based on audience location
+    - **Seasonal opportunities** for ${currentMonth}
+    
+    For each content piece, consider:
+    1. **Platform-Specific Optimization**:
+       - LinkedIn: Professional tone, industry insights
+       - Facebook: Community-focused, shareable content
+       - Instagram: Visual storytelling, reels/carousel posts
+       - Blog Articles: SEO-optimized, long-form value
+    
+    2. **Content Pillars** (based on marketing goals):
+       ${input.marketingGoals?.map((goal) => `- ${goal}: ${getContentApproach(goal)}`).join('\n   ') || 'Not specified'}
+    
+    3. **Posting Rhythm**:
+       - Light (1-2x/week): Focus on high-impact pieces
+       - Medium (3-4x/week): Mix of educational and promotional
+       - Heavy (5+x/week): Include engagement-focused quick content
+    
+    ### Content Generation Guidelines:
+    Create a detailed calendar with:
+    - **Platform-specific** content tailored to each channel's strengths
+    - **Goal-aligned** posts that drive measurable results
+    - **Audience-centric** messaging that resonates
+    - **Varied formats** to maintain engagement
+    
+    For each content piece include:
+    1. **Title**: Platform-optimized, attention-grabbing (include emojis where appropriate)
+    2. **Date**: In "YYYY-MM-DD" format with logical spacing between posts
+    3. **Platform**: Specific platform with content type (e.g., "LinkedIn carousel")
+    4. **Content Focus**: Primary goal this addresses
+    5. **Key Message**: Core value proposition
+    6. **Suggested Visuals**: Type of media to use
+    7. **Call-to-Action**: Clear next step for audience
+
+    - Format the output as a structured JSON object.
+    ### Output Requirements:
+    {
+      "month": "${currentMonth}-${currentYear}",
+      "contentStrategy": "[Brief overview of the monthly strategy]",
+      "theme": "[Primary Theme (Regional Focus)]",
+      "events": [
+        {
+          "title": "[Platform-specific optimized title]",
+          "date": "YYYY-MM-DD",
+          "type": "[Event Type]",
+          "audienceFocus": "[Primary marketing goal addressed]",
+          "theme": "[Core value proposition]",
+        }
+      ],
+    }
+    
+    ### Special Considerations:
+    - For B2B: Focus on thought leadership and case studies
+    - For B2C: Emphasize benefits and emotional connection
+    - Blend educational, promotional, and engagement content as specified
+    - Maintain consistent branding across all platforms
+    `;
+    function getContentApproach(goal) {
+        const approaches = {
+            'Increase Brand awareness': 'Storytelling, viral hooks, shareable content',
+            'Generate more leads': 'Lead magnets, gated content, strong CTAs',
+            'Increase social media engagement': 'Polls, questions, UGC prompts',
+            'Boost sales/conversions': 'Product highlights, testimonials, offers',
+            'Improve customers retention': 'Loyalty content, how-tos, community building',
+        };
+        return approaches[goal] || 'Content that aligns with this objective';
+    }
+};
+exports.generateAdvancedCalendarPrompt = generateAdvancedCalendarPrompt;
 const generateCalendarPrompt = (input, currentMonth, currentYear) => {
     return `
-You are a **creative content strategist and calendar planning assistant**. Based on the user's input, generate a **detailed content calendar** for the current month (${currentMonth}-${currentYear}) with **precise, engaging, and high-impact event titles**. Here are the user's answers:
-
-1. **Are you creating this content calendar for a company, personal brand, or another initiative?**
-   Answer: ${input.category}
-
-2. **What region is your audience located in, and are there any holidays or events this month you’d like to highlight?**
-   Answer: ${input.audience}
-
-3. **What is the primary theme or message you want to emphasize this month?**
-   Answer: **[INTERACTIVE THEME GENERATION WITH REGIONAL RELEVANCE]**  
-   To help you define a **unique and impactful theme**, please consider the following prompts:
-   - **Emotionally Driven**: How do you want your audience to feel after seeing your content? (e.g., excited, motivated, inspired, curious)
-   - **Challenge or Opportunity**: Is there a current trend or challenge your audience is facing in the **Middle East, US, or Europe** that you can address? Or, is there an opportunity you're providing that can help them solve a problem or meet a goal?
-   - **Connection with Audience**: What kind of relationship do you want to build with your audience through your content? Do you want them to see you as an expert, a friend, a guide, or an advocate for their journey? (Consider regional nuances in communication style and needs)
-   - **Seasonal or Time-Sensitive**: Is your theme related to a specific season, holiday, or time-bound event in the **Middle East, US, or Europe**? For example, Ramadan in the Middle East, Back-to-School in the US, or Summer Festivals in Europe?
-   - **Cultural Relevance**: How does your theme align with the cultural norms, values, or current issues in the region? For example, AI adoption in SMBs in the US or the impact of AI on businesses in the Middle East.
-   Answer with a **theme** that resonates deeply with the **specific region's mood, challenges, and opportunities**.
-
-4. **What types of content do you prefer to post? (e.g., Blog Post, LinkedIn Post, Twitter Post etc.)**
-   Answer: ${input.contentTypes}
-
-5. **How often would you like to post? (e.g., daily, three times a week, or specific days)?**
-   Answer: ${input.posting}
-
-### **Instructions:**
-- Generate a **detailed content calendar** for the current month (${currentMonth}-${currentYear}).
-- Ensure the **title is highly engaging, precise, and impactful** by following these guidelines:
-  - **Attention-Grabbing**: Use strong, emotionally engaging words relevant to the **target region**.
-  - **Concise Yet Meaningful**: Keep it short but informative and regionally tailored.
-  - **Optimized for SEO & Social Sharing**: Ensure it resonates with the audience's needs in the **Middle East, US, or Europe**.
-  - **Formatted for Maximum Impact**: Use power words, numbers, or thought-provoking questions where relevant to the cultural context of the region.
-
-- **For each post, include:**
-  - **Title**: A compelling and optimized title for the event or post (e.g., "The Ultimate Guide to Ramadan Reflection: How to Make the Most of the Holy Month" for the Middle East, or "Leveraging AI for SMB Growth: U.S. Market Insights" for the US).
-  - **Date**: The specific date for the event in "YYYY-MM-DD" format.
-  - **Type**: The type of content (e.g., blog post, LinkedIn post, Twitter post, Instagram reel, YouTube video, podcast, etc.).
-  - **Audience Focus**: The region or audience to target (Middle East, US, Europe).
-  - **Theme**: The primary theme or message for the event, considering the cultural nuances and regional relevance.
-
-### **Additional Rules:**
-- Ensure that the **titles are unique, thought-provoking, and engaging** for the **specified region**.
-- Maintain the **posting frequency** according to the user’s preference.
-- Format the output as a structured JSON object.
-
-### **Output Format:**
-{
-  "month": "[Month and Year]",
-  "theme": "[Primary Theme (Regional Focus)]",
-  "events": [
-    {
-      "title": "[Highly Engaging & Optimized Event Title (with Regional Focus)]",
-      "date": "[YYYY-MM-DD]",
-      "type": "[Event Type]",
-      "audienceFocus": "[Audience Region]",
-      "theme": "[Event Theme]"
-    }
-  ]
-}
-`;
+ You are a **creative content strategist and calendar planning assistant**. Based on the user's input, generate a **detailed content calendar** for the current month (${currentMonth}-${currentYear}) with **precise, engaging, and high-impact event titles**. Here are the user's answers:
+ 
+ 1. **Are you creating this content calendar for a company, personal brand, or another initiative?**
+    Answer: ${input.whoIsThisFor}
+ 
+ 2. **What is the business type?**
+    Answer: ${input.businessType}
+ 
+ 3. **What region is your audience located in, and are there any holidays or events this month you’d like to highlight?**
+    Answer: ${input.targetAudience}
+ 
+ 4. **What is the primary theme or message you want to emphasize this month?**
+    Answer: **[INTERACTIVE THEME GENERATION WITH REGIONAL RELEVANCE]**  
+    To help you define a **unique and impactful theme**, please consider the following prompts:
+    - **Emotionally Driven**: How do you want your audience to feel after seeing your content? (e.g., excited, motivated, inspired, curious)
+    - **Challenge or Opportunity**: Is there a current trend or challenge your audience is facing in the **Middle East, US, or Europe** that you can address? Or, is there an opportunity you're providing that can help them solve a problem or meet a goal?
+    - **Connection with Audience**: What kind of relationship do you want to build with your audience through your content? Do you want them to see you as an expert, a friend, a guide, or an advocate for their journey? (Consider regional nuances in communication style and needs)
+    - **Seasonal or Time-Sensitive**: Is your theme related to a specific season, holiday, or time-bound event in the **Middle East, US, or Europe**? For example, Ramadan in the Middle East, Back-to-School in the US, or Summer Festivals in Europe?
+    - **Cultural Relevance**: How does your theme align with the cultural norms, values, or current issues in the region? For example, AI adoption in SMBs in the US or the impact of AI on businesses in the Middle East.
+    Answer with a **theme** that resonates deeply with the **specific region's mood, challenges, and opportunities**.
+ 
+ 5. **What types of content do you prefer to post? **
+    Answer: ${input.domains?.join(', ')}
+ 
+ 6. **How often would you like to post? **
+    Answer: ${input.postingFrequency?.join(', ')}
+ 
+ 7. **What are your primary marketing goals?**
+    Answer: ${input.marketingGoals?.join(', ')}
+ 
+ 8. **What types of content do you prefer to create?**
+    Answer: ${input.preferredContentType?.join(', ')}
+ 
+ ### **Instructions:**
+ - Generate a **detailed content calendar** for the current month (${currentMonth}-${currentYear}).
+ - Ensure the **title is highly engaging, precise, and impactful** by following these guidelines:
+   - **Attention-Grabbing**: Use strong, emotionally engaging words relevant to the **target region**.
+   - **Concise Yet Meaningful**: Keep it short but informative and regionally tailored.
+   - **Optimized for SEO & Social Sharing**: Ensure it resonates with the audience's needs in the **Middle East, US, or Europe**.
+   - **Formatted for Maximum Impact**: Use power words, numbers, or thought-provoking questions where relevant to the cultural context of the region.
+ 
+ - **For each post, include:**
+   - **Title**: A compelling and optimized title for the event or post (e.g., "The Ultimate Guide to Ramadan Reflection: How to Make the Most of the Holy Month" for the Middle East, or "Leveraging AI for SMB Growth: U.S. Market Insights" for the US).(include emojis where appropriate)
+   - **Date**: The specific date for the event in "YYYY-MM-DD" format.
+   - **Type**: The type of content (e.g., blog post, LinkedIn post, Twitter post, Instagram reel, YouTube video, podcast, etc.).
+   - **Audience Focus**: The region or audience to target (Middle East, US, Europe).
+   - **Theme**: The primary theme or message for the event, considering the cultural nuances and regional relevance.
+ 
+ ### **Additional Rules:**
+ - Ensure that the **titles are unique, thought-provoking, and engaging** for the **specified region**.
+ - Maintain the **posting frequency** according to the user’s preference.
+ - Format the output as a structured JSON object.
+ 
+ ### **Output Format:**
+ {
+   "month": "[Month and Year]",
+   "theme": "[Primary Theme (Regional Focus)]",
+   "events": [
+     {
+       "title": "[Highly Engaging & Optimized Event Title (with Regional Focus)]",
+       "date": "[YYYY-MM-DD]",
+       "type": "[Event Type]",
+       "audienceFocus": "[Audience Region]",
+       "theme": "[Event Theme]"
+     }
+   ]
+ }
+ `;
 };
 exports.generateCalendarPrompt = generateCalendarPrompt;
 const eventSuggestionPrompt = (event) => {

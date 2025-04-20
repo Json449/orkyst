@@ -14,6 +14,7 @@ import {
   calendarSuggestionPrompt,
   defaultPrompt,
   eventSuggestionPrompt,
+  generateAdvancedCalendarPrompt,
   generateCalendarPrompt,
   imageGenerationPrompt,
   linkedInPrompt,
@@ -193,7 +194,6 @@ export class CalendarService {
         max_tokens: 3000, // Increase token limit for more detailed responses
         temperature: 0.5, // Lower temperature for more focused and precise responses
       });
-
       // Parse the OpenAI response into a JavaScript object
       const fixedJson = jsonrepair(response?.choices[0]?.message?.content);
       let calendarData: any;
@@ -202,7 +202,7 @@ export class CalendarService {
       } catch (parseError) {
         throw new Error('Failed to parse OpenAI response');
       }
-
+      console.log('view snoww', calendarData);
       // Validate the received calendar data
       if (
         !calendarData.month ||

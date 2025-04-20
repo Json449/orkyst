@@ -56,6 +56,7 @@ const transformDataForCalendar = (data?: Event[]): CalendarEvent[] => {
   if (!data) return [];
 
   return data.map((event) => {
+    console.log("daya", event);
     // Validate the date string before creating Date objects
     const date = new Date(event.date);
     if (isNaN(date.getTime())) {

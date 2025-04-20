@@ -15,30 +15,44 @@ const class_transformer_1 = require("class-transformer");
 class CalendarInputsDto {
 }
 __decorate([
-    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
-], CalendarInputsDto.prototype, "category", void 0);
+], CalendarInputsDto.prototype, "whoIsThisFor", void 0);
 __decorate([
-    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
-], CalendarInputsDto.prototype, "audience", void 0);
+], CalendarInputsDto.prototype, "businessType", void 0);
 __decorate([
-    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
-], CalendarInputsDto.prototype, "theme", void 0);
+], CalendarInputsDto.prototype, "targetAudience", void 0);
 __decorate([
-    (0, class_validator_1.IsNotEmpty)(),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
-], CalendarInputsDto.prototype, "contentTypes", void 0);
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsArray)(),
+    (0, class_validator_1.IsString)({ each: true }),
+    __metadata("design:type", Array)
+], CalendarInputsDto.prototype, "marketingGoals", void 0);
 __decorate([
-    (0, class_validator_1.IsNotEmpty)(),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
-], CalendarInputsDto.prototype, "posting", void 0);
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsArray)(),
+    (0, class_validator_1.IsString)({ each: true }),
+    __metadata("design:type", Array)
+], CalendarInputsDto.prototype, "domains", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsArray)(),
+    (0, class_validator_1.IsString)({ each: true }),
+    __metadata("design:type", Array)
+], CalendarInputsDto.prototype, "postingFrequency", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsArray)(),
+    (0, class_validator_1.IsString)({ each: true }),
+    __metadata("design:type", Array)
+], CalendarInputsDto.prototype, "preferredContentType", void 0);
 class UpdateUserDto {
 }
 exports.UpdateUserDto = UpdateUserDto;
@@ -48,7 +62,7 @@ __decorate([
     __metadata("design:type", String)
 ], UpdateUserDto.prototype, "userId", void 0);
 __decorate([
-    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsObject)(),
     (0, class_validator_1.ValidateNested)(),
     (0, class_transformer_1.Type)(() => CalendarInputsDto),

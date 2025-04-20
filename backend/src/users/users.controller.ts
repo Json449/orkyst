@@ -26,4 +26,20 @@ export class UsersController {
       status: 200,
     };
   }
+
+  @UseGuards(JwtAuthGuard) // Protect this route with JWT authentication
+  @Patch('update_user')
+  async updateUser(@Request() req, @Body() updateUserDto: UpdateUserDto) {
+    console.log('fetched', updateUserDto);
+    const userId = req.user?.userId;
+    const updatedUser = await this.usersService.updateUser(
+      userId,
+      updateUserDto,
+    );
+    return {
+      message: 'User updated successfully',
+      status: 200,
+      result: updatedUser,
+    };
+  }
 }

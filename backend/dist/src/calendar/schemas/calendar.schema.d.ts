@@ -13,52 +13,61 @@ export declare const CalendarSchema: mongoose.Schema<any, mongoose.Model<any, an
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    userId: mongoose.Types.ObjectId;
-    theme: string;
-    calendarInputs: {
-        category: string;
-        audience: string;
-        theme: string;
-        contentTypes: string;
-        posting: string;
-    };
     month: string;
+    contentStrategy: string;
+    theme: string;
     events: mongoose.Types.ObjectId[];
     collaborators: mongoose.Types.ObjectId[];
+    userId: mongoose.Types.ObjectId;
+    calendarInputs: {
+        whoIsThisFor: string;
+        businessType: string;
+        targetAudience: string;
+        marketingGoals: string[];
+        domains: string[];
+        postingFrequency: string[];
+        preferredContentType: string[];
+    };
     suggestions?: string | null | undefined;
 }, mongoose.Document<unknown, {}, mongoose.FlatRecord<{
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    userId: mongoose.Types.ObjectId;
-    theme: string;
-    calendarInputs: {
-        category: string;
-        audience: string;
-        theme: string;
-        contentTypes: string;
-        posting: string;
-    };
     month: string;
+    contentStrategy: string;
+    theme: string;
     events: mongoose.Types.ObjectId[];
     collaborators: mongoose.Types.ObjectId[];
+    userId: mongoose.Types.ObjectId;
+    calendarInputs: {
+        whoIsThisFor: string;
+        businessType: string;
+        targetAudience: string;
+        marketingGoals: string[];
+        domains: string[];
+        postingFrequency: string[];
+        preferredContentType: string[];
+    };
     suggestions?: string | null | undefined;
 }>> & mongoose.FlatRecord<{
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    userId: mongoose.Types.ObjectId;
-    theme: string;
-    calendarInputs: {
-        category: string;
-        audience: string;
-        theme: string;
-        contentTypes: string;
-        posting: string;
-    };
     month: string;
+    contentStrategy: string;
+    theme: string;
     events: mongoose.Types.ObjectId[];
     collaborators: mongoose.Types.ObjectId[];
+    userId: mongoose.Types.ObjectId;
+    calendarInputs: {
+        whoIsThisFor: string;
+        businessType: string;
+        targetAudience: string;
+        marketingGoals: string[];
+        domains: string[];
+        postingFrequency: string[];
+        preferredContentType: string[];
+    };
     suggestions?: string | null | undefined;
 }> & {
     _id: mongoose.Types.ObjectId;
@@ -66,14 +75,17 @@ export declare const CalendarSchema: mongoose.Schema<any, mongoose.Model<any, an
     __v: number;
 }>;
 export interface ICalendarInputs {
-    category?: string;
-    audience?: string;
-    theme?: string;
-    contentTypes?: string;
-    posting?: string;
+    whoIsThisFor?: string;
+    businessType?: string;
+    targetAudience?: string;
+    marketingGoals?: string[];
+    domains?: string[];
+    postingFrequency?: string[];
+    preferredContentType?: string[];
 }
 export interface CalendarDocument extends Document {
     month: string;
+    contentStrategy: string;
     theme: string;
     events: mongoose.Types.ObjectId[];
     suggestions?: string;

@@ -105,13 +105,7 @@ let AuthService = class AuthService {
     }
     async updateUser(userId, updateUserDto) {
         const user = await this.usersService.updateUser(userId, updateUserDto);
-        const payload = { email: user.email, sub: user._id };
-        const accessToken = this.jwtService.sign(payload, {
-            secret: 'your_secret_key',
-            expiresIn: '2h',
-        });
-        const result = { ...user, access_token: accessToken };
-        return result;
+        return user.save();
     }
 };
 exports.AuthService = AuthService;

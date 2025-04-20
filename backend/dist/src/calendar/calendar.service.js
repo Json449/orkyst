@@ -200,6 +200,7 @@ let CalendarService = class CalendarService {
             catch (parseError) {
                 throw new Error('Failed to parse OpenAI response');
             }
+            console.log('view snoww', calendarData);
             if (!calendarData.month ||
                 !calendarData.theme ||
                 !Array.isArray(calendarData.events)) {

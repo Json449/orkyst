@@ -3,25 +3,33 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Calendar = exports.CalendarSchema = void 0;
 const mongoose = require("mongoose");
 const CalendarInputsSchema = new mongoose.Schema({
-    category: {
+    whoIsThisFor: {
         type: String,
         default: '',
     },
-    audience: {
+    businessType: {
         type: String,
         default: '',
     },
-    theme: {
+    targetAudience: {
         type: String,
         default: '',
     },
-    contentTypes: {
-        type: String,
-        default: '',
+    marketingGoals: {
+        type: [String],
+        default: [],
     },
-    posting: {
-        type: String,
-        default: '',
+    domains: {
+        type: [String],
+        default: [],
+    },
+    postingFrequency: {
+        type: [String],
+        default: [],
+    },
+    preferredContentType: {
+        type: [String],
+        default: [],
     },
 }, { _id: false });
 exports.CalendarSchema = new mongoose.Schema({
@@ -29,9 +37,13 @@ exports.CalendarSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    contentStrategy: {
+        type: String,
+        default: '',
+    },
     theme: {
         type: String,
-        required: true,
+        default: '',
     },
     events: [
         {

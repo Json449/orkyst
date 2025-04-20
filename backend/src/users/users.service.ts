@@ -64,10 +64,11 @@ export class UsersService {
     if (!user) {
       throw new NotFoundException(`User with ID ${userId} not found`);
     }
-    await this.calendarService.generateCalendar(
+    const result = await this.calendarService.generateCalendar(
       updateUserDto.calendarInputs,
       userId,
     );
+    console.log('check now', result);
     return await user.save();
   }
 }

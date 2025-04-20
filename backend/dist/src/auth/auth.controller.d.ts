@@ -1,7 +1,6 @@
 import { HttpStatus } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/create-user-dto';
-import { UpdateUserDto } from '@/users/dto/update-user-dto';
 export declare class AuthController {
     private readonly authService;
     constructor(authService: AuthService);
@@ -34,10 +33,5 @@ export declare class AuthController {
     } | {
         result: string;
         status: number;
-    }>;
-    updateUser(req: any, updateUserDto: UpdateUserDto): Promise<{
-        message: string;
-        status: number;
-        result: import("../users/schemas/user.schema").UserDocument;
     }>;
 }

@@ -146,12 +146,6 @@ export class AuthService {
     updateUserDto: Partial<UpdateUserDto>,
   ): Promise<UserDocument> {
     const user = await this.usersService.updateUser(userId, updateUserDto);
-    const payload = { email: user.email, sub: user._id }; // JWT payload
-    const accessToken = this.jwtService.sign(payload, {
-      secret: 'your_secret_key', // Ensure this matches the secret in the strategy
-      expiresIn: '2h', // Access token expires in 2 hours
-    });
-    const result: any = { ...user, access_token: accessToken };
-    return result;
+    return user.save();
   }
 }

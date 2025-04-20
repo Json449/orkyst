@@ -2,32 +2,44 @@
 import {
   IsOptional,
   IsString,
-  IsNotEmpty,
   IsObject,
   ValidateNested,
+  IsArray,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
 class CalendarInputsDto {
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  category: string;
+  whoIsThisFor?: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  audience: string;
+  businessType?: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  theme: string;
+  targetAudience?: string;
 
-  @IsNotEmpty()
-  @IsString()
-  contentTypes: string;
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  marketingGoals?: string[];
 
-  @IsNotEmpty()
-  @IsString()
-  posting: string;
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  domains?: string[];
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  postingFrequency?: string[];
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  preferredContentType?: string[];
 }
 
 export class UpdateUserDto {
@@ -35,9 +47,9 @@ export class UpdateUserDto {
   @IsString()
   userId?: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsObject()
   @ValidateNested()
   @Type(() => CalendarInputsDto)
-  calendarInputs: CalendarInputsDto;
+  calendarInputs?: CalendarInputsDto;
 }
