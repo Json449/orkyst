@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useCallback, Suspense } from "react";
+import { useState, useEffect, useCallback, Suspense, JSX } from "react";
 import { useSearchParams } from "next/navigation";
 import { timeAgo } from "@/utils";
 import ImageUploader from "../component/imageUploader";
@@ -11,6 +11,55 @@ import { useEventDetailsMutation } from "../hooks/useEventDetails";
 import TinyMCEEditor from "../component/TinyMiceEditor";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import {
+  LinkedIn,
+  Article,
+  Poll,
+  Videocam,
+  Event,
+  Chat,
+  Mic,
+  CameraAlt,
+  VideoLibrary,
+  X,
+} from "@mui/icons-material";
+
+const eventTypeIcons = {
+  linkedin: <LinkedIn style={{ fontSize: "44px", color: "black" }} />,
+  blog: <Article style={{ fontSize: "44px", color: "black" }} />,
+  poll: <Poll style={{ fontSize: "44px", color: "black" }} />,
+  dvc: <Videocam style={{ fontSize: "44px", color: "black" }} />,
+  social: <Chat style={{ fontSize: "44px", color: "black" }} />,
+  event: <Event style={{ fontSize: "44px", color: "black" }} />,
+  twitter: <X style={{ fontSize: "44px", color: "black" }} />,
+  podcast: <Mic style={{ fontSize: "44px", color: "black" }} />,
+  instagram: <CameraAlt style={{ fontSize: "44px", color: "black" }} />,
+  youtube: <VideoLibrary style={{ fontSize: "44px", color: "black" }} />,
+  // Add any exact match exceptions here
+  "twitter space": <X style={{ fontSize: "44px", color: "black" }} />,
+  "twitter thread": <X style={{ fontSize: "44px", color: "black" }} />,
+};
+
+const priorityOrder = [
+  "twitter", // Highest priority
+  "instagram",
+  "youtube",
+  "linkedin",
+  "podcast",
+  "blog",
+  "social",
+  "poll",
+  "dvc",
+];
+
+function formatDate(dateString) {
+  const date = new Date(dateString);
+  return date.toLocaleDateString("en-US", {
+    month: "long", // 'long' will give the full month name like "April"
+    day: "numeric",
+    year: "numeric",
+  });
+}
 
 interface Version {
   eventId: number;
@@ -362,6 +411,29 @@ function DetailForm() {
   useEffect(() => {
     setContent(eventDetails?.description ?? "");
   }, [eventDetails?.description]);
+
+  const getEventIcon = (eventType?: string): JSX.Element => {
+    if (!eventType) return eventTypeIcons.event; // Default to event icon if no eventType
+
+    const lowerType = eventType.toLowerCase();
+
+    // 1. First check for exact matches (case insensitive)
+    const exactMatch = Object.entries(eventTypeIcons).find(
+      ([key]) => key.toLowerCase() === lowerType
+    );
+    if (exactMatch) return exactMatch[1]; // Return the icon for the exact match
+
+    // 2. Check for partial matches in priority order
+    for (const key of priorityOrder) {
+      if (lowerType.includes(key)) {
+        return eventTypeIcons[key as keyof typeof eventTypeIcons]; // Assert key is one of the valid keys in eventTypeIcons
+      }
+    }
+
+    // 3. Fallback to default
+    return eventTypeIcons.event; // Return the default icon
+  };
+
   const fetchImage = useCallback(
     async (
       response: Event,
@@ -522,10 +594,6 @@ function DetailForm() {
     }
   };
 
-  if (!eventDetails) {
-    return <div> {loading && <FullScreenLoader />}</div>;
-  }
-
   const goBack = () => {
     router.replace("/dashboard");
   };
@@ -548,18 +616,25 @@ function DetailForm() {
         {loading && <FullScreenLoader />}
         <div className="flex w-full bg-white">
           <div className="w-[22%] bg-primarygrey border-r border-gray-100 flex flex-col">
-            <div className="flex gap-2 items-center px-4 py-6 text-2xl">
-              <span className="cursor-pointer" onClick={goBack}>
-                <Image
-                  alt="Version icon"
-                  src="/images/back.svg"
-                  width={19}
-                  height={38}
-                  priority
-                  className="mr-3"
-                />
+            <div className="flex gap-2 items-center justify-between px-4 py-4 text-2xl">
+              <div className="flex items-center">
+                <span className="cursor-pointer" onClick={goBack}>
+                  <Image
+                    alt="Version icon"
+                    src="/images/back.svg"
+                    width={19}
+                    height={38}
+                    priority
+                    className="mr-3"
+                  />
+                </span>
+                <span className="font-bold text-black">
+                  {eventDetails?.type}
+                </span>
+              </div>
+              <span className="flex-shrink-0">
+                {getEventIcon(eventDetails?.type)}
               </span>
-              <span className="font-bold text-black">{eventDetails?.type}</span>
             </div>
             <div className="p-4 flex bg-primary items-center justify-between mb-4">
               <h3 className="text-xl font-bold text-white flex items-center">
@@ -596,6 +671,9 @@ function DetailForm() {
               <p className="p-2 rounded-xl bg-primarygrey text-black font-bold">
                 v 1.1
               </p>
+              <p className="px-4 py-2 rounded-xl bg-primarygrey text-black font-bold">
+                {formatDate(eventDetails?.date)}
+              </p>
               <div className="flex gap-2">
                 <button className="w-[157px] h-[40px] bg-[#7a0860] text-white text-[16px] font-medium rounded-xl hover:bg-[#5c0648] transition-colors disabled:opacity-70">
                   <span className="flex items-center justify-center">
@@ -610,27 +688,30 @@ function DetailForm() {
                 </button>
               </div>
             </div>
-            {!loading && eventDetails?.type != "Blog Post" && (
-              <ImageUploader
-                generateImageLoading={generateImageLoading}
-                setImageUrl={setImageUrl}
-                imageUrl={imageUrl}
-                onGenerateAI={(prompt) =>
-                  fetchImage(eventDetails, prompt, null)
+            {!loading &&
+              !eventDetails?.type?.toLowerCase().startsWith("blog") && (
+                <ImageUploader
+                  generateImageLoading={generateImageLoading}
+                  setImageUrl={setImageUrl}
+                  imageUrl={imageUrl}
+                  onGenerateAI={(prompt) =>
+                    fetchImage(eventDetails, prompt, null)
+                  }
+                  onCloudinaryUpload={handleImageUpload}
+                />
+              )}
+            {eventDetails && (
+              <TinyMCEEditor
+                loading={loading}
+                highlightContent="In today's fast-paced digital landscape, small an"
+                handleFeedbackSubmit={(text: string, comment: string) =>
+                  handleFeedbackSubmit(text, comment)
                 }
-                onCloudinaryUpload={handleImageUpload}
+                onChangeContent={setContent}
+                value={content}
+                eventType={eventDetails?.type ?? ""}
               />
             )}
-            <TinyMCEEditor
-              loading={loading}
-              highlightContent="In today's fast-paced digital landscape, small an"
-              handleFeedbackSubmit={(text: string, comment: string) =>
-                handleFeedbackSubmit(text, comment)
-              }
-              onChangeContent={setContent}
-              value={content}
-              eventType={eventDetails?.type ?? ""}
-            />
           </div>
           <div className="w-[24%] bg-white ml-3 rounded-xl overflow-hidden">
             <div className="h-[86vh] shadow-lg flex flex-col">

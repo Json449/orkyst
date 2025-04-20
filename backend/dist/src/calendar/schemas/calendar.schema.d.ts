@@ -13,11 +13,6 @@ export declare const CalendarSchema: mongoose.Schema<any, mongoose.Model<any, an
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    month: string;
-    contentStrategy: string;
-    theme: string;
-    events: mongoose.Types.ObjectId[];
-    collaborators: mongoose.Types.ObjectId[];
     userId: mongoose.Types.ObjectId;
     calendarInputs: {
         whoIsThisFor: string;
@@ -28,16 +23,16 @@ export declare const CalendarSchema: mongoose.Schema<any, mongoose.Model<any, an
         postingFrequency: string[];
         preferredContentType: string[];
     };
+    month: string;
+    contentStrategy: string;
+    theme: string;
+    events: mongoose.Types.ObjectId[];
+    collaborators: mongoose.Types.ObjectId[];
     suggestions?: string | null | undefined;
 }, mongoose.Document<unknown, {}, mongoose.FlatRecord<{
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    month: string;
-    contentStrategy: string;
-    theme: string;
-    events: mongoose.Types.ObjectId[];
-    collaborators: mongoose.Types.ObjectId[];
     userId: mongoose.Types.ObjectId;
     calendarInputs: {
         whoIsThisFor: string;
@@ -48,16 +43,16 @@ export declare const CalendarSchema: mongoose.Schema<any, mongoose.Model<any, an
         postingFrequency: string[];
         preferredContentType: string[];
     };
+    month: string;
+    contentStrategy: string;
+    theme: string;
+    events: mongoose.Types.ObjectId[];
+    collaborators: mongoose.Types.ObjectId[];
     suggestions?: string | null | undefined;
 }>> & mongoose.FlatRecord<{
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    month: string;
-    contentStrategy: string;
-    theme: string;
-    events: mongoose.Types.ObjectId[];
-    collaborators: mongoose.Types.ObjectId[];
     userId: mongoose.Types.ObjectId;
     calendarInputs: {
         whoIsThisFor: string;
@@ -68,6 +63,11 @@ export declare const CalendarSchema: mongoose.Schema<any, mongoose.Model<any, an
         postingFrequency: string[];
         preferredContentType: string[];
     };
+    month: string;
+    contentStrategy: string;
+    theme: string;
+    events: mongoose.Types.ObjectId[];
+    collaborators: mongoose.Types.ObjectId[];
     suggestions?: string | null | undefined;
 }> & {
     _id: mongoose.Types.ObjectId;

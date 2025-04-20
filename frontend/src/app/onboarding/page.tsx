@@ -202,22 +202,24 @@ function FormData() {
         Choose your domains. Select all that apply
       </h3>
 
-      {["Linkedin", "Facebook", "Instagram", "Blog articles"].map((domain) => (
-        <div key={domain} className="flex items-center">
-          <input
-            type="checkbox"
-            id={domain}
-            name="domains"
-            value={domain}
-            checked={formData.domains.includes(domain)}
-            onChange={handleCheckboxChange}
-            className="h-5 w-5 rounded border-gray-300 text-[#7a0860] focus:ring-[#7a0860]"
-          />
-          <label htmlFor={domain} className="ml-2 text-[#5A5A5A]">
-            {domain}
-          </label>
-        </div>
-      ))}
+      {["Linkedin", "Facebook", "Twitter", "Instagram", "Blog"].map(
+        (domain) => (
+          <div key={domain} className="flex items-center">
+            <input
+              type="checkbox"
+              id={domain}
+              name="domains"
+              value={domain}
+              checked={formData.domains.includes(domain)}
+              onChange={handleCheckboxChange}
+              className="h-5 w-5 rounded border-gray-300 text-[#7a0860] focus:ring-[#7a0860]"
+            />
+            <label htmlFor={domain} className="ml-2 text-[#5A5A5A]">
+              {domain}
+            </label>
+          </div>
+        )
+      )}
     </div>
   );
 

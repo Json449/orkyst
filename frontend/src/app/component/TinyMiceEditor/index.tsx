@@ -123,7 +123,8 @@ const TinyMCEEditor: React.FC<TinyMCEEditorProps> = ({
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-  console.log("checd", eventType);
+
+  console.log("view now", eventType.toLowerCase().startsWith("blog"));
 
   return (
     <div className="relative rounded-xl border-bg-primarygrey border-4 mx-6 mt-2">
@@ -136,7 +137,9 @@ const TinyMCEEditor: React.FC<TinyMCEEditorProps> = ({
             value={value}
             onInit={handleInit}
             init={{
-              height: eventType == "Blog Post" ? "86vh" : "37vh",
+              height: eventType.toLowerCase().startsWith("blog")
+                ? "76vh"
+                : "37vh",
               menubar: true,
               plugins: [
                 "advlist autolink lists link image charmap print preview anchor",
@@ -145,7 +148,7 @@ const TinyMCEEditor: React.FC<TinyMCEEditorProps> = ({
                 "fontselect fontsizeselect",
               ],
               toolbar: `${
-                eventType == "Blog Post" && "image"
+                eventType.toLowerCase().startsWith("blog") && "image"
               } | formatselect | fontselect fontsizeselect | bold italic backcolor | 
                   alignleft aligncenter alignright alignjustify | 
                   bullist numlist outdent indent | undo redo | removeformat | help`,

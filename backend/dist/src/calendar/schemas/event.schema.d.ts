@@ -11,9 +11,9 @@ export declare const EventSchema: mongoose.Schema<any, mongoose.Model<any, any, 
     type: string;
     version: number;
     calendarId: mongoose.Types.ObjectId;
+    theme: string;
     title: string;
     audienceFocus: string;
-    theme: string;
     feedback: mongoose.Types.ObjectId[];
     versionHistory: mongoose.Types.ObjectId[];
     description?: string | null | undefined;
@@ -26,9 +26,9 @@ export declare const EventSchema: mongoose.Schema<any, mongoose.Model<any, any, 
     type: string;
     version: number;
     calendarId: mongoose.Types.ObjectId;
+    theme: string;
     title: string;
     audienceFocus: string;
-    theme: string;
     feedback: mongoose.Types.ObjectId[];
     versionHistory: mongoose.Types.ObjectId[];
     description?: string | null | undefined;
@@ -41,9 +41,9 @@ export declare const EventSchema: mongoose.Schema<any, mongoose.Model<any, any, 
     type: string;
     version: number;
     calendarId: mongoose.Types.ObjectId;
+    theme: string;
     title: string;
     audienceFocus: string;
-    theme: string;
     feedback: mongoose.Types.ObjectId[];
     versionHistory: mongoose.Types.ObjectId[];
     description?: string | null | undefined;

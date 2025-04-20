@@ -348,7 +348,7 @@ const generateCalendarPrompt = (input, currentMonth, currentYear) => {
    - **Formatted for Maximum Impact**: Use power words, numbers, or thought-provoking questions where relevant to the cultural context of the region.
  
  - **For each post, include:**
-   - **Title**: A compelling and optimized title for the event or post (e.g., "The Ultimate Guide to Ramadan Reflection: How to Make the Most of the Holy Month" for the Middle East, or "Leveraging AI for SMB Growth: U.S. Market Insights" for the US).(include emojis where appropriate)
+   - **Title**: A compelling and optimized title for the event or post (include emojis in beginning of title) (e.g., "The Ultimate Guide to Ramadan Reflection: How to Make the Most of the Holy Month" for the Middle East, or "Leveraging AI for SMB Growth: U.S. Market Insights" for the US).
    - **Date**: The specific date for the event in "YYYY-MM-DD" format.
    - **Type**: The type of content (e.g., blog post, LinkedIn post, Twitter post, Instagram reel, YouTube video, podcast, etc.).
    - **Audience Focus**: The region or audience to target (Middle East, US, Europe).
