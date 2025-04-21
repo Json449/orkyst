@@ -12,7 +12,6 @@ export async function middleware(req: NextRequest) {
 
   const _cookies = await cookies();
   const accessTokenFromCookie = _cookies.get("access_token")?.value;
-  console.log("cjecked", accessTokenFromCookie);
   if (accessTokenFromCookie) {
     try {
       // Verify the access token using jose
