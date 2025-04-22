@@ -161,7 +161,7 @@ export default function SignUpForm() {
     <div className="pb-10 flex h-screen bg-[#ffffff] justify-center items-center">
       <div className="lg:min-w-[60%] relative lg:block hidden justify-center items-center w-full">
         <Image
-          src="/images/loginbanners.svg"
+          src="/images/loginbanner.svg"
           alt="Login Banner"
           layout="responsive"
           width={502}

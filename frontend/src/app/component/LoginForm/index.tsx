@@ -136,7 +136,7 @@ export default function LoginForm() {
             </span>
           </div>
         </div>
-        <p className="text-center mt-6 font-inter text-[#080a0b] text-sm font-medium leading-5">
+        <p className="text-center mt-3 font-inter text-[#080a0b] text-sm font-medium leading-5">
           Forgot password?
         </p>
         <div className="pt-2 relative mt-6">

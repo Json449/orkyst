@@ -227,6 +227,8 @@ export default function CalendarPage() {
     setCollaboratorModalOpen(value);
   };
 
+  console.log("asdasdasd", aiTips);
+
   return (
     <div className="bg-white w-full">
       <Header

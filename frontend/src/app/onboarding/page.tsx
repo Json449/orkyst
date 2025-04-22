@@ -2,6 +2,7 @@
 import React, { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
+import axios from "axios";
 
 function FormData() {
   const router = useRouter();
@@ -55,25 +56,37 @@ function FormData() {
   const prevStep = () => {
     setCurrentStep((prev) => prev - 1);
   };
-
+  console.log("wowww", access_token);
   const updateProfile = async () => {
-    const url = "/api/updateuser";
     setIsLoading(true);
     setErrors(null);
+    const url = `${process.env.NEXT_PUBLIC_BASE_URL}/users/update_user`;
     try {
-      const response = await fetch(url, {
+      const payload = {
+        calendarInputs: formData,
+      };
+      const result = await axios.patch(url, payload, {
+        headers: {
+          Authorization: `Bearer ${access_token.access_token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      if (result.data.status != 200) {
+        setErrors(result?.data?.error || "Something went wrong");
+        return;
+      }
+      const response = await fetch("/api/updateuser", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ calendarInputs: formData, access_token }),
       });
-
-      const result = await response.json();
-      if (result.success) {
+      const status = await response.json();
+      if (status.success) {
         router.replace("/dashboard");
       } else {
-        setErrors(result?.data?.error || "Something went wrong");
+        setErrors("Something went wrong");
       }
     } catch (error: any) {
       console.log("err", error);
@@ -234,7 +247,7 @@ function FormData() {
         {[
           "Light (1-2 times per week)",
           "Medium (3-4 times per week)",
-          "Heavy (5+ times per week)",
+          "Heavy (daily or multiple time per day)",
         ].map((frequency) => (
           <div key={frequency} className="flex items-center mb-2">
             <input
@@ -294,7 +307,7 @@ function FormData() {
             />
             <div className="w-full px-[102px]">
               <p className="mt-[54px] text-[#000000] text-[28px] font-open-sans font-bold mb-[20px]">
-                {"Answer few questions to create your first calendar"}
+                {"Answer a few questions to create your first calendar"}
               </p>
 
               {/* Step counter with circles */}
