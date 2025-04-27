@@ -50,6 +50,7 @@ export async function middleware(req: NextRequest) {
         request: { headers: requestHeaders },
       });
     } catch (error) {
+      console.log(error);
       // Your existing error handling...
     }
   }

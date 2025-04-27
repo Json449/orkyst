@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useCallback, Suspense, JSX } from "react";
+import { useState, useEffect, useCallback, JSX, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { timeAgo } from "@/utils";
 import ImageUploader from "../component/imageUploader";
@@ -811,5 +811,9 @@ function DetailForm() {
 }
 
 export default function EventDetails() {
-  return <DetailForm />;
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <DetailForm />
+    </Suspense>
+  );
 }
