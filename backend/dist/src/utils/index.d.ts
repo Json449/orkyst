@@ -1,5 +1,6 @@
 export declare const twitterPrompt: (title: any, audienceFocus: any, theme: any, date: any) => string;
 export declare const blogPostPrompt: (title: any, audienceFocus: any, theme: any, date: any) => string;
+export declare const generateDynamicBlogPostPrompt: (title: any, audienceFocus: any, theme: any, date: any) => string;
 export declare const linkedInPrompt: (title: any, audienceFocus: any, theme: any, date: any) => string;
 export declare const defaultPrompt: (title: any, audienceFocus: any, theme: any, date: any, platform: any) => string;
 export declare const generateAdvancedCalendarPrompt: (input: any, currentMonth: any, currentYear: any) => string;

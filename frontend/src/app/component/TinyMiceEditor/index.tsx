@@ -127,7 +127,7 @@ const TinyMCEEditor: React.FC<TinyMCEEditorProps> = ({
   console.log("view now", eventType.toLowerCase().startsWith("blog"));
 
   return (
-    <div className="relative rounded-xl border-bg-primarygrey border-4 mx-6 mt-2">
+    <div className="h-full relative rounded-xl border-bg-primarygrey border-4 mx-6 mt-2">
       {loading ? (
         <p className="mt-5 text-md text-black">Content Loading...</p>
       ) : (
@@ -137,9 +137,7 @@ const TinyMCEEditor: React.FC<TinyMCEEditorProps> = ({
             value={value}
             onInit={handleInit}
             init={{
-              height: eventType.toLowerCase().startsWith("blog")
-                ? "76vh"
-                : "37vh",
+              height: "100%",
               menubar: true,
               plugins: [
                 "advlist autolink lists link image charmap print preview anchor",

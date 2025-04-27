@@ -56,7 +56,7 @@ function FormData() {
   const prevStep = () => {
     setCurrentStep((prev) => prev - 1);
   };
-  console.log("wowww", access_token);
+
   const updateProfile = async () => {
     setIsLoading(true);
     setErrors(null);
@@ -80,7 +80,7 @@ function FormData() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ calendarInputs: formData, access_token }),
+        body: JSON.stringify({ access_token }),
       });
       const status = await response.json();
       if (status.success) {
@@ -95,6 +95,33 @@ function FormData() {
       setIsLoading(false);
     }
   };
+
+  // const updateProfile = async () => {
+  //   const url = "/api/updateuser";
+  //   setIsLoading(true);
+  //   setErrors(null);
+  //   try {
+  //     const response = await fetch(url, {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({ calendarInputs: formData, access_token }),
+  //     });
+
+  //     const result = await response.json();
+  //     if (result.success) {
+  //       router.replace("/dashboard");
+  //     } else {
+  //       setErrors(result?.data?.error || "Something went wrong");
+  //     }
+  //   } catch (error: any) {
+  //     console.log("err", error);
+  //     setErrors(error);
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
 
   console.log("view form data", formData);
 
@@ -180,11 +207,11 @@ function FormData() {
   const Step2 = () => (
     <div className="space-y-6">
       <h3 className="text-[#5A5A5A] text-lg font-medium mb-4">
-        What are your marketing goals? Select all that apply
+        Select all that apply
       </h3>
 
       {[
-        "Increase Brand awareness",
+        "Increase brand awareness",
         "Generate more leads",
         "Increase social media engagement",
         "Boost sales/conversions",

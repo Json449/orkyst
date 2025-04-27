@@ -32,7 +32,7 @@ let CalendarService = class CalendarService {
         this.getPrompt = (title, audienceFocus, theme, date, type) => {
             switch (type) {
                 case 'Blog Post':
-                    return (0, utils_1.blogPostPrompt)(title, audienceFocus, theme, date);
+                    return (0, utils_1.generateDynamicBlogPostPrompt)(title, audienceFocus, theme, date);
                 case 'Twiiter Post':
                     return (0, utils_1.twitterPrompt)(title, audienceFocus, theme, date);
                 case 'LinkedIn Post':

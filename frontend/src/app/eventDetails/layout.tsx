@@ -5,5 +5,9 @@ export default function EventDetails({
 }: {
   children: React.ReactNode;
 }) {
-  return <div className="min-h-screen flex w-full bg-white">{children}</div>;
+  return (
+    <div className="flex flex-col h-screen w-full bg-white overflow-hidden">
+      {children}
+    </div>
+  );
 }

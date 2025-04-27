@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.imageGenerationPrompt = exports.calendarSuggestionPrompt = exports.eventSuggestionPrompt = exports.generateCalendarPrompt = exports.generateAdvancedCalendarPrompt = exports.defaultPrompt = exports.linkedInPrompt = exports.blogPostPrompt = exports.twitterPrompt = void 0;
+exports.imageGenerationPrompt = exports.calendarSuggestionPrompt = exports.eventSuggestionPrompt = exports.generateCalendarPrompt = exports.generateAdvancedCalendarPrompt = exports.defaultPrompt = exports.linkedInPrompt = exports.generateDynamicBlogPostPrompt = exports.blogPostPrompt = exports.twitterPrompt = void 0;
 const twitterPrompt = (title, audienceFocus, theme, date) => {
     return `
       You are tasked with creating a concise and engaging Twitter post titled *"${title}"*. The post should educate and inspire ${audienceFocus} about the benefits and relevance of ${theme}. The content must be tailored to Twitter's platform, focusing on brevity, hashtags, mentions, and a strong call-to-action. Ensure the following:
@@ -105,6 +105,45 @@ const blogPostPrompt = (title, audienceFocus, theme, date) => {
  `;
 };
 exports.blogPostPrompt = blogPostPrompt;
+const generateDynamicBlogPostPrompt = (title, audienceFocus, theme, date) => {
+    return `
+ You are a skilled writer tasked with creating a **dynamic and insightful blog post**. The blog should be **tailored to the provided audience** and **responsive to the provided theme**. Please ensure that the tone of the post is **engaging** and **informative**, and that it reflects the core subject matter dynamically based on the theme, audience, and other inputs.
+ 
+ - **Title**: "${title}"
+ - **Date**: ${date.toLocaleDateString()}
+ - **Type of content**: ${theme}
+ - **Audience Focus**: ${audienceFocus}
+ - **Theme**: ${theme}
+ 
+ Use the following guidelines to shape the blog post:
+ 1. **Understand the audience**: Ensure the content is relevant and speaks directly to the target audience. Address their interests, challenges, and needs.
+ 2. **Incorporate the theme dynamically**: Analyze the provided theme and generate relevant content that discusses how it applies in real-world scenarios.
+ 3. **Structure**: While the structure is not fixed, make sure that the blog:
+     - **Introduces the topic clearly** by relating it to the audience's interests and needs.
+     - **Explains the core concept** based on the theme provided. Adjust your explanation to the complexity and relevance based on the type (whether it's business, tech, social issues, etc.).
+     - **Presents examples or case studies** that tie into the theme, offering insights or solutions where appropriate.
+     - **Concludes with a call to action or a forward-thinking perspective** that aligns with the goals of the audience.
+ 
+ Do not assume specifics like "blockchain" or "decentralized" unless they are part of the input theme. Focus on **understanding the inputs dynamically** and creating content that **fits**.
+ 
+ ### Example of input-driven approach:
+ 
+ 1. For an **audience** like "Nonprofit Leaders," the blog might discuss how certain themes can **benefit nonprofits**, including examples or practical insights.
+ 2. For a **theme** like "Sustainable Business Practices," the blog would explore **sustainability in business** while offering actionable advice for business owners, focusing on the benefits, challenges, and ways to implement sustainable practices.
+ 3. For a **business type** like "B2B," the blog could analyze the challenges and solutions within **business-to-business** operations.
+ 
+ Output your blog as a **structured piece** that feels personalized and specific to the inputs given. Focus on making sure your writing is **relevant, engaging, and educational**. 
+ 
+ Make sure you **adapt the structure, content, and depth** of the blog based on the title, audience, and theme, ensuring the content resonates deeply with the intended reader.
+
+ - Format the output as a structured JSON object.
+ ### **Output Format:**
+ {
+   "html": "[Your tweet here, formatted with HTML tags]"
+ }
+ `;
+};
+exports.generateDynamicBlogPostPrompt = generateDynamicBlogPostPrompt;
 const linkedInPrompt = (title, audienceFocus, theme, date) => {
     return `
    You are tasked with creating a professional and engaging LinkedIn post titled *"${title}"*. The post should educate and inspire ${audienceFocus} about the benefits and relevance of ${theme}. The content must be tailored to LinkedIn's platform, focusing on professional insights, storytelling, and actionable advice. Ensure the following:

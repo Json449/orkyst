@@ -211,7 +211,13 @@ export default function CalendarPage() {
 
   const handleSelectEvent = useCallback(
     (event: Event) => {
-      router.push(`/eventDetails?eventId=${event._id}`);
+      const serializedCollaborators = encodeURIComponent(
+        JSON.stringify(calendar?.collaborators ?? [])
+      );
+      // Update the URL with eventId and collaborators
+      router.push(
+        `/eventDetails?eventId=${event._id}&collaborators=${serializedCollaborators}`
+      );
     },
     [router]
   );
@@ -227,6 +233,15 @@ export default function CalendarPage() {
     setCollaboratorModalOpen(value);
   };
 
+  const handleAddCalendar = () => {
+    // const serializedResponse = encodeURIComponent(
+    //   JSON.stringify({
+    //     access_token: getAccessToken(),
+    //   })
+    // );
+    // router.replace(`/onboarding?access_token=${serializedResponse}`);
+  };
+
   console.log("asdasdasd", aiTips);
 
   return (
@@ -240,7 +255,7 @@ export default function CalendarPage() {
         <div className="w-[22%] h-[86vh] bg-primarygrey from-gray-50 to-gray-100 shadow-xl flex flex-col justify-between border-r border-gray-200">
           {/* AI Tips Section */}
           <div className="mb-6">
-            <div className="flex p-4 bg-primary items-center justify-between mb-4">
+            <div className="h-[57] flex p-4 bg-primary items-center justify-between mb-4">
               <h3 className="text-xl font-bold text-white flex items-center">
                 <Image
                   alt="Calendar icon"
@@ -307,7 +322,7 @@ export default function CalendarPage() {
 
           {/* Brand Calendars Section */}
           <div>
-            <div className="flex p-4 bg-primary items-center justify-between mb-4">
+            <div className="h[57] flex p-4 bg-primary items-center justify-between mb-4">
               <h3 className="text-xl font-bold text-white flex items-center">
                 <Image
                   alt="Calendar icon"
@@ -334,8 +349,8 @@ export default function CalendarPage() {
                     ></div>
                   ))}
                 </div>
-              ) : calendarList?.length > 0 ? (
-                calendarList.map((item: Calendar) => (
+              ) : Array.isArray(calendarList) && calendarList.length > 0 ? (
+                calendarList?.map((item: Calendar) => (
                   <div
                     onClick={() => handleCalendarDetails(item._id)}
                     key={item._id}
@@ -403,7 +418,10 @@ export default function CalendarPage() {
               )}
             </div>
           </div>
-          <div className="bg-primary rounded-xl flex items-center justify-center h-full px-5 py-2.5">
+          <div
+            onClick={handleAddCalendar}
+            className="bg-primary rounded-xl flex items-center justify-center h-full px-5 py-2.5"
+          >
             <span className="text-white font-semibold tracking-wide text-sm uppercase flex items-center">
               Add New Calendar
             </span>

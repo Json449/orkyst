@@ -10,12 +10,11 @@ import { FeedbackDocument } from './schemas/feedback.schema';
 import { AddFeedbackDto } from './dto/add-feedback-dto';
 import { VersionHistory } from './schemas/versionhistory.schema';
 import {
-  blogPostPrompt,
   calendarSuggestionPrompt,
   defaultPrompt,
   eventSuggestionPrompt,
-  generateAdvancedCalendarPrompt,
   generateCalendarPrompt,
+  generateDynamicBlogPostPrompt,
   imageGenerationPrompt,
   linkedInPrompt,
   twitterPrompt,
@@ -271,7 +270,7 @@ export class CalendarService {
   getPrompt = (title: string, audienceFocus, theme, date, type) => {
     switch (type) {
       case 'Blog Post':
-        return blogPostPrompt(title, audienceFocus, theme, date);
+        return generateDynamicBlogPostPrompt(title, audienceFocus, theme, date);
       case 'Twiiter Post':
         return twitterPrompt(title, audienceFocus, theme, date);
       case 'LinkedIn Post':

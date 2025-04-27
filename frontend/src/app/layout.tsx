@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   },
   description: "A modern application built with Next.js",
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
+    process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3001"
   ),
 };
 

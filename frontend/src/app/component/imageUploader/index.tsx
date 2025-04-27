@@ -24,7 +24,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
   onGenerateAI,
   onCloudinaryUpload,
 }) => {
-  const [mode, setMode] = useState<"upload" | "generate">("upload");
+  const [mode, setMode] = useState<"upload" | "generate">("generate");
   const [prompt, setPrompt] = useState("");
   const [dragActive, setDragActive] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -79,22 +79,12 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
       promptInputRef.current.focus();
     }
   }, [mode]);
+  console.log("yahooo", imageUrl);
 
   return (
-    <div className="mx-auto bg-white overflow-hidden mx-6 rounded-xl border-4 border-bg-primarygrey">
+    <div className="h-full bg-white overflow-hidden mx-6 rounded-xl border-4 border-bg-primarygrey">
       {/* Header with glossy tabs */}
       <div className="flex border-b border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100">
-        <button
-          className={`bg-primarygrey border-r-2 border-r-[grey] flex-1 py-2 px-4 font-semibold text-lg transition-all duration-300 flex items-center justify-center gap-2 ${
-            mode === "upload"
-              ? "text-blue-600 border-b-2 border-blue-600 bg-white shadow-sm"
-              : "text-gray-500 hover:text-gray-700"
-          }`}
-          onClick={() => setMode("upload")}
-        >
-          <UploadIcon fontSize="medium" />
-          Upload Image
-        </button>
         <button
           className={`bg-primarygrey flex-1 py-2 px-4 font-semibold text-lg transition-all duration-300 flex items-center justify-center gap-2 ${
             mode === "generate"
@@ -105,6 +95,17 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
         >
           <AutoAwesomeIcon fontSize="medium" />
           AI Generate
+        </button>
+        <button
+          className={`bg-primarygrey border-r-2 border-r-[grey] flex-1 py-2 px-4 font-semibold text-lg transition-all duration-300 flex items-center justify-center gap-2 ${
+            mode === "upload"
+              ? "text-blue-600 border-b-2 border-blue-600 bg-white shadow-sm"
+              : "text-gray-500 hover:text-gray-700"
+          }`}
+          onClick={() => setMode("upload")}
+        >
+          <UploadIcon fontSize="medium" />
+          Upload Image
         </button>
       </div>
 
