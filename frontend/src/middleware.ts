@@ -8,8 +8,8 @@ export async function middleware(req: NextRequest) {
   const { pathname, origin } = req.nextUrl;
   const requestHeaders = new Headers(req.headers);
 
-  // 1. Handle CORS for all requests (including client-side API calls)
-  requestHeaders.set("Access-Control-Allow-Origin", origin);
+  // Set CORS headers to allow all origins (use '*' for wildcard)
+  requestHeaders.set("Access-Control-Allow-Origin", "*"); // Allow all origins
   requestHeaders.set(
     "Access-Control-Allow-Methods",
     "GET, POST, PUT, DELETE, OPTIONS"
@@ -20,19 +20,19 @@ export async function middleware(req: NextRequest) {
   );
   requestHeaders.set("Access-Control-Allow-Credentials", "true");
 
-  // Handle preflight requests
+  // Handle preflight requests (OPTIONS method)
   if (req.method === "OPTIONS") {
     return new NextResponse(null, {
       headers: requestHeaders,
     });
   }
 
-  // 2. Skip CORS for API routes (handled by Next.js proxy)
+  // 1. Skip CORS for API routes (handled by Next.js proxy)
   if (pathname.startsWith("/api")) {
     return NextResponse.next();
   }
 
-  // 3. Authentication logic for protected routes
+  // 2. Authentication logic for protected routes
   const publicPaths = ["/", "/signup"];
   const _cookies = cookies();
   const accessTokenFromCookie = _cookies.get("access_token")?.value;
@@ -55,13 +55,13 @@ export async function middleware(req: NextRequest) {
     }
   }
 
-  // 4. Final response with CORS headers
+  // 3. Final response with CORS headers
   const response = !publicPaths.includes(pathname)
     ? NextResponse.redirect(new URL("/", req.url))
     : NextResponse.next();
 
-  // Ensure CORS headers are set
-  response.headers.set("Access-Control-Allow-Origin", origin);
+  // Ensure CORS headers are set for non-public paths
+  response.headers.set("Access-Control-Allow-Origin", "*");
   response.headers.set("Access-Control-Allow-Credentials", "true");
 
   return response;
