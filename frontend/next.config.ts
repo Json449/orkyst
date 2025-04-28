@@ -29,9 +29,9 @@ const nextConfig: NextConfig = {
     serverActions: {
       bodySizeLimit: "10mb",
       allowedOrigins: [
-        process.env.NEXT_PUBLIC_BASE_URL, // Ensure this is set correctly
+        process.env.NEXT_PUBLIC_FRONTEND_URL, // Ensure this is set correctly
         "http://localhost:3000",
-        "https://orkyst.netlify.app",
+        "https://680e35febbe5c30008ce311e--orkyst.netlify.app",
       ],
     },
   },

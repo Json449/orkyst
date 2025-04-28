@@ -11,7 +11,7 @@ async function bootstrap() {
   app.enableCors({
     origin: [
       'http://localhost:3000', // Local development
-      'https://orkyst.netlify.app', // Your production frontend
+      'https://680e35febbe5c30008ce311e--orkyst.netlify.app', // Your production frontend
       process.env.FRONTEND_URL, // Environment variable
     ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
