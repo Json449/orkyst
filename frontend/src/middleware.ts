@@ -12,7 +12,7 @@ export async function middleware(req: NextRequest) {
   requestHeaders.set("Access-Control-Allow-Origin", "*"); // Allow all origins
   requestHeaders.set(
     "Access-Control-Allow-Methods",
-    "GET, POST, PUT, DELETE, OPTIONS"
+    "GET, POST, PUT, PATCH, DELETE, OPTIONS"
   );
   requestHeaders.set(
     "Access-Control-Allow-Headers",
@@ -34,7 +34,7 @@ export async function middleware(req: NextRequest) {
 
   // 2. Authentication logic for protected routes
   const publicPaths = ["/", "/signup"];
-  const _cookies = cookies();
+  const _cookies = await cookies();
   const accessTokenFromCookie = _cookies.get("access_token")?.value;
 
   if (accessTokenFromCookie) {
