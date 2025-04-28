@@ -5,7 +5,7 @@ import { cookies } from "next/headers";
 import type { NextRequest } from "next/server";
 
 export async function middleware(req: NextRequest) {
-  const { pathname, origin } = req.nextUrl;
+  const { pathname } = req.nextUrl;
   const requestHeaders = new Headers(req.headers);
 
   // Set CORS headers to allow all origins (use '*' for wildcard)
