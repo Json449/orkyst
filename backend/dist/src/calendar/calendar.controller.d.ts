@@ -55,4 +55,10 @@ export declare class CalendarController {
         message: string;
         data: any;
     }>;
+    getJobStatus(req: any, jobId: string): Promise<{
+        status: "pending" | "processing" | "completed" | "failed";
+        progress: number;
+        result: any;
+        error: string | undefined;
+    }>;
 }

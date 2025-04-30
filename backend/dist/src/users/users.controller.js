@@ -32,11 +32,11 @@ let UsersController = class UsersController {
     async updateUser(req, updateUserDto) {
         console.log('fetched', updateUserDto);
         const userId = req.user?.userId;
-        const updatedUser = await this.usersService.updateUser(userId, updateUserDto);
+        const jobId = await this.usersService.updateUser(userId, updateUserDto);
         return {
-            message: 'User updated successfully',
+            message: 'Job Created successfully',
             status: 200,
-            result: updatedUser,
+            result: jobId,
         };
     }
 };
@@ -51,7 +51,7 @@ __decorate([
 ], UsersController.prototype, "getProfile", null);
 __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
-    (0, common_1.Patch)('update_user'),
+    (0, common_1.Put)('update_user'),
     __param(0, (0, common_1.Request)()),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),

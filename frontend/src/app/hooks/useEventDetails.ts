@@ -14,7 +14,6 @@ export const useEventDetailsMutation = () => {
       return data;
     },
     onSuccess: (data) => {
-      console.log("dataassss", data);
       queryClient.setQueryData(["events", data], data);
     },
     onError: (error: Error) => {

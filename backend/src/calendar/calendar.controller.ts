@@ -154,4 +154,28 @@ export class CalendarController {
       );
     }
   }
+
+  @Get('job-status/:jobId')
+  @UseGuards(JwtAuthGuard)
+  async getJobStatus(@Request() req, @Param('jobId') jobId: string) {
+    try {
+      console.log('jobidd', jobId, req.user.userId);
+      const job = await this.calendarService.getJobStatus(jobId, req.user.userId);
+      return {
+        status: job.status,
+        progress: job.progress,
+        result: job.result,
+        error: job.error,
+      };
+    } catch (error) {
+      // Handle errors and return appropriate HTTP status code
+      throw new HttpException(
+        {
+          status: 'error',
+          message: error.message || 'Failed to find job',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
 }

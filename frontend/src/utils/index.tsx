@@ -40,3 +40,12 @@ export enum Role {
   OWNER = "owner",
   // Add other roles as needed
 }
+
+export const statusMessages = [
+  "Initializing calendar generation...",
+  "Analyzing your business needs...",
+  "Generating content ideas...",
+  "Optimizing for your audience...",
+  "Finalizing your calendar...",
+  "Almost there!",
+];

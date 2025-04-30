@@ -1,13 +1,5 @@
 // src/users/users.controller.ts
-import {
-  Controller,
-  Body,
-  UseGuards,
-  Get,
-  Request,
-  Patch,
-  Param,
-} from '@nestjs/common';
+import { Controller, Body, UseGuards, Get, Request, Put } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { UpdateUserDto } from './dto/update-user-dto';
@@ -28,18 +20,15 @@ export class UsersController {
   }
 
   @UseGuards(JwtAuthGuard) // Protect this route with JWT authentication
-  @Patch('update_user')
+  @Put('update_user')
   async updateUser(@Request() req, @Body() updateUserDto: UpdateUserDto) {
     console.log('fetched', updateUserDto);
     const userId = req.user?.userId;
-    const updatedUser = await this.usersService.updateUser(
-      userId,
-      updateUserDto,
-    );
+    const jobId = await this.usersService.updateUser(userId, updateUserDto);
     return {
-      message: 'User updated successfully',
+      message: 'Job Created successfully',
       status: 200,
-      result: updatedUser,
+      result: jobId,
     };
   }
 }

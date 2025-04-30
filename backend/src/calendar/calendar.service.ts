@@ -22,6 +22,9 @@ import {
 import { CollaboratorDocument } from './schemas/collaborator.schema';
 import { CreateCollaboratorDto } from './dto/create-collaborator.dto';
 import { UserDocument } from 'src/users/schemas/user.schema';
+import { JobDocument } from './schemas/job.schema';
+import { v4 as uuidv4 } from 'uuid';
+import mongoose from 'mongoose';
 
 @Injectable()
 export class CalendarService {
@@ -39,6 +42,8 @@ export class CalendarService {
     private readonly feedbackModel: Model<FeedbackDocument>,
     @InjectModel('VersionHistory')
     private readonly versionModel: Model<VersionHistory>,
+    @InjectModel('Job')
+    private readonly jobModel: Model<JobDocument>,
     private configService: ConfigService,
   ) {
     this.openai = new OpenAI({
@@ -150,9 +155,7 @@ export class CalendarService {
       // Extract the AI-generated tips from the response
       let data: any = jsonrepair(response?.choices[0]?.message?.content);
       data = JSON.parse(data);
-      console.log(data);
       let tips = data.tips;
-      console.log(tips);
       calendar.suggestions = JSON.stringify(tips);
       await calendar.save();
       return {
@@ -165,22 +168,97 @@ export class CalendarService {
     }
   }
 
-  async generateCalendar(calendarInputs, userId: string): Promise<any> {
-    // Get the current date
-    const currentDate = new Date();
-    const currentYear = currentDate.getFullYear();
-    const currentMonth = currentDate.getMonth() + 1; // Months are 0-indexed in JavaScript
-    console.log('Input received:', calendarInputs);
-
-    // Construct the prompt for OpenAI API
-    const prompt = generateCalendarPrompt(
-      calendarInputs,
-      currentMonth,
-      currentYear,
-    );
-
+  async validateCalendarResponse(openAiResponse: string): Promise<any> {
     try {
-      // OpenAI API call
+      // 1. First repair the JSON if needed
+      const fixedJson = jsonrepair(openAiResponse);
+      // 2. Parse the JSON
+      const parsedData = JSON.parse(fixedJson);
+
+      // 3. Validate the structure
+      if (
+        !parsedData.month ||
+        !parsedData.theme ||
+        !Array.isArray(parsedData.events)
+      ) {
+        throw new Error('Invalid calendar data structure from OpenAI');
+      }
+
+      // 4. Validate individual events
+      const isValidEvents = parsedData.events.every((event) => {
+        return event.title && event.date && event.type;
+      });
+
+      if (!isValidEvents) {
+        throw new Error('Some calendar events are missing required fields');
+      }
+
+      return parsedData;
+    } catch (error) {
+      console.error('Validation failed:', error);
+      throw new Error(`Calendar validation failed: ${error.message}`);
+    }
+  }
+
+  async validateCalendarEvents(response, currentYear, currentMonth) {
+    return response.events.map((event: any) => {
+      const eventDate = new Date(event.date);
+      if (
+        eventDate.getFullYear() !== currentYear ||
+        eventDate.getMonth() + 1 !== currentMonth
+      ) {
+        // If the event date is not in the current month, adjust it to the current month
+        event.date = `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(eventDate.getDate()).padStart(2, '0')}`;
+      }
+      return event;
+    });
+  }
+
+  async createEvents(events: any[], calendarId: string): Promise<any> {
+    try {
+      // Use Promise.all properly with async operations
+      const eventCreationPromises = events.map(async (eventData) => {
+        try {
+          const newEvent = new this.eventModel({
+            title: eventData.title,
+            date: new Date(eventData.date),
+            type: eventData.type,
+            audienceFocus: eventData.audienceFocus,
+            theme: eventData.theme,
+            description: null,
+            calendarId: calendarId,
+          });
+          const savedEvent = await newEvent.save();
+          return savedEvent._id;
+        } catch (eventError) {
+          console.error('Error saving event:', eventData, eventError);
+          throw new Error(`Failed to save event: ${eventData.title}`);
+        }
+      });
+      return await Promise.all(eventCreationPromises);
+    } catch (error) {
+      console.error('Error in batch event creation:', error);
+      throw new Error('Failed to create events');
+    }
+  }
+
+  private async processCalendar(jobId: string) {
+    try {
+      const job = await this.jobModel.findOne({ jobId });
+      if (!job) throw new Error('Job not found');
+      // Update status to processing
+      await this.updateJob(jobId, { status: 'processing', progress: 20 });
+      const currentDate = new Date();
+      const currentYear = currentDate.getFullYear();
+      const currentMonth = currentDate.getMonth() + 1;
+      // Step 1: Generate prompt
+      const prompt = generateCalendarPrompt(
+        job.inputs,
+        currentMonth,
+        currentYear,
+      );
+      await this.updateJob(jobId, { progress: 40 });
+      // Step 2: Call OpenAI
       const response: any = await this.openai.chat.completions.create({
         model: 'gpt-4o-mini',
         messages: [
@@ -193,74 +271,58 @@ export class CalendarService {
         max_tokens: 3000, // Increase token limit for more detailed responses
         temperature: 0.5, // Lower temperature for more focused and precise responses
       });
-      // Parse the OpenAI response into a JavaScript object
-      const fixedJson = jsonrepair(response?.choices[0]?.message?.content);
-      let calendarData: any;
-      try {
-        calendarData = JSON.parse(fixedJson);
-      } catch (parseError) {
-        throw new Error('Failed to parse OpenAI response');
-      }
-      console.log('view snoww', calendarData);
-      // Validate the received calendar data
-      if (
-        !calendarData.month ||
-        !calendarData.theme ||
-        !Array.isArray(calendarData.events)
-      ) {
-        throw new Error('Invalid calendar data received from OpenAI');
-      }
-
-      // Validate and adjust dates to ensure they are within the current month
-      const validatedEvents = calendarData.events.map((event: any) => {
-        const eventDate = new Date(event.date);
-        if (
-          eventDate.getFullYear() !== currentYear ||
-          eventDate.getMonth() + 1 !== currentMonth
-        ) {
-          // If the event date is not in the current month, adjust it to the current month
-          event.date = `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(eventDate.getDate()).padStart(2, '0')}`;
-        }
-        return event;
-      });
-
-      // Update the events with validated dates
+      await this.updateJob(jobId, { progress: 50 });
+      const calendarData = await this.validateCalendarResponse(
+        response?.choices[0]?.message?.content,
+      );
+      await this.updateJob(jobId, { progress: 70 });
+      const validatedEvents = await this.validateCalendarEvents(
+        calendarData,
+        currentYear,
+        currentMonth,
+      );
       calendarData.events = validatedEvents;
-      calendarData.calendarInputs = calendarInputs;
-      // Add the userId to the calendar data
-      calendarData.userId = userId;
+      calendarData.calendarInputs = job.inputs;
+      calendarData.userId = job.userId;
       calendarData.suggestions = null;
       calendarData.isActive = true;
-
-      // Create and save the calendar, link it to events
-      const newCalendar = new this.calendarModel(calendarData);
-
-      // Create and save events (assuming events are already validated)
-      const eventPromises = calendarData.events.map(async (eventData: any) => {
-        const newEvent = new this.eventModel({
-          title: eventData.title,
-          date: new Date(eventData.date),
-          type: eventData.type,
-          audienceFocus: eventData.audienceFocus,
-          theme: eventData.theme,
-          description: null,
-          calendarId: newCalendar._id, // Assign the calendarId
-        });
-        const savedEvent = await newEvent.save();
-        return savedEvent._id;
-      });
-
-      // Wait for all events to be saved and get their IDs
-      const eventIds = await Promise.all(eventPromises);
-
-      // Link events to the calendar
-      newCalendar.events = eventIds;
-      await this.calendarModel.updateMany(
-        { userId: userId },
-        { isActive: false },
+      const newCalendar: any = new this.calendarModel(calendarData);
+      const eventIds = await this.createEvents(
+        calendarData.events,
+        newCalendar._id,
       );
-      // Save the new calendar with linked events
-      return await newCalendar.save();
+      newCalendar.events = eventIds;
+      await this.updateJob(jobId, { progress: 90 });
+      await newCalendar.save();
+      await this.updateJob(jobId, {
+        status: 'completed',
+        result: newCalendar,
+        progress: 100,
+      });
+    } catch (error) {
+      await this.updateJob(jobId, {
+        status: 'failed',
+        error: error.message,
+      });
+    }
+  }
+
+  private async updateJob(jobId: string, updates: Partial<JobDocument>) {
+    await this.jobModel.updateOne({ jobId }, updates);
+  }
+
+  async generateCalendar(calendarInputs, userId: string): Promise<any> {
+    try {
+      const jobId = uuidv4();
+      await this.jobModel.create({
+        jobId,
+        userId,
+        status: 'pending',
+        inputs: calendarInputs,
+        progress: 0,
+      });
+      this.processCalendar(jobId).catch(console.error);
+      return { jobId };
     } catch (error) {
       console.error('Error generating calendar:', error);
       throw new Error('Failed to generate calendar');
@@ -378,8 +440,6 @@ export class CalendarService {
       // Create and save the feedback
       const feedback = new this.feedbackModel(payload);
       const savedFeedback = await feedback.save();
-
-      console.log('Saved Feedback:', savedFeedback);
 
       // Update the corresponding event to include the feedback ID
       const event = await this.eventModel.findById(payload.eventId);
@@ -553,15 +613,31 @@ export class CalendarService {
       // Extract the AI-generated tips from the response
       let data: any = jsonrepair(response?.choices[0]?.message?.content);
       data = JSON.parse(data);
-      console.log(data);
       let tips = data.tips;
-      console.log(tips);
       return {
         success: true,
         tips,
       };
     } catch (e) {
       console.log(e);
+    }
+  }
+
+  async getJobStatus(jobId: string, userId: string) {
+    try {
+      const job = await this.jobModel.findOne({
+        jobId,
+        userId: userId,
+      });
+      if (!job) throw new Error('Job not found');
+      return {
+        status: job.status,
+        progress: job.progress,
+        result: job.result,
+        error: job.error,
+      };
+    } catch (e) {
+      throw new Error('Failed to  find job');
     }
   }
 }

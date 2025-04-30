@@ -69,6 +69,6 @@ export class UsersService {
       userId,
     );
     console.log('check now', result);
-    return await user.save();
+    return result;
   }
 }

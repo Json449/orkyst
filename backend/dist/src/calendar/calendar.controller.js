@@ -112,6 +112,24 @@ let CalendarController = class CalendarController {
             }, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    async getJobStatus(req, jobId) {
+        try {
+            console.log('jobidd', jobId, req.user.userId);
+            const job = await this.calendarService.getJobStatus(jobId, req.user.userId);
+            return {
+                status: job.status,
+                progress: job.progress,
+                result: job.result,
+                error: job.error,
+            };
+        }
+        catch (error) {
+            throw new common_1.HttpException({
+                status: 'error',
+                message: error.message || 'Failed to find job',
+            }, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 };
 exports.CalendarController = CalendarController;
 __decorate([
@@ -195,6 +213,15 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], CalendarController.prototype, "updateEvent", null);
+__decorate([
+    (0, common_1.Get)('job-status/:jobId'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Param)('jobId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:returntype", Promise)
+], CalendarController.prototype, "getJobStatus", null);
 exports.CalendarController = CalendarController = __decorate([
     (0, common_1.Controller)('calendar'),
     __metadata("design:paramtypes", [calendar_service_1.CalendarService])

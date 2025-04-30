@@ -17,6 +17,7 @@ const versionhistory_schema_1 = require("./schemas/versionhistory.schema");
 const collaborator_schema_1 = require("./schemas/collaborator.schema");
 const feedback_schema_1 = require("./schemas/feedback.schema");
 const user_schema_1 = require("../users/schemas/user.schema");
+const job_schema_1 = require("./schemas/job.schema");
 let CalendarModule = class CalendarModule {
 };
 exports.CalendarModule = CalendarModule;
@@ -26,6 +27,7 @@ exports.CalendarModule = CalendarModule = __decorate([
             mongoose_1.MongooseModule.forFeature([
                 { name: 'Calendar', schema: calendar_schema_1.CalendarSchema },
                 { name: 'Collaborator', schema: collaborator_schema_1.CollaboratorSchema },
+                { name: 'Job', schema: job_schema_1.JobSchema },
                 { name: 'User', schema: user_schema_1.UserSchema },
                 { name: 'Event', schema: event_schema_1.EventSchema },
                 { name: 'VersionHistory', schema: versionhistory_schema_1.VersionHistorySchema },

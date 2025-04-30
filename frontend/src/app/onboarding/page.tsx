@@ -1,11 +1,12 @@
 "use client";
-import React, { useState, Suspense } from "react";
+import React, { useState, Suspense, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
-import axios from "axios";
+import { useJobStatusPollingMutation } from "../hooks/useJobStatusPolling";
+import { useUpdateTokenMutation } from "../hooks/useUpdateToken";
+import { statusMessages } from "@/utils";
 
 function FormData() {
-  const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
     whoIsThisFor: "",
@@ -23,6 +24,8 @@ function FormData() {
   const access_token: Event | null = serializedEvent
     ? JSON.parse(decodeURIComponent(serializedEvent))
     : null;
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [currentJobId, setCurrentJobId] = useState<string | null>(null);
 
   const handleInputChange = (event: any) => {
     const { name, value } = event.target;
@@ -57,36 +60,26 @@ function FormData() {
     setCurrentStep((prev) => prev - 1);
   };
 
-  const updateProfile = async () => {
+  const generateCalendar = async () => {
+    const url = "/api/generateCalendar";
+    console.log("generate calendar now");
     setIsLoading(true);
     setErrors(null);
-    const url = `${process.env.NEXT_PUBLIC_BASE_URL}/users/update_user`;
     try {
-      const payload = {
-        calendarInputs: formData,
-      };
-      const result = await axios.patch(url, payload, {
-        headers: {
-          Authorization: `Bearer ${access_token.access_token}`,
-          "Content-Type": "application/json",
-        },
-      });
-      if (result.data.status != 200) {
-        setErrors(result?.data?.error || "Something went wrong");
-        return;
-      }
-      const response = await fetch("/api/updateuser", {
+      const response = await fetch(url, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ access_token }),
+        body: JSON.stringify({ calendarInputs: formData, access_token }),
       });
-      const status = await response.json();
-      if (status.success) {
-        router.replace("/dashboard");
+
+      const result = await response.json();
+      if (result.success) {
+        setCurrentJobId(result.data.result.jobId);
+        setIsGenerating(true);
       } else {
-        setErrors("Something went wrong");
+        setErrors(result?.data?.error || "Something went wrong");
       }
     } catch (error: any) {
       console.log("err", error);
@@ -95,33 +88,6 @@ function FormData() {
       setIsLoading(false);
     }
   };
-
-  // const updateProfile = async () => {
-  //   const url = "/api/updateuser";
-  //   setIsLoading(true);
-  //   setErrors(null);
-  //   try {
-  //     const response = await fetch(url, {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify({ calendarInputs: formData, access_token }),
-  //     });
-
-  //     const result = await response.json();
-  //     if (result.success) {
-  //       router.replace("/dashboard");
-  //     } else {
-  //       setErrors(result?.data?.error || "Something went wrong");
-  //     }
-  //   } catch (error: any) {
-  //     console.log("err", error);
-  //     setErrors(error);
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
 
   console.log("view form data", formData);
 
@@ -321,127 +287,239 @@ function FormData() {
   );
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <div className="flex w-full flex-col bg-white h-[100vh]">
-        <div className="flex h-screen bg-[#ffffff]">
-          <div className="py-5 lg:min-w-[50%] relative lg:flex flex-col items-center justify-center w-full px-[54px]">
-            <Image
-              src="/logo.svg"
-              alt="Login Banner"
-              width={228}
-              height={76}
-              priority
-            />
-            <div className="w-full px-[102px]">
-              <p className="mt-[54px] text-[#000000] text-[28px] font-open-sans font-bold mb-[20px]">
-                {"Answer a few questions to create your first calendar"}
-              </p>
+    <div className="flex w-full flex-col bg-white h-[100vh]">
+      {isGenerating && currentJobId && (
+        <ProgressTracker jobId={currentJobId} access_token={access_token} />
+      )}
+      <div
+        className={`flex h-screen bg-[#ffffff] 
+        
+        `}
+      >
+        {" "}
+        <div className="py-5 lg:min-w-[50%] relative lg:flex flex-col items-center justify-center w-full px-[54px]">
+          <Image
+            src="/logo.svg"
+            alt="Login Banner"
+            width={228}
+            height={76}
+            priority
+          />
+          <div className="w-full px-[102px]">
+            <p className="mt-[54px] text-[#000000] text-[28px] font-open-sans font-bold mb-[20px]">
+              {"Answer a few questions to create your first calendar"}
+            </p>
 
-              {/* Step counter with circles */}
-              <StepCounter />
-              <p className="text-[#000000] text-[24px] font-open-sans font-bold mb-[8px]">
-                {currentStep === 1 && "Tell us about your business"}
-                {currentStep === 2 && "What are your marketing goals?"}
-                {currentStep === 3 && "Where do you want to post?"}
-                {currentStep === 4 && "Posting preferences"}
-              </p>
-              {/* Render current step */}
-              {currentStep === 1 && Step1()}
-              {currentStep === 2 && Step2()}
-              {currentStep === 3 && Step3()}
-              {currentStep === 4 && Step4()}
+            {/* Step counter with circles */}
+            <StepCounter />
+            <p className="text-[#000000] text-[24px] font-open-sans font-bold mb-[8px]">
+              {currentStep === 1 && "Tell us about your business"}
+              {currentStep === 2 && "What are your marketing goals?"}
+              {currentStep === 3 && "Where do you want to post?"}
+              {currentStep === 4 && "Posting preferences"}
+            </p>
+            {/* Render current step */}
+            {currentStep === 1 && Step1()}
+            {currentStep === 2 && Step2()}
+            {currentStep === 3 && Step3()}
+            {currentStep === 4 && Step4()}
 
-              {errors && (
-                <div className="mt-4 p-3 bg-red-50 text-red-600 rounded-lg">
-                  {errors}
-                </div>
+            {errors && (
+              <div className="mt-4 p-3 bg-red-50 text-red-600 rounded-lg">
+                {errors}
+              </div>
+            )}
+
+            <div className="flex justify-between gap-5 mt-8">
+              {currentStep > 1 ? (
+                <button
+                  onClick={prevStep}
+                  disabled={isLoading}
+                  className="w-[157px] h-[50px] bg-white text-[#7a0860] text-[16px] font-medium rounded-lg border-2 border-[#7a0860] hover:bg-[#F8F7F7] transition-colors"
+                >
+                  Back
+                </button>
+              ) : (
+                <div></div>
               )}
 
-              <div className="flex justify-between gap-5 mt-8">
-                {currentStep > 1 ? (
-                  <button
-                    onClick={prevStep}
-                    disabled={isLoading}
-                    className="w-[157px] h-[50px] bg-white text-[#7a0860] text-[16px] font-medium rounded-lg border-2 border-[#7a0860] hover:bg-[#F8F7F7] transition-colors"
-                  >
-                    Back
-                  </button>
-                ) : (
-                  <div></div>
-                )}
-
-                {currentStep < 4 ? (
-                  <button
-                    onClick={nextStep}
-                    disabled={isLoading}
-                    className="w-[157px] h-[50px] bg-[#7a0860] text-white text-[16px] font-medium rounded-lg hover:bg-[#5c0648] transition-colors disabled:opacity-70"
-                  >
-                    Next
-                  </button>
-                ) : (
-                  <button
-                    disabled={isLoading}
-                    onClick={updateProfile}
-                    className="w-[157px] h-[50px] bg-[#7a0860] text-white text-[16px] font-medium rounded-lg hover:bg-[#5c0648] transition-colors disabled:opacity-70"
-                  >
-                    {isLoading ? (
-                      <span className="flex items-center justify-center">
-                        <svg
-                          className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <circle
-                            className="opacity-25"
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke="currentColor"
-                            strokeWidth="4"
-                          ></circle>
-                          <path
-                            className="opacity-75"
-                            fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                          ></path>
-                        </svg>
-                        Processing...
-                      </span>
-                    ) : (
-                      "Finish"
-                    )}
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
-          <div className="lg:min-w-[50%] min-w-[100%] bg-[#7a0860] hidden lg:block lg:flex justify-center items-center w-full">
-            <div>
-              <h3 className="text-[#fffefe] text-[30px] font-bold text-start">
-                Faster Execution, Fewer Bottlenecks
-              </h3>
-              <Image
-                src="/images/onboarding_banner.svg"
-                alt="Login Banner"
-                width={624}
-                height={279}
-                style={{
-                  margin: "90px 0 75px 0",
-                }}
-                priority
-              />
-              <p className="text-[#fffefe] text-[30px] mt-8 font-bold text-start">
-                AI-Powered Campaigns
-              </p>
-              <p className="text-[#fffefe] text-[30px] font-bold text-end">
-                All-in-One Marketing Hub
-              </p>
+              {currentStep < 4 ? (
+                <button
+                  onClick={nextStep}
+                  disabled={isLoading}
+                  className="w-[157px] h-[50px] bg-[#7a0860] text-white text-[16px] font-medium rounded-lg hover:bg-[#5c0648] transition-colors disabled:opacity-70"
+                >
+                  Next
+                </button>
+              ) : (
+                <button
+                  disabled={isLoading}
+                  onClick={generateCalendar}
+                  className="w-[157px] h-[50px] bg-[#7a0860] text-white text-[16px] font-medium rounded-lg hover:bg-[#5c0648] transition-colors disabled:opacity-70"
+                >
+                  {isLoading ? (
+                    <span className="flex items-center justify-center">
+                      <svg
+                        className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                      </svg>
+                      Processing...
+                    </span>
+                  ) : (
+                    "Finish"
+                  )}
+                </button>
+              )}
             </div>
           </div>
         </div>
+        <div className="lg:min-w-[50%] min-w-[100%] bg-[#7a0860] hidden lg:block lg:flex justify-center items-center w-full">
+          <div>
+            <h3 className="text-[#fffefe] text-[30px] font-bold text-start">
+              Faster Execution, Fewer Bottlenecks
+            </h3>
+            <Image
+              src="/images/onboarding_banner.svg"
+              alt="Login Banner"
+              width={624}
+              height={279}
+              style={{
+                margin: "90px 0 75px 0",
+              }}
+              priority
+            />
+            <p className="text-[#fffefe] text-[30px] mt-8 font-bold text-start">
+              AI-Powered Campaigns
+            </p>
+            <p className="text-[#fffefe] text-[30px] font-bold text-end">
+              All-in-One Marketing Hub
+            </p>
+          </div>
+        </div>
       </div>
-    </Suspense>
+    </div>
+  );
+}
+
+function ProgressTracker({ jobId, access_token }) {
+  const [progress, setProgress] = useState(0);
+  const [status, setStatus] = useState("Initializing calendar generation...");
+  const router = useRouter();
+  const { mutate: jobPollingMutate } =
+    useJobStatusPollingMutation(access_token);
+  const { mutate: updateTokenMutate } = useUpdateTokenMutation();
+
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+    let isMounted = true;
+
+    const pollJobStatus = () => {
+      jobPollingMutate(jobId, {
+        onSuccess: async (response) => {
+          const { data } = response;
+          console.log("asdasds", data);
+          if (!isMounted) return;
+
+          if (data.status === "completed") {
+            updateTokenMutate(access_token, {
+              onSuccess: () => {
+                router.replace("/dashboard");
+              },
+              onError: (error) => {
+                console.error("Token update failed:", error);
+                router.replace("/dashboard"); // Still redirect even if token update fails
+              },
+            });
+          }
+          if (data.status === "failed") {
+            setStatus(`Error: ${data.error}`);
+            return;
+          }
+
+          setProgress(data.progress);
+          const statusIndex = Math.floor(data.progress / 25);
+          setStatus(
+            statusMessages[statusIndex] ||
+              statusMessages[statusMessages.length - 1]
+          );
+
+          // Continue polling
+          timeoutId = setTimeout(pollJobStatus, 2000);
+        },
+        onError: (error) => {
+          if (!isMounted) return;
+          console.error("Polling error:", error);
+          setStatus("Connection issue - retrying...");
+        },
+      });
+    };
+
+    pollJobStatus();
+
+    return () => {
+      isMounted = false;
+      clearTimeout(timeoutId);
+    };
+  }, [jobId, router, jobPollingMutate]);
+
+  return (
+    <div className="fixed inset-0 bg-white bg-opacity-90 z-50 flex flex-col items-center justify-center">
+      <div className="max-w-md w-full p-8 bg-white rounded-xl shadow-lg">
+        <div className="text-center mb-8">
+          <h2 className="text-2xl font-bold text-[#7a0860] mb-2">
+            Creating Your Perfect Calendar
+          </h2>
+          <p className="text-gray-600">{status}</p>
+        </div>
+
+        {/* Animated Lottie loader */}
+        <div className="w-32 h-32 mx-auto mb-6">
+          {/* <Lottie animationData={loadingAnimation} loop={true} /> */}
+        </div>
+
+        {/* Progress bar with animation */}
+        <div className="mb-6">
+          <div className="flex justify-between mb-2">
+            <span className="text-sm font-medium text-[#7a0860]">
+              {progress}% Complete
+            </span>
+            <span className="text-sm text-gray-500">
+              {Math.floor(progress / 20) + 1}/5 Stages
+            </span>
+          </div>
+          <div className="w-full bg-gray-200 rounded-full h-3">
+            <div
+              className="bg-gradient-to-r from-[#7a0860] to-[#a50b7f] h-3 rounded-full transition-all duration-500 ease-out"
+              style={{ width: `${progress}%` }}
+            ></div>
+          </div>
+        </div>
+
+        {/* Time estimate (optional) */}
+        <div className="text-center text-sm text-gray-500">
+          <p>
+            Estimated time remaining:{" "}
+            {Math.max(1, Math.ceil((100 - progress) / 10))} seconds
+          </p>
+        </div>
+      </div>
+    </div>
   );
 }
 

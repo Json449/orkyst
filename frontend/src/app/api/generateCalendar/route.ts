@@ -1,33 +1,31 @@
 import { NextResponse } from "next/server";
 import axios from "axios";
-import { cookies } from "next/headers";
 
 export async function POST(request: Request) {
   try {
-    const _cookies = await cookies();
-
     const body = await request.json(); // Get request body
     // Retrieve the access token from cookies
     const access_token = body.access_token;
+
     if (!access_token.access_token) {
       return NextResponse.json(
         { success: false, data: { error: "Unauthorized: No access token" } },
         { status: 401 }
       );
     }
-    _cookies.set("isAuthenticated", "true", {
-      maxAge: 30 * 86400,
-      path: "/",
-      sameSite: "strict",
-    });
+    delete body.access_token;
+    const url = `${process.env.BASE_URL}/users/update_user`;
 
-    _cookies.set("access_token", access_token.access_token, {
-      maxAge: 30 * 86400,
-      path: "/",
-      sameSite: "strict",
+    // Make the PATCH request with Authorization header
+    const rawResponse = await axios.put(url, body, {
+      headers: {
+        Authorization: `Bearer ${access_token.access_token}`,
+        "Content-Type": "application/json",
+      },
     });
-
-    return NextResponse.json({ success: true });
+    const { data, status } = rawResponse;
+    console.log("yahooo now update user check", data?.result);
+    return NextResponse.json({ success: true, data }, { status });
   } catch (err) {
     console.error("Error:", err);
 

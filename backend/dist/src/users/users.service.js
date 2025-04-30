@@ -60,7 +60,7 @@ let UsersService = class UsersService {
         }
         const result = await this.calendarService.generateCalendar(updateUserDto.calendarInputs, userId);
         console.log('check now', result);
-        return await user.save();
+        return result;
     }
 };
 exports.UsersService = UsersService;

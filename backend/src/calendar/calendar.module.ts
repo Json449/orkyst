@@ -8,12 +8,14 @@ import { VersionHistorySchema } from './schemas/versionhistory.schema';
 import { CollaboratorSchema } from './schemas/collaborator.schema';
 import { FeedbackSchema } from './schemas/feedback.schema';
 import { UserSchema } from 'src/users/schemas/user.schema';
+import { JobSchema } from './schemas/job.schema';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: 'Calendar', schema: CalendarSchema },
       { name: 'Collaborator', schema: CollaboratorSchema },
+      { name: 'Job', schema: JobSchema },
       { name: 'User', schema: UserSchema },
       { name: 'Event', schema: EventSchema }, // Register the Event schema
       { name: 'VersionHistory', schema: VersionHistorySchema },
