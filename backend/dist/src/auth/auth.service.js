@@ -38,7 +38,11 @@ let AuthService = class AuthService {
             expiresIn: '2h',
         });
         return {
-            result: { access_token: accessToken, isVerified: user.isVerified },
+            result: {
+                access_token: accessToken,
+                isVerified: user.isVerified,
+                ...payload,
+            },
             status: 200,
         };
     }

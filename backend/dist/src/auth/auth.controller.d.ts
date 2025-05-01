@@ -26,6 +26,8 @@ export declare class AuthController {
     }>;
     refreshToken(authHeader: string): Promise<{
         result: {
+            email: any;
+            sub: any;
             access_token: string;
             isVerified: any;
         };

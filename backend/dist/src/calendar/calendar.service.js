@@ -260,6 +260,7 @@ let CalendarService = class CalendarService {
             const calendarData = await this.validateCalendarResponse(response?.choices[0]?.message?.content);
             await this.updateJob(jobId, { progress: 70 });
             const validatedEvents = await this.validateCalendarEvents(calendarData, currentYear, currentMonth);
+            console.log('validated events', validatedEvents);
             calendarData.events = validatedEvents;
             calendarData.calendarInputs = job.inputs;
             calendarData.userId = job.userId;
@@ -269,7 +270,8 @@ let CalendarService = class CalendarService {
             const eventIds = await this.createEvents(calendarData.events, newCalendar._id);
             newCalendar.events = eventIds;
             await this.updateJob(jobId, { progress: 90 });
-            await newCalendar.save();
+            const check = await newCalendar.save();
+            console.log('calendar', check);
             await this.updateJob(jobId, {
                 status: 'completed',
                 result: newCalendar,

@@ -281,6 +281,7 @@ export class CalendarService {
         currentYear,
         currentMonth,
       );
+      console.log('validated events', validatedEvents);
       calendarData.events = validatedEvents;
       calendarData.calendarInputs = job.inputs;
       calendarData.userId = job.userId;
@@ -293,7 +294,8 @@ export class CalendarService {
       );
       newCalendar.events = eventIds;
       await this.updateJob(jobId, { progress: 90 });
-      await newCalendar.save();
+      const check = await newCalendar.save();
+      console.log('calendar', check);
       await this.updateJob(jobId, {
         status: 'completed',
         result: newCalendar,

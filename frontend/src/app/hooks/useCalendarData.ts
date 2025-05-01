@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 export const useAITipsMutation = () => {
   const queryClient = useQueryClient();
+  const currentUser: any = queryClient.getQueryData(["currentUser"]);
 
   return useMutation({
     mutationFn: async (calendarId: string) => {
@@ -15,7 +16,10 @@ export const useAITipsMutation = () => {
       return data?.data?.result || [];
     },
     onSuccess: (tips, calendarId) => {
-      queryClient.setQueryData(["aiTips", calendarId], tips);
+      queryClient.setQueryData(
+        ["aiTips", `${calendarId + currentUser?.id}`],
+        tips
+      );
     },
     onError: (error: Error) => {
       console.error("Error fetching AI tips:", error.message);
@@ -24,8 +28,10 @@ export const useAITipsMutation = () => {
 };
 
 export const useCalendarList = () => {
+  const queryClient = useQueryClient();
+  const currentUser: any = queryClient.getQueryData(["currentUser"]);
   return useQuery({
-    queryKey: ["calendarList"],
+    queryKey: [`${"calendarList" + currentUser.id}`],
     queryFn: async () => {
       const res = await fetch("/api/calendarList");
       const data = await res.json();
@@ -37,6 +43,7 @@ export const useCalendarList = () => {
 
 export const useCalendarDetails = () => {
   const queryClient = useQueryClient();
+  const currentUser: any = queryClient.getQueryData(["currentUser"]);
 
   return useMutation({
     mutationFn: async (calendarId: string) => {
@@ -53,7 +60,10 @@ export const useCalendarDetails = () => {
       return res.json();
     },
     onSuccess: (response, calendarId) => {
-      queryClient.setQueryData(["calendar", calendarId], response); // Cache the response
+      queryClient.setQueryData(
+        ["calendar", `${calendarId + currentUser?.id}`],
+        response
+      ); // Cache the response
     },
     onError: (error) => {
       console.error("Error fetching calendar details:", error);

@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import { useAuth } from "@/app/hooks/useAuth";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -10,6 +11,7 @@ export default function LoginForm() {
   const [loginState, setLoginState] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const { login } = useAuth();
 
   const checkPasswordLength = (pass: string) => {
     if (pass.length < 6 || pass.length > 15) {
@@ -20,34 +22,19 @@ export default function LoginForm() {
   const handleSubmit = async (isAutoLogin = false) => {
     const { email, password } = loginState;
     if (isAutoLogin || validateInput()) {
-      const url = "/api/login";
       setIsLoading(true);
-      const body = {
-        email: email,
-        password: password,
-      };
       try {
-        const data = await fetch(url, {
-          method: "POST",
-          body: JSON.stringify(body),
-        });
-        const response = await data.json();
-        if (response.success) {
-          if (response.data.result.isVerified) {
-            router.push("/dashboard");
-          } else {
-            const serializedEvent = encodeURIComponent(
-              JSON.stringify({
-                access_token: response.data.result.access_token,
-              })
-            );
-            router.push(
-              `/account_verification?access_token=${serializedEvent}`
-            );
+        await login.mutateAsync(
+          { email, password },
+          {
+            onSuccess: (response) => {
+              console.log("Login successful", response);
+            },
+            onError: (error: Error) => {
+              setErrors(true);
+            },
           }
-        } else {
-          setErrors(true);
-        }
+        );
       } catch {
         setErrors(true);
       } finally {
@@ -143,7 +130,9 @@ export default function LoginForm() {
           <div
             className={`${errors ? "block" : "hidden"} text-center m-auto py-3`}
           >
-            <p className="text-sm text-red-600">Please check your Username or Password</p>
+            <p className="text-sm text-red-600">
+              Please check your Username or Password
+            </p>
           </div>
           <button
             className="text-base rounded-xl w-full p-3.5 font-medium bg-primary text-white"

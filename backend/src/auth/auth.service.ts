@@ -46,7 +46,11 @@ export class AuthService {
       expiresIn: '2h', // Access token expires in 2 hours
     });
     return {
-      result: { access_token: accessToken, isVerified: user.isVerified }, // Return the access token
+      result: {
+        access_token: accessToken,
+        isVerified: user.isVerified,
+        ...payload,
+      }, // Return the access token
       status: 200, // Status code for successful login
     };
   }

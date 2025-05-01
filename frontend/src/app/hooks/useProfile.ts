@@ -1,11 +1,17 @@
 // hooks/useCalendarData.ts
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const useProfile = () => {
+  const queryClient = useQueryClient();
+  const currentUser = queryClient.getQueryData(["currentUser"]);
   return useQuery({
-    queryKey: ["profile"],
+    queryKey: ["profile", currentUser?.id],
     queryFn: async () => {
-      const res = await fetch("/api/profile");
+      const res = await fetch("/api/profile", {
+        headers: {
+          "Cache-Control": "no-cache",
+        },
+      });
       const data = await res.json();
       return data?.data?.result || [];
     },

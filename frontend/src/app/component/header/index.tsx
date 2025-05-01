@@ -2,10 +2,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import ArrowDropDown from "@mui/icons-material/ArrowDropDown";
-import { useLogout } from "@/app/hooks/useAuth";
-import { useRouter } from "next/navigation";
 import Image from "next/image";
-
+import { useAuth } from "@/app/hooks/useAuth";
 interface Profile {
   avatar?: string;
   fullname?: string;
@@ -21,8 +19,7 @@ interface HeaderProps {
 const Header = ({ profile, editor, handleApproveChanges }: HeaderProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const router = useRouter();
-  const { mutate: logout, isPending } = useLogout();
+  const { logout } = useAuth();
 
   const toggleDropdown = () => setIsOpen((prev) => !prev);
 
@@ -40,9 +37,7 @@ const Header = ({ profile, editor, handleApproveChanges }: HeaderProps) => {
   }, []);
 
   const handleLogout = () => {
-    logout(undefined, {
-      onSuccess: () => router.push("/"),
-    });
+    logout.mutate();
   };
 
   return (
@@ -143,10 +138,10 @@ const Header = ({ profile, editor, handleApproveChanges }: HeaderProps) => {
                   </a>
                   <button
                     onClick={handleLogout}
-                    disabled={isPending}
+                    disabled={logout.isPending}
                     className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center"
                   >
-                    {isPending ? (
+                    {logout.isPending ? (
                       <>
                         <svg
                           className="animate-spin -ml-1 mr-2 h-4 w-4 text-gray-500"

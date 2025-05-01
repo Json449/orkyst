@@ -10,6 +10,8 @@ export declare class AuthService {
     validateUser(email: string, password: string): Promise<any>;
     login(user: any): Promise<{
         result: {
+            email: any;
+            sub: any;
             access_token: string;
             isVerified: any;
         };

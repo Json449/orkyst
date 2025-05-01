@@ -97,7 +97,10 @@ export default function CalendarPage() {
   const [aiTips, setAITips] = useState<AiTip[]>([]);
   const [collaboratorModalOpen, setCollaboratorModalOpen] = useState(false);
   const router = useRouter();
-  const { mutate } = useCalendarDetails();
+  const [selectedCalendarId, setSelectedCalendarId] = useState<string | null>(
+    null
+  );
+  const { mutate: calendarDetailsMutate } = useCalendarDetails();
   const { mutate: aiTipsMutate } = useAITipsMutation();
   const queryClient = useQueryClient();
 
@@ -105,12 +108,10 @@ export default function CalendarPage() {
   const { data: profile } = useProfile();
   const { data: calendarList = [], isLoading: calendarListLoading } =
     useCalendarList();
-  const { setSelectedCalendarId, getSelectedCalendarId } =
-    useCalendarSelection();
 
   const handleCalendarDetails = useCallback(
     (calendarId: string) => {
-      mutate(calendarId, {
+      calendarDetailsMutate(calendarId, {
         onSuccess: (response) => {
           setCalendar(response?.data);
           setSelectedCalendarId(calendarId);
@@ -125,21 +126,16 @@ export default function CalendarPage() {
         },
       });
     },
-    [mutate, aiTipsMutate]
+    [calendarDetailsMutate, aiTipsMutate]
   );
 
   useEffect(() => {
     if (calendarList?.length > 0) {
-      // Try to get the saved calendar ID first
-      const savedCalendarId = getSelectedCalendarId();
+      const savedCalendarId = selectedCalendarId;
       const calendarIdToUse = savedCalendarId || calendarList[0]._id;
-
-      // Save it if not already saved
       if (!savedCalendarId) {
         setSelectedCalendarId(calendarIdToUse);
       }
-
-      // Fetch details for the calendar
       handleCalendarDetails(calendarIdToUse);
     }
   }, [calendarList]);
