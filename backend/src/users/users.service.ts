@@ -68,7 +68,6 @@ export class UsersService {
       updateUserDto.calendarInputs,
       userId,
     );
-    console.log('check now', result);
     return result;
   }
 }

@@ -3,7 +3,6 @@ import { useMutation } from "@tanstack/react-query";
 export const useUpdateTokenMutation = () => {
   return useMutation({
     mutationFn: async (access_token: { access_token: string }) => {
-      console.log("shaoasd", access_token);
       const res = await fetch("/api/updateToken", {
         method: "POST",
         headers: {

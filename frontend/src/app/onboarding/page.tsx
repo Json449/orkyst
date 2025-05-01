@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useJobStatusPollingMutation } from "../hooks/useJobStatusPolling";
 import { useUpdateTokenMutation } from "../hooks/useUpdateToken";
 import { statusMessages } from "@/utils";
+import "./styles.css";
 
 function FormData() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -62,7 +63,6 @@ function FormData() {
 
   const generateCalendar = async () => {
     const url = "/api/generateCalendar";
-    console.log("generate calendar now");
     setIsLoading(true);
     setErrors(null);
     try {
@@ -88,8 +88,6 @@ function FormData() {
       setIsLoading(false);
     }
   };
-
-  console.log("view form data", formData);
 
   // Step counter component
   const StepCounter = () => (
@@ -433,7 +431,6 @@ function ProgressTracker({ jobId, access_token }) {
       jobPollingMutate(jobId, {
         onSuccess: async (response) => {
           const { data } = response;
-          console.log("asdasds", data);
           if (!isMounted) return;
 
           if (data.status === "completed") {
@@ -478,46 +475,188 @@ function ProgressTracker({ jobId, access_token }) {
   }, [jobId, router, jobPollingMutate]);
 
   return (
-    <div className="fixed inset-0 bg-white bg-opacity-90 z-50 flex flex-col items-center justify-center">
-      <div className="max-w-md w-full p-8 bg-white rounded-xl shadow-lg">
-        <div className="text-center mb-8">
-          <h2 className="text-2xl font-bold text-[#7a0860] mb-2">
-            Creating Your Perfect Calendar
+    <div className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="w-full max-w-lg bg-white/90 rounded-2xl shadow-xl overflow-hidden backdrop-blur-[2px] border border-white/20">
+        {/* Header with shimmer effect */}
+        <div className="bg-gradient-to-r from-[#7a0860]/90 to-[#a50b7f]/90 p-6 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-30 animate-shimmer" />
+          <h2 className="text-2xl font-bold text-white text-center relative">
+            Creating Your Calendar
           </h2>
-          <p className="text-gray-600">{status}</p>
         </div>
 
-        {/* Animated Lottie loader */}
-        <div className="w-32 h-32 mx-auto mb-6">
-          {/* <Lottie animationData={loadingAnimation} loop={true} /> */}
-        </div>
+        <div className="p-6">
+          {/* Progress circle with shimmer */}
+          <div className="relative w-32 h-32 mx-auto mb-8">
+            <div className="absolute inset-0 rounded-full bg-white/80 border border-white/30 shadow-sm overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#f3e8ff]/50 to-transparent opacity-40 animate-shimmer" />
+            </div>
 
-        {/* Progress bar with animation */}
-        <div className="mb-6">
-          <div className="flex justify-between mb-2">
-            <span className="text-sm font-medium text-[#7a0860]">
-              {progress}% Complete
-            </span>
-            <span className="text-sm text-gray-500">
-              {Math.floor(progress / 20) + 1}/5 Stages
-            </span>
+            <svg className="w-full h-full relative" viewBox="0 0 100 100">
+              <circle
+                cx="50"
+                cy="50"
+                r="45"
+                fill="none"
+                stroke="#f3e8ff"
+                strokeWidth="8"
+                strokeOpacity="0.5"
+              />
+              <circle
+                cx="50"
+                cy="50"
+                r="45"
+                fill="none"
+                stroke="url(#progressGradient)"
+                strokeWidth="8"
+                strokeLinecap="round"
+                strokeDasharray="283"
+                strokeDashoffset={283 - (283 * progress) / 100}
+                transform="rotate(-90 50 50)"
+                className="transition-all duration-700 ease-out"
+              />
+              <text
+                x="50"
+                y="50"
+                textAnchor="middle"
+                dy=".3em"
+                fontSize="20"
+                fontWeight="bold"
+                fill="#7a0860"
+              >
+                {progress}%
+              </text>
+              <defs>
+                <linearGradient
+                  id="progressGradient"
+                  x1="0%"
+                  y1="0%"
+                  x2="100%"
+                  y2="0%"
+                >
+                  <stop offset="0%" stopColor="#7a0860" />
+                  <stop offset="100%" stopColor="#d53a9d" />
+                </linearGradient>
+              </defs>
+            </svg>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-3">
-            <div
-              className="bg-gradient-to-r from-[#7a0860] to-[#a50b7f] h-3 rounded-full transition-all duration-500 ease-out"
-              style={{ width: `${progress}%` }}
-            ></div>
-          </div>
-        </div>
 
-        {/* Time estimate (optional) */}
-        <div className="text-center text-sm text-gray-500">
-          <p>
-            Estimated time remaining:{" "}
-            {Math.max(1, Math.ceil((100 - progress) / 10))} seconds
-          </p>
+          {/* Status panel with shimmer */}
+          <div className="bg-white/70 backdrop-blur-sm rounded-lg p-4 mb-6 border border-white/30 relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent opacity-20 animate-shimmer" />
+            <p className="text-center text-gray-700 relative">
+              <span className="inline-block whitespace-pre-wrap">
+                {status.split("").map((char, i) => (
+                  <span
+                    key={i}
+                    className={`animate-typing inline-block ${
+                      char === " " ? "w-2" : ""
+                    }`}
+                    style={{ animationDelay: `${i * 0.03}s` }}
+                  >
+                    {char === " " ? "\u00A0" : char}
+                  </span>
+                ))}
+              </span>
+            </p>
+          </div>
+
+          {/* Progress steps with shimmer */}
+          <div className="bg-white/70 backdrop-blur-sm rounded-lg p-4 border border-white/30 relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent opacity-20 animate-shimmer" />
+            <div className="relative">
+              <div className="flex justify-between mb-3 relative">
+                <div className="absolute top-1/2 left-0 right-0 h-1.5 bg-gray-200/50 -translate-y-1/2 z-0">
+                  <div
+                    className="h-full bg-gradient-to-r from-[#7a0860] to-[#a50b7f] transition-all duration-700 ease-out"
+                    style={{ width: `${progress}%` }}
+                  ></div>
+                </div>
+                {[0, 25, 50, 75, 100].map((step) => (
+                  <div key={step} className="relative z-10">
+                    <div
+                      className={`w-7 h-7 rounded-full flex items-center justify-center shadow-sm transition-colors duration-300 ${
+                        progress >= step
+                          ? "bg-[#7a0860]"
+                          : "bg-white border-2 border-gray-300"
+                      }`}
+                    >
+                      {progress >= step && (
+                        <svg
+                          className="w-3 h-3 text-white"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="3"
+                            d="M5 13l4 4L19 7"
+                          />
+                        </svg>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="flex justify-between text-xs text-gray-500 px-1">
+                <span>Start</span>
+                <span>Finish</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Time estimate with pulse */}
+          <div className="text-center mt-6 text-sm text-gray-600/90">
+            <p className="animate-pulse">
+              Estimated time: ~{Math.max(1, Math.ceil((100 - progress) / 10))}{" "}
+              seconds
+            </p>
+          </div>
         </div>
       </div>
+
+      <style jsx global>{`
+        @keyframes typing {
+          from {
+            opacity: 0;
+            transform: translateY(3px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        @keyframes shimmer {
+          0% {
+            transform: translateX(-100%);
+          }
+          100% {
+            transform: translateX(100%);
+          }
+        }
+        @keyframes pulse {
+          0%,
+          100% {
+            opacity: 0.8;
+          }
+          50% {
+            opacity: 1;
+          }
+        }
+        .animate-typing {
+          animation: typing 0.3s ease forwards;
+          opacity: 0;
+          display: inline-block;
+        }
+        .animate-shimmer {
+          animation: shimmer 2s infinite linear;
+        }
+        .animate-pulse {
+          animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+      `}</style>
     </div>
   );
 }

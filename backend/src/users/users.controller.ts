@@ -22,7 +22,6 @@ export class UsersController {
   @UseGuards(JwtAuthGuard) // Protect this route with JWT authentication
   @Put('update_user')
   async updateUser(@Request() req, @Body() updateUserDto: UpdateUserDto) {
-    console.log('fetched', updateUserDto);
     const userId = req.user?.userId;
     const jobId = await this.usersService.updateUser(userId, updateUserDto);
     return {

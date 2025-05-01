@@ -79,11 +79,9 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
       promptInputRef.current.focus();
     }
   }, [mode]);
-  console.log("yahooo", imageUrl);
 
   return (
     <div className="h-full bg-white overflow-hidden mx-6 rounded-xl border-4 border-bg-primarygrey">
-      {/* Header with glossy tabs */}
       <div className="flex border-b border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100">
         <button
           className={`bg-primarygrey flex-1 py-2 px-4 font-semibold text-lg transition-all duration-300 flex items-center justify-center gap-2 ${
@@ -108,8 +106,6 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
           Upload Image
         </button>
       </div>
-
-      {/* Content area with glass morphism effect */}
       <div className="bg-gradient-to-br from-gray-50 to-white">
         {mode === "upload" ? (
           <>
@@ -249,10 +245,10 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
                 </p>
                 {generateImageLoading && (
                   <div className="flex flex-col items-center">
-                    <HourglassTopIcon
+                    {/* <HourglassTopIcon
                       className="animate-spin text-purple-500"
                       style={{ fontSize: "3rem" }}
-                    />
+                    /> */}
                     <p className="text-sm text-gray-400 mt-3">
                       This usually takes 10-30 seconds
                     </p>

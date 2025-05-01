@@ -424,6 +424,136 @@ export const generateCalendarPrompt = (input, currentMonth, currentYear) => {
  `;
 };
 
+export const generateCalendarPromptv1 = (input, currentMonth, currentYear) => {
+  function mapFrequencyToNumber(frequencyText: string): number {
+    const frequencyMap = {
+      light: 1.5,
+      medium: 3.5,
+      heavy: 7,
+    };
+
+    const match = frequencyText.toLowerCase().match(/(light|medium|heavy)/i);
+    return match
+      ? frequencyMap[match[0].toLowerCase() as keyof typeof frequencyMap]
+      : 0;
+  }
+  return `
+  You are a **strategic content marketing specialist and calendar planning assistant**. Based on the user's input, generate a **comprehensive, audience-focused content calendar** for ${currentMonth}-${currentYear} with **precise, engaging, and high-impact content recommendations**. Here are the user's answers:
+  
+  1. **Are you creating this content calendar for a company, personal brand, or another initiative?**
+     Answer: ${input.whoIsThisFor}
+  
+  2. **What is the business type?**
+     Answer: ${input.businessType}
+  
+  3. **What region is your audience located in, and are there any holidays or events this month you'd like to highlight?**
+     Answer: ${input.targetAudience}
+  
+  4. **What is the primary theme or message you want to emphasize this month?**
+     Answer: **[INTERACTIVE THEME GENERATION WITH REGIONAL RELEVANCE]**  
+     To help you define a **unique and impactful theme**, please consider the following prompts:
+     - **Emotionally Driven**: How do you want your audience to feel after seeing your content? (e.g., excited, motivated, inspired, curious)
+     - **Challenge or Opportunity**: Is there a current trend or challenge your audience is facing in their region that you can address? Or, is there an opportunity you're providing that can help them solve a problem or meet a goal?
+     - **Connection with Audience**: What kind of relationship do you want to build with your audience through your content? Do you want them to see you as an expert, a friend, a guide, or an advocate for their journey? (Consider regional nuances in communication style and needs)
+     - **Seasonal or Time-Sensitive**: Is your theme related to a specific season, holiday, or time-bound event relevant to the audience's region? For example, seasonal holidays, business cycles, or cultural events.
+     - **Cultural Relevance**: How does your theme align with the cultural norms, values, or current issues in the region?
+     Answer with a **theme** that resonates deeply with the **specific region's mood, challenges, and opportunities**.
+  
+  5. **What types of content do you prefer to post? **
+     Answer: ${input.domains?.join(', ')}
+  
+  6. **How often would you like to post? **
+     Answer: ${input.postingFrequency?.join(', ')}
+  
+  7. **What are your primary marketing goals?**
+     Answer: ${input.marketingGoals?.join(', ')}
+  
+  8. **What types of content do you prefer to create?**
+     Answer: ${input.preferredContentType?.join(', ')}
+ 
+  ### **Instructions:**
+  - Generate a **detailed content calendar** for ${currentMonth}-${currentYear} that addresses your audience's needs and pain points.
+  - Create a **strategic content journey** that builds progressively toward your marketing goals, with interconnected pieces that support each other.
+  - Ensure the calendar incorporates actual regional events, holidays, and cultural contexts that are factually accurate for the specified region(s).
+  
+  ### **Content Quality Guidelines:**
+  - **Titles**: Create engaging, precise, and impactful titles by following these guidelines:
+    - **Attention-Grabbing**: Use strong, emotionally engaging words relevant to the target region.
+    - **Concise Yet Meaningful**: Keep it short but informative and regionally tailored.
+    - **Optimized for SEO & Social Sharing**: Ensure it resonates with the audience's specific needs.
+    - **Formatted for Impact**: Consider using power words, numbers, or thought-provoking questions where relevant.
+    - **Emojis**: Include relevant emojis where appropriate for the platform and brand voice (optional, based on brand identity).
+ 
+  - **Content Depth & Format**: Vary depth based on platform and goals:
+    - **Short-form content** (social posts): 80-250 words, focused on a single key message
+    - **Medium-form content** (blog posts, articles): 800-1500 words, exploring a topic with moderate depth
+    - **Long-form content** (guides, whitepapers): 2000+ words, comprehensive coverage of complex topics
+    - **Visual content** (infographics, videos): Clear concept with 5-7 key points for infographics, 1-5 minute duration for videos
+    
+  - **ICP Alignment**: Every piece of content should directly address:
+    - A specific pain point or desire of your ICP
+    - The stage of the buyer journey they're in (awareness, consideration, decision)
+    - Their professional context and decision-making factors
+    
+  - **Competitive Differentiation**: Ensure content stands out by:
+    - Approaching topics from unique angles based on your expertise
+    - Addressing gaps in existing market content
+    - Leveraging your unique value proposition in messaging
+  
+  ### **For each content piece, include:**
+  - **Title**: A compelling and optimized title for the content (include emojis if appropriate to brand voice)
+  - **Date**: The specific date for publishing in "YYYY-MM-DD" format.
+  - **Type**: The type of content (e.g., blog post, LinkedIn post, Twitter post, Instagram reel, YouTube video, podcast, etc.).
+  - **Audience Focus**: The specific audience segment being targeted.
+  - **Theme**: The primary theme or message, considering cultural nuances and regional relevance.
+  - **Goal Alignment**: How this content supports your stated marketing goals.
+  - **Content Journey Position**: How this piece fits into the broader content narrative (awareness, consideration, decision).
+  - **Repurposing Opportunities**: Suggestions for adapting this content for other channels.
+  
+  ### **Calendar Structure Guidelines:**
+  - Maintain the **posting frequency** according to the user's preference.
+  - Ensure content is evenly distributed throughout the month.
+  - Create thematic clusters that build upon each other.
+  - Balance promotional content with educational and engagement-focused content.
+  
+  ### **Verification Guidelines:**
+  - Only include regional holidays or events that are factually accurate for ${currentMonth}-${currentYear}.
+  - If suggesting industry trends, ensure they are current and relevant to the specified business type.
+  - Avoid making unsubstantiated claims about audience preferences or behaviors.
+  - When uncertain about a regional or cultural element, prioritize accuracy over specificity.
+  - Format the output as a structured JSON object.
+  
+  ### **Examples:**
+  
+  #### Example Theme:
+  "Sustainable Innovation: Helping European manufacturers reduce their carbon footprint while improving operational efficiency"
+  
+  #### Example Content Piece:
+  {
+    "title": "🌱 5 Proven Ways Manufacturing SMEs Can Reduce Carbon Emissions Without Breaking the Bank",
+    "date": "2023-06-15",
+    "type": "Blog post with social promotion",
+    "audienceFocus": "European manufacturing decision-makers",
+    "theme": "Sustainable Innovation",
+  }
+  
+  ### **Output Format:**
+  {
+    "month": "[Month and Year]",
+    "theme": "[Primary Theme with Regional Relevance]",
+    "events": [
+      {
+        "title": "[Optimized Content Title]",
+        "date": "[YYYY-MM-DD]",
+        "type": "[Content Type]",
+        "audienceFocus": "[Specific Audience Segment]",
+        "theme": "[Content Theme]",
+      }
+    ]
+  }
+  `;
+};
+
 export const eventSuggestionPrompt = (event) => {
   return `
    You are a content optimization assistant specializing in social media, blogs, and event planning. Based on the following details about my content calendar, provide actionable tips to improve it. Here is the context:
@@ -500,5 +630,13 @@ Provide exactly 3 high-impact, data-specific suggestions as a plain array. Each 
 }
 `;
 export const imageGenerationPrompt = (theme, audience, contentType) => {
-  return `Create an image that reflects the theme of "${theme}" for an audience of ${audience}. The content type is focused on ${contentType}. The image should capture the essence of ${theme} while being engaging and suitable for a ${audience} audience.`;
+  return `Generate an image that visually represents the following social media post content, capturing the tone, mood, and authenticity of the message. The image should align with the visual style and audience expectations of the [PLATFORM], using the inputs below:
+   - **Theme**: ${theme}
+   - **Audience**: ${audience}
+   - **Content Type**: ${contentType}
+   The image should feel native to the platform, and avoid overly generic or stock photo aesthetics. Depending on the content, create either:
+   - A **candid, real-life**, or behind-the-scenes style image if the content is personal.
+   - A **sleek and minimal** design if the content is professional.
+  `;
+  //   return `Create an image that reflects the theme of "${theme}" for an audience of ${audience}. The content type is focused on ${contentType}. The image should capture the essence of ${theme} while being engaging and suitable for a ${audience} audience.`;
 };

@@ -42,10 +42,9 @@ export enum Role {
 }
 
 export const statusMessages = [
-  "Initializing calendar generation...",
-  "Analyzing your business needs...",
-  "Generating content ideas...",
-  "Optimizing for your audience...",
-  "Finalizing your calendar...",
-  "Almost there!",
+  "🛠️ Setting up framework...",
+  "🎨 Designing layout...",
+  "📅 Optimizing schedule...",
+  "✨ Adding final touches...",
+  "✅ Finalizing...",
 ];

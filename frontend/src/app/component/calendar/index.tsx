@@ -16,6 +16,7 @@ import {
   X,
 } from "@mui/icons-material";
 import { Tooltip, Chip } from "@mui/material";
+import "./styles.css";
 
 const localizer = dateFnsLocalizer({
   format,

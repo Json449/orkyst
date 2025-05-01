@@ -14,6 +14,7 @@ import {
   defaultPrompt,
   eventSuggestionPrompt,
   generateCalendarPrompt,
+  generateCalendarPromptv1,
   generateDynamicBlogPostPrompt,
   imageGenerationPrompt,
   linkedInPrompt,
@@ -24,7 +25,6 @@ import { CreateCollaboratorDto } from './dto/create-collaborator.dto';
 import { UserDocument } from 'src/users/schemas/user.schema';
 import { JobDocument } from './schemas/job.schema';
 import { v4 as uuidv4 } from 'uuid';
-import mongoose from 'mongoose';
 
 @Injectable()
 export class CalendarService {
@@ -252,7 +252,7 @@ export class CalendarService {
       const currentYear = currentDate.getFullYear();
       const currentMonth = currentDate.getMonth() + 1;
       // Step 1: Generate prompt
-      const prompt = generateCalendarPrompt(
+      const prompt = generateCalendarPromptv1(
         job.inputs,
         currentMonth,
         currentYear,
@@ -281,7 +281,6 @@ export class CalendarService {
         currentYear,
         currentMonth,
       );
-      console.log('validated events', validatedEvents);
       calendarData.events = validatedEvents;
       calendarData.calendarInputs = job.inputs;
       calendarData.userId = job.userId;
@@ -294,8 +293,7 @@ export class CalendarService {
       );
       newCalendar.events = eventIds;
       await this.updateJob(jobId, { progress: 90 });
-      const check = await newCalendar.save();
-      console.log('calendar', check);
+      await newCalendar.save();
       await this.updateJob(jobId, {
         status: 'completed',
         result: newCalendar,
@@ -608,8 +606,8 @@ export class CalendarService {
           },
         ],
         response_format: { type: 'json_object' },
-        max_tokens: 1000, // Increase token limit for more detailed responses
-        temperature: 1, // Lower temperature for more focused and precise responses
+        max_tokens: 3000, // Increase token limit for more detailed responses
+        temperature: 0.5, // Lower temperature for more focused and precise responses
       });
 
       // Extract the AI-generated tips from the response

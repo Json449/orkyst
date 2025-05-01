@@ -30,7 +30,6 @@ let UsersController = class UsersController {
         };
     }
     async updateUser(req, updateUserDto) {
-        console.log('fetched', updateUserDto);
         const userId = req.user?.userId;
         const jobId = await this.usersService.updateUser(userId, updateUserDto);
         return {

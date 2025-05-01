@@ -18,7 +18,6 @@ export class MailService {
 
   async sendVerificationEmail(to: string, code: string): Promise<void> {
     try {
-      console.log('sending emaik');
       const mailOptions = {
         from: process.env.GMAIL_USER, // Sender address
         to, // Recipient address
@@ -27,7 +26,6 @@ export class MailService {
       };
       // Send the email
       await this.transporter.sendMail(mailOptions);
-      console.log('sending success');
     } catch (error) {
       throw error;
     }

@@ -492,13 +492,15 @@ function DetailForm() {
   const { data: profile = [] } = useProfile();
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [pendingChanges, setPendingChanges] = useState<PendingChanges>();
-  const { mutate: eventDetailMutate } = useEventDetailsMutation();
+  const { mutate: eventDetailMutate, isPending: isEventLoading } =
+    useEventDetailsMutation();
+
   const router = useRouter();
   const serializedEvent = searchParams.get("collaborators");
+  const event_type = searchParams.get("event_type");
   const collaborators: Event | null = serializedEvent
     ? JSON.parse(decodeURIComponent(serializedEvent))
     : null;
-  console.log("ccccc", collaborators);
 
   const eventId = searchParams.get("eventId");
   useEffect(() => {
@@ -548,7 +550,6 @@ function DetailForm() {
             method: "PUT",
             body: JSON.stringify(body),
           });
-          console.log("asdsadsad", imageUrl);
           setEventDetails((prev) => ({
             ...prev,
             artwork: imageUrl?.data?.result,
@@ -566,31 +567,24 @@ function DetailForm() {
 
   const handleEventDetail = useCallback(
     (eventId: string) => {
-      setGenerateImageLoading(true);
       eventDetailMutate(eventId, {
         onSuccess: (response) => {
-          setGenerateImageLoading(false);
-          console.log("event details:", response);
           setEventDetails((prev) => ({
             ...prev,
             ...response?.data,
             artwork: response?.data?.artwork || imageUrl?.data?.result,
           }));
           setImageUrl(response?.data?.artwork || imageUrl?.data?.result);
-          fetchImage(response?.data, null, null);
         },
         onError: (error) => {
-          setGenerateImageLoading(false);
           console.error("Failed:", error.message);
         },
       });
     },
     [
       eventDetailMutate,
-      setGenerateImageLoading,
       setEventDetails,
       setImageUrl,
-      fetchImage,
       imageUrl?.data?.result, // Added missing dependency
     ]
   );
@@ -690,7 +684,6 @@ function DetailForm() {
   const goBack = () => {
     router.replace("/dashboard");
   };
-
   return (
     <div className="flex flex-col h-screen bg-white w-full">
       <Header
@@ -720,11 +713,17 @@ function DetailForm() {
                   className="mr-3"
                 />
               </span>
-              <span className="font-bold text-black">{eventDetails?.type}</span>
+              {!isEventLoading && (
+                <span className="font-bold text-black">
+                  {eventDetails?.type}
+                </span>
+              )}
             </div>
-            <span className="flex-shrink-0">
-              {getEventIcon(eventDetails?.type)}
-            </span>
+            {!isEventLoading && (
+              <span className="flex-shrink-0">
+                {getEventIcon(eventDetails?.type)}
+              </span>
+            )}
           </div>
           <div className="h-[57] p-4 flex bg-primary items-center justify-between mb-4">
             <h3 className="text-xl font-bold text-white flex items-center">
@@ -753,9 +752,11 @@ function DetailForm() {
               <p className="p-2 rounded-xl bg-primarygrey text-black font-bold">
                 v 1.1
               </p>
-              <p className="px-4 py-2 rounded-xl bg-primarygrey text-black font-bold">
-                {formatDate(eventDetails?.date)}
-              </p>
+              {!isEventLoading && (
+                <p className="px-4 py-2 rounded-xl bg-primarygrey text-black font-bold">
+                  {formatDate(eventDetails?.date)}
+                </p>
+              )}
             </div>
             <div className="flex gap-4">
               <button className="w-[157px] h-[40px] bg-[#7a0860] text-white text-[16px] font-medium rounded-xl hover:bg-[#5c0648] transition-colors disabled:opacity-70">
@@ -771,30 +772,25 @@ function DetailForm() {
               </button>
             </div>
           </div>
-          {!loading &&
-            !eventDetails?.type?.toLowerCase().startsWith("blog") && (
-              <ImageUploader
-                generateImageLoading={generateImageLoading}
-                setImageUrl={setImageUrl}
-                imageUrl={imageUrl}
-                onGenerateAI={(prompt) =>
-                  fetchImage(eventDetails, prompt, null)
-                }
-                onCloudinaryUpload={handleImageUpload}
-              />
-            )}
-          {eventDetails && (
-            <TinyMCEEditor
-              loading={loading}
-              highlightContent="In today's fast-paced digital landscape, small an"
-              handleFeedbackSubmit={(text: string, comment: string) =>
-                handleFeedbackSubmit(text, comment)
-              }
-              onChangeContent={setContent}
-              value={content}
-              eventType={eventDetails?.type ?? ""}
+          {!event_type?.toLowerCase().startsWith("blog") && (
+            <ImageUploader
+              generateImageLoading={generateImageLoading}
+              setImageUrl={setImageUrl}
+              imageUrl={imageUrl}
+              onGenerateAI={(prompt) => fetchImage(eventDetails, prompt, null)}
+              onCloudinaryUpload={handleImageUpload}
             />
           )}
+          <TinyMCEEditor
+            loading={isEventLoading}
+            highlightContent="In today's fast-paced digital landscape, small an"
+            handleFeedbackSubmit={(text: string, comment: string) =>
+              handleFeedbackSubmit(text, comment)
+            }
+            onChangeContent={setContent}
+            value={content}
+            eventType={eventDetails?.type ?? ""}
+          />
         </div>
         <div className="w-[24%] bg-primarygrey overflow-hidden">
           <div className="shadow-lg flex flex-col">

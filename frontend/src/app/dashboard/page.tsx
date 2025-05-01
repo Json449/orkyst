@@ -55,7 +55,6 @@ const transformDataForCalendar = (data?: Event[]): CalendarEvent[] => {
   if (!data) return [];
 
   return data.map((event) => {
-    console.log("daya", event);
     // Validate the date string before creating Date objects
     const date = new Date(event.date);
     if (isNaN(date.getTime())) {
@@ -211,7 +210,7 @@ export default function CalendarPage() {
       );
       // Update the URL with eventId and collaborators
       router.push(
-        `/eventDetails?eventId=${event?._id}&collaborators=${serializedCollaborators}`
+        `/eventDetails?eventId=${event?._id}&collaborators=${serializedCollaborators}&&event_type=${event.type}`
       );
     },
     [router]

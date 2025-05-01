@@ -6,7 +6,6 @@ export async function POST(request: Request) {
   const { email, password } = await request.json();
   const _cookies = await cookies();
   const url = `${process.env.BASE_URL}/auth/login`;
-  console.log("sss", url);
 
   try {
     const response = await axios.post(url, { email, password });

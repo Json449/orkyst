@@ -124,12 +124,42 @@ const TinyMCEEditor: React.FC<TinyMCEEditorProps> = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  console.log("view now", eventType.toLowerCase().startsWith("blog"));
-
   return (
     <div className="h-full relative rounded-xl border-bg-primarygrey border-4 mx-6 mt-2">
       {loading ? (
-        <p className="mt-5 text-md text-black">Content Loading...</p>
+        <div className="flex flex-col items-center justify-center h-full py-8">
+          <div className="relative w-16 h-16 mb-4">
+            {/* Animated circles in 7a0860 color scheme */}
+            <div
+              className="absolute inset-0 rounded-full border-4 border-[#7a0860] border-t-transparent animate-spin"
+              style={{ borderColor: "#7a0860", borderTopColor: "transparent" }}
+            ></div>
+            <div
+              className="absolute inset-2 rounded-full border-4 border-[#9d3a7e] border-b-transparent animate-spin animation-delay-150"
+              style={{
+                borderColor: "#9d3a7e",
+                borderBottomColor: "transparent",
+              }}
+            ></div>
+            <div
+              className="absolute inset-4 rounded-full border-4 border-[#c06c9d] border-l-transparent animate-spin animation-delay-300"
+              style={{ borderColor: "#c06c9d", borderLeftColor: "transparent" }}
+            ></div>
+
+            {/* Center dot */}
+            <div
+              className="absolute inset-6 rounded-full"
+              style={{ backgroundColor: "#7a0860" }}
+            ></div>
+          </div>
+
+          <p className="text-lg font-medium text-[#7a0860]">
+            Loading your content...
+          </p>
+          <p className="text-sm text-[#9d3a7e] mt-1">
+            Just a moment while we prepare your editor
+          </p>
+        </div>
       ) : (
         <>
           <Editor

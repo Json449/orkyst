@@ -1,0 +1,10 @@
+.animate-shimmer {
+    animation: shimmer 1.5s infinite linear;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.5) 50%,
+      transparent 100%
+    );
+    background-size: 200% 100%;
+  }

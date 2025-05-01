@@ -5,7 +5,6 @@ export const useJobStatusPollingMutation = (access_token: {
 }) => {
   return useMutation({
     mutationFn: async (jobId: string) => {
-      console.log("Accc", access_token.access_token);
       const url = `/api/jobStatus?jobId=${jobId}`;
       const res = await fetch(url, {
         method: "GET",

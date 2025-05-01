@@ -22,7 +22,6 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
       }
       return user; // Return the user if authentication is successful
     } catch (error) {
-      console.log('Errr', error);
       // Catch any other errors and structure the response accordingly
       throw new UnauthorizedException({
         result: null,

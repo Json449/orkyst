@@ -24,7 +24,6 @@ let MailService = class MailService {
     }
     async sendVerificationEmail(to, code) {
         try {
-            console.log('sending emaik');
             const mailOptions = {
                 from: process.env.GMAIL_USER,
                 to,
@@ -32,7 +31,6 @@ let MailService = class MailService {
                 html: `<p>Your verification code is: <strong>${code}</strong></p>`,
             };
             await this.transporter.sendMail(mailOptions);
-            console.log('sending success');
         }
         catch (error) {
             throw error;

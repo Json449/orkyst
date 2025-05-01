@@ -7,7 +7,6 @@ export class ConfigurationService {
 
   getOpenAiApiKey(): string {
     const apiKey = this.configService.get<string>('OPENAI_API_KEY_CHECK');
-    console.log('sss', apiKey);
     if (!apiKey) {
       throw new Error('Missing OPENAI_API_KEY in environment variables');
     }

@@ -242,7 +242,7 @@ let CalendarService = class CalendarService {
             const currentDate = new Date();
             const currentYear = currentDate.getFullYear();
             const currentMonth = currentDate.getMonth() + 1;
-            const prompt = (0, utils_1.generateCalendarPrompt)(job.inputs, currentMonth, currentYear);
+            const prompt = (0, utils_1.generateCalendarPromptv1)(job.inputs, currentMonth, currentYear);
             await this.updateJob(jobId, { progress: 40 });
             const response = await this.openai.chat.completions.create({
                 model: 'gpt-4o-mini',
@@ -260,7 +260,6 @@ let CalendarService = class CalendarService {
             const calendarData = await this.validateCalendarResponse(response?.choices[0]?.message?.content);
             await this.updateJob(jobId, { progress: 70 });
             const validatedEvents = await this.validateCalendarEvents(calendarData, currentYear, currentMonth);
-            console.log('validated events', validatedEvents);
             calendarData.events = validatedEvents;
             calendarData.calendarInputs = job.inputs;
             calendarData.userId = job.userId;
@@ -270,8 +269,7 @@ let CalendarService = class CalendarService {
             const eventIds = await this.createEvents(calendarData.events, newCalendar._id);
             newCalendar.events = eventIds;
             await this.updateJob(jobId, { progress: 90 });
-            const check = await newCalendar.save();
-            console.log('calendar', check);
+            await newCalendar.save();
             await this.updateJob(jobId, {
                 status: 'completed',
                 result: newCalendar,
@@ -481,8 +479,8 @@ let CalendarService = class CalendarService {
                     },
                 ],
                 response_format: { type: 'json_object' },
-                max_tokens: 1000,
-                temperature: 1,
+                max_tokens: 3000,
+                temperature: 0.5,
             });
             let data = (0, jsonrepair_1.jsonrepair)(response?.choices[0]?.message?.content);
             data = JSON.parse(data);

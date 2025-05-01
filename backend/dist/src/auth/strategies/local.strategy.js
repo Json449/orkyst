@@ -32,7 +32,6 @@ let LocalStrategy = class LocalStrategy extends (0, passport_1.PassportStrategy)
             return user;
         }
         catch (error) {
-            console.log('Errr', error);
             throw new common_1.UnauthorizedException({
                 result: null,
                 status: 500,

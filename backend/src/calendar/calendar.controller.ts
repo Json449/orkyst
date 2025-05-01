@@ -109,7 +109,6 @@ export class CalendarController {
   @Put('image-generation/:id')
   @UseGuards(JwtAuthGuard)
   async generateImage(@Param('id') id: string, @Body() prompt) {
-    console.log('prompt', prompt);
     const response = await this.calendarService.generateImage(prompt, id);
     return {
       result: response,
@@ -159,7 +158,6 @@ export class CalendarController {
   @UseGuards(JwtAuthGuard)
   async getJobStatus(@Request() req, @Param('jobId') jobId: string) {
     try {
-      console.log('jobidd', jobId, req.user.userId);
       const job = await this.calendarService.getJobStatus(jobId, req.user.userId);
       return {
         status: job.status,

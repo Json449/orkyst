@@ -24,7 +24,6 @@ export async function POST(request: Request) {
       },
     });
     const { data, status } = rawResponse;
-    console.log("yahooo now update user check", data?.result);
     return NextResponse.json({ success: true, data }, { status });
   } catch (err) {
     console.error("Error:", err);

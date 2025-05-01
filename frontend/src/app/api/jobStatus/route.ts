@@ -9,8 +9,6 @@ export async function GET(req: NextRequest) {
   const authHeader = req.headers.get("Authorization");
   const accessToken = authHeader?.split(" ")[1]; // Extract token from "Bearer <token>"
 
-  console.log("Request details:", accessToken);
-
   try {
     // Validate required parameters
     if (!jobId) {
@@ -28,7 +26,6 @@ export async function GET(req: NextRequest) {
     }
 
     const url = `${process.env.BASE_URL}/calendar/job-status/${jobId}`;
-    console.log("Forwarding request to:", url);
 
     const response = await axios.get(url, {
       headers: {

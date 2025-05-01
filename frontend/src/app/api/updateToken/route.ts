@@ -6,7 +6,6 @@ export async function POST(request: Request) {
   const _cookies = await cookies();
   const authHeader = request.headers.get("Authorization");
   const accessToken = authHeader?.split(" ")[1]; // Extract token from "Bearer <token>"
-  console.log("accesss", accessToken);
   try {
     _cookies.set("isAuthenticated", "true", {
       maxAge: 30 * 86400,

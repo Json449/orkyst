@@ -79,7 +79,6 @@ let CalendarController = class CalendarController {
         };
     }
     async generateImage(id, prompt) {
-        console.log('prompt', prompt);
         const response = await this.calendarService.generateImage(prompt, id);
         return {
             result: response,
@@ -114,7 +113,6 @@ let CalendarController = class CalendarController {
     }
     async getJobStatus(req, jobId) {
         try {
-            console.log('jobidd', jobId, req.user.userId);
             const job = await this.calendarService.getJobStatus(jobId, req.user.userId);
             return {
                 status: job.status,

@@ -30,7 +30,7 @@ export const useAITipsMutation = () => {
 export const useCalendarList = () => {
   const queryClient = useQueryClient();
   const currentUser: any = queryClient.getQueryData(["currentUser"]);
-  console.log("query now", currentUser?.id);
+
   return useQuery({
     queryKey: ["calendarList", currentUser?.id],
     queryFn: async () => {
@@ -38,7 +38,13 @@ export const useCalendarList = () => {
       const data = await res.json();
       return data?.data || [];
     },
-    staleTime: 3 * 60 * 1000, // 1 hour
+    // Disable all caching behavior
+    staleTime: 0, // Always considered stale
+    refetchOnMount: true, // Always refetch when component mounts
+    refetchOnWindowFocus: true, // Refetch when window regains focus
+    refetchOnReconnect: true, // Refetch when network reconnects
+    // Optional: Force refetch every X milliseconds
+    // refetchInterval: 5000,
   });
 };
 

@@ -9,7 +9,6 @@ import { CollaboratorDocument } from './schemas/collaborator.schema';
 import { CreateCollaboratorDto } from './dto/create-collaborator.dto';
 import { UserDocument } from 'src/users/schemas/user.schema';
 import { JobDocument } from './schemas/job.schema';
-import mongoose from 'mongoose';
 export declare class CalendarService {
     private readonly collaboratorModel;
     private readonly calendarModel;
@@ -22,7 +21,7 @@ export declare class CalendarService {
     private openai;
     constructor(collaboratorModel: Model<CollaboratorDocument>, calendarModel: Model<CalendarDocument>, userModel: Model<UserDocument>, eventModel: Model<EventDocument>, feedbackModel: Model<FeedbackDocument>, versionModel: Model<VersionHistory>, jobModel: Model<JobDocument>, configService: ConfigService);
     getCalendarDetails(calendarId: string): Promise<CalendarDocument>;
-    addCollaborator(calendarId: string, createCollaboratorDto: CreateCollaboratorDto): Promise<mongoose.Document<unknown, {}, CollaboratorDocument> & CollaboratorDocument & Required<{
+    addCollaborator(calendarId: string, createCollaboratorDto: CreateCollaboratorDto): Promise<import("mongoose").Document<unknown, {}, CollaboratorDocument> & CollaboratorDocument & Required<{
         _id: unknown;
     }> & {
         __v: number;
@@ -35,22 +34,22 @@ export declare class CalendarService {
     private updateJob;
     generateCalendar(calendarInputs: any, userId: string): Promise<any>;
     getPrompt: (title: string, audienceFocus: any, theme: any, date: any, type: any) => string;
-    generateBlogPostContent(id: string): Promise<(mongoose.Document<unknown, {}, EventDocument> & EventDocument & Required<{
+    generateBlogPostContent(id: string): Promise<(import("mongoose").Document<unknown, {}, EventDocument> & EventDocument & Required<{
         _id: unknown;
     }> & {
         __v: number;
     }) | null>;
-    getEventDetails(id: string): Promise<mongoose.Document<unknown, {}, EventDocument> & EventDocument & Required<{
+    getEventDetails(id: string): Promise<import("mongoose").Document<unknown, {}, EventDocument> & EventDocument & Required<{
         _id: unknown;
     }> & {
         __v: number;
     }>;
-    getCalendarList(id: string): Promise<(mongoose.Document<unknown, {}, CalendarDocument> & CalendarDocument & Required<{
+    getCalendarList(id: string): Promise<(import("mongoose").Document<unknown, {}, CalendarDocument> & CalendarDocument & Required<{
         _id: unknown;
     }> & {
         __v: number;
     })[]>;
-    addFeedback(payload: AddFeedbackDto): Promise<mongoose.Document<unknown, {}, FeedbackDocument> & FeedbackDocument & Required<{
+    addFeedback(payload: AddFeedbackDto): Promise<import("mongoose").Document<unknown, {}, FeedbackDocument> & FeedbackDocument & Required<{
         _id: unknown;
     }> & {
         __v: number;

@@ -8,7 +8,6 @@ const nextConfig: NextConfig = {
     unoptimized: true,
     domains: [
       "oaidalleapiprodscus.blob.core.windows.net",
-      // Add your backend domain if serving images
     ],
   },
 

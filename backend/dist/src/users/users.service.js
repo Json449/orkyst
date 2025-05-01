@@ -59,7 +59,6 @@ let UsersService = class UsersService {
             throw new common_1.NotFoundException(`User with ID ${userId} not found`);
         }
         const result = await this.calendarService.generateCalendar(updateUserDto.calendarInputs, userId);
-        console.log('check now', result);
         return result;
     }
 };
