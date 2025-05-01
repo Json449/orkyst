@@ -30,14 +30,15 @@ export const useAITipsMutation = () => {
 export const useCalendarList = () => {
   const queryClient = useQueryClient();
   const currentUser: any = queryClient.getQueryData(["currentUser"]);
+  console.log("query now", currentUser?.id);
   return useQuery({
-    queryKey: [`${"calendarList" + currentUser?.id}`],
+    queryKey: ["calendarList", currentUser?.id],
     queryFn: async () => {
       const res = await fetch("/api/calendarList");
       const data = await res.json();
       return data?.data || [];
     },
-    staleTime: 60 * 60 * 1000, // 1 hour
+    staleTime: 3 * 60 * 1000, // 1 hour
   });
 };
 
