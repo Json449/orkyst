@@ -31,7 +31,7 @@ export const useCalendarList = () => {
   const queryClient = useQueryClient();
   const currentUser: any = queryClient.getQueryData(["currentUser"]);
   return useQuery({
-    queryKey: [`${"calendarList" + currentUser.id}`],
+    queryKey: [`${"calendarList" + currentUser?.id}`],
     queryFn: async () => {
       const res = await fetch("/api/calendarList");
       const data = await res.json();

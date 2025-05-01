@@ -1,12 +1,10 @@
 "use client";
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { useAuth } from "@/app/hooks/useAuth";
 
 export default function LoginForm() {
-  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [loginState, setLoginState] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState(false);
@@ -31,6 +29,7 @@ export default function LoginForm() {
               console.log("Login successful", response);
             },
             onError: (error: Error) => {
+              console.log("error", error);
               setErrors(true);
             },
           }

@@ -13,7 +13,6 @@ import {
 import { useProfile } from "../hooks/useProfile";
 import Image from "next/image";
 import AddCollaboratorModal from "../component/AddCollaboratorModal";
-import { useCalendarSelection } from "../hooks/useSelectedCalendar";
 interface AiTip {
   description: string;
   // Add any other properties that aiTips might contain
@@ -212,7 +211,7 @@ export default function CalendarPage() {
       );
       // Update the URL with eventId and collaborators
       router.push(
-        `/eventDetails?eventId=${event._id}&collaborators=${serializedCollaborators}`
+        `/eventDetails?eventId=${event?._id}&collaborators=${serializedCollaborators}`
       );
     },
     [router]
@@ -237,8 +236,6 @@ export default function CalendarPage() {
     // );
     // router.replace(`/onboarding?access_token=${serializedResponse}`);
   };
-
-  console.log("asdasdasd", aiTips);
 
   return (
     <div className="bg-white w-full">

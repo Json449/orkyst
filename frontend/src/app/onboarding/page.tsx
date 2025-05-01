@@ -5,7 +5,6 @@ import Image from "next/image";
 import { useJobStatusPollingMutation } from "../hooks/useJobStatusPolling";
 import { useUpdateTokenMutation } from "../hooks/useUpdateToken";
 import { statusMessages } from "@/utils";
-import { useQueryClient } from "@tanstack/react-query";
 
 function FormData() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -425,7 +424,6 @@ function ProgressTracker({ jobId, access_token }) {
   const { mutate: jobPollingMutate } =
     useJobStatusPollingMutation(access_token);
   const { mutate: updateTokenMutate } = useUpdateTokenMutation();
-  const queryClient = useQueryClient();
 
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
