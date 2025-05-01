@@ -1,8 +1,6 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 
 export const useEventDetailsMutation = () => {
-  const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: async (eventId: string) => {
       const url = `/api/events/details?id=${eventId}`;
@@ -13,9 +11,7 @@ export const useEventDetailsMutation = () => {
       }
       return data;
     },
-    onSuccess: (data, eventId) => {
-      queryClient.setQueryData(["events", eventId], data);
-    },
+    onSuccess: () => {},
     onError: (error: Error) => {
       console.log("Error fetching AI tips:", error?.message);
     },
