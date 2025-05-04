@@ -48,3 +48,10 @@ export const statusMessages = [
   "✨ Adding final touches...",
   "✅ Finalizing...",
 ];
+
+export const plurals = (value: any, name: string) => {
+  if (value?.length > 1) {
+    return `${name}s`;
+  }
+  return name;
+};

@@ -11,6 +11,7 @@ import { AddFeedbackDto } from './dto/add-feedback-dto';
 import { VersionHistory } from './schemas/versionhistory.schema';
 import {
   calendarSuggestionPrompt,
+  calendarSuggestionPromptv1,
   defaultPrompt,
   eventSuggestionPrompt,
   generateCalendarPrompt,
@@ -80,12 +81,13 @@ export class CalendarService {
     calendarId: string,
     createCollaboratorDto: CreateCollaboratorDto,
   ) {
+    console.log('calendarid', calendarId, createCollaboratorDto);
     // Validate calendar exists
     const calendar = await this.calendarModel.findById(calendarId);
     if (!calendar) {
       throw new Error('Calendar not found');
     }
-
+    console.log('calendar', calendar);
     // Verify the user exists
     const user = await this.userModel.findOne({
       email: createCollaboratorDto.email,
@@ -127,7 +129,13 @@ export class CalendarService {
   }
 
   async getCalendarSuggestions(id: string): Promise<any> {
-    const calendar = await this.calendarModel.findById(id).exec();
+    const calendar = await this.calendarModel
+      .findById(id)
+      .populate({
+        path: 'events',
+        select: '-description', // Exclude 'description' while including all other fields
+      })
+      .exec();
     if (!calendar) {
       throw new Error('No record found');
     }
@@ -135,8 +143,8 @@ export class CalendarService {
       return JSON.parse(calendar.suggestions);
     }
     // Generate the prompt for AI tips based on the calendar data
-    const prompt = calendarSuggestionPrompt(calendar.calendarInputs);
-
+    const prompt = calendarSuggestionPromptv1(calendar);
+    console.log('sss', prompt);
     try {
       // Call the OpenAI API to generate tips
       const response: any = await this.openai.chat.completions.create({

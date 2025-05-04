@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.imageGenerationPrompt = exports.calendarSuggestionPrompt = exports.eventSuggestionPrompt = exports.generateCalendarPromptv1 = exports.generateCalendarPrompt = exports.generateAdvancedCalendarPrompt = exports.defaultPrompt = exports.linkedInPrompt = exports.generateDynamicBlogPostPrompt = exports.blogPostPrompt = exports.twitterPrompt = void 0;
+exports.imageGenerationPrompt = exports.calendarSuggestionPrompt = exports.calendarSuggestionPromptv1 = exports.eventSuggestionPrompt = exports.generateCalendarPromptv1 = exports.generateCalendarPrompt = exports.generateAdvancedCalendarPrompt = exports.defaultPrompt = exports.linkedInPrompt = exports.generateDynamicBlogPostPrompt = exports.blogPostPrompt = exports.twitterPrompt = void 0;
 const twitterPrompt = (title, audienceFocus, theme, date) => {
     return `
       You are tasked with creating a concise and engaging Twitter post titled *"${title}"*. The post should educate and inspire ${audienceFocus} about the benefits and relevance of ${theme}. The content must be tailored to Twitter's platform, focusing on brevity, hashtags, mentions, and a strong call-to-action. Ensure the following:
@@ -416,17 +416,6 @@ const generateCalendarPrompt = (input, currentMonth, currentYear) => {
 };
 exports.generateCalendarPrompt = generateCalendarPrompt;
 const generateCalendarPromptv1 = (input, currentMonth, currentYear) => {
-    function mapFrequencyToNumber(frequencyText) {
-        const frequencyMap = {
-            light: 1.5,
-            medium: 3.5,
-            heavy: 7,
-        };
-        const match = frequencyText.toLowerCase().match(/(light|medium|heavy)/i);
-        return match
-            ? frequencyMap[match[0].toLowerCase()]
-            : 0;
-    }
     return `
   You are a **strategic content marketing specialist and calendar planning assistant**. Based on the user's input, generate a **comprehensive, audience-focused content calendar** for ${currentMonth}-${currentYear} with **precise, engaging, and high-impact content recommendations**. Here are the user's answers:
   
@@ -589,45 +578,145 @@ const eventSuggestionPrompt = (event) => {
    `;
 };
 exports.eventSuggestionPrompt = eventSuggestionPrompt;
-const calendarSuggestionPrompt = (calendarInputs) => `
-Analyze this ${calendarInputs.category} content calendar targeting ${calendarInputs.audience} with theme "${calendarInputs.theme}". 
-Current content: ${calendarInputs.contentTypes} posted ${calendarInputs.posting}.
+const calendarSuggestionPromptv1 = (calendar) => {
+    return `You are a strategic AI assistant specialized in marketing content optimization.
 
-Provide exactly 3 high-impact, data-specific suggestions as a plain array. Each suggestion must:
-1. Address visible gaps/opportunities
-2. Be actionable within 1-2 lines
-3. Leverage the ${calendarInputs.theme} theme
-4. Consider ${calendarInputs.audience} preferences
+  Your job is to analyze a calendar of upcoming content and provide actionable, platform-specific suggestions to improve engagement, visibility, and alignment with campaign goals.
+  
+  Use the full context below to generate **precise, creative, and localized tips** for the campaign owner.
+  
+  ---
+  
+  CAMPAIGN BRIEF:
+  - Audience Type: ${calendar.calendarInputs.whoIsThisFor}
+  - Business Type: ${calendar.calendarInputs.businessType}
+  - Target Region: ${calendar.calendarInputs.targetAudience}
+  - Primary Marketing Goals: ${calendar.calendarInputs.marketingGoals.join(', ')}
+  - Platforms in Use: ${calendar.calendarInputs.domains.join(', ')}
+  - Posting Frequency: ${calendar.calendarInputs.postingFrequency[0]}
+  - Preferred Content Style: ${calendar.calendarInputs.preferredContentType.join(', ')}
+  
+  ---
+  
+  CONTENT CALENDAR DATA:
+  - Month: ${calendar.month}
+  - Theme: ${calendar.theme}
+  
+  Planned Events:
+  ${calendar.events}
+  
+  ---
+  
+  🎯 TASK:
+  Based on the information above, provide **5 concise and high-impact AI suggestions** to enhance the calendar’s effectiveness.
+  
+  Suggestions can include:
+  - Platform-specific content improvements
+  - Audience engagement hacks
+  - Strategic post timing
+  - Regional relevance additions
+  - Calls-to-action, hashtag use, or content repurposing
+  
+  Ensure tips align with the marketing goals, preferred style, and posting cadence.
+  
+  Respond only with the 3 numbered tips.
 
-**Output Format**:
-- Provide only 3 tips in a structured JSON format.
-- Each tip should include a brief explanation of why it is beneficial.
-- Provide only JSON output, no extra text.
+  #### Example Content Piece:
+  {
+    "action":"Utilize Instagram Stories to create polls or quizzes related to the upcoming blog posts, such as 'What AI fashion trend are you most excited about?'",
+    "platform":"Instagram",
+    "reason":"Stories have higher engagement rates than regular posts, allowing for direct interaction with your audience and collecting instant feedback on topics of interest."}}
+  }
 
-### **Output Format:**
+  **Output Format (Strict JSON)**:  
 {
   "tips": [
     {
-      "description": "[Brief explanation of why this tip is beneficial]"
+      "action": "[Concrete action]",
+      "platform": "[Platform/Channel]",
+      "reason": "[Data, trend, or audience behavior justifying this]"
     },
     {
-      "description": "[Brief explanation of why this tip is beneficial]"
+      "action": "[Concrete action]",
+      "platform": "[Platform/Channel]",
+      "reason": "[Data, trend, or audience behavior justifying this]"
     },
     {
-      "description": "[Brief explanation of why this tip is beneficial]"
+      "action": "[Concrete action]",
+      "platform": "[Platform/Channel]",
+      "reason": "[Data, trend, or audience behavior justifying this]"
     }
   ]
-}
+}  
+  `;
+};
+exports.calendarSuggestionPromptv1 = calendarSuggestionPromptv1;
+const calendarSuggestionPrompt = (calendarInputs) => `
+Analyze the following content calendar strategy and provide 3 precise optimization suggestions.  
+
+**Context**:  
+- **User Type**: ${calendarInputs.whoIsThisFor || 'Not specified'}  
+- **Industry**: ${calendarInputs.businessType || 'Not specified'}  
+- **Target Audience**: ${calendarInputs.targetAudience || 'Not specified'}  
+- **Goals**: ${calendarInputs.marketingGoals?.join(', ') || 'Not specified'}  
+- **Platforms**: ${calendarInputs.domains?.join(', ') || 'Not specified'}  
+- **Frequency**: ${calendarInputs.postingFrequency?.join(', ') || 'Not specified'}  
+- **Content Types**: ${calendarInputs.preferredContentType?.join(', ') || 'Not specified'}  
+
+**Task**:  
+Generate 3 actionable suggestions to improve this calendar. Each must:  
+1. **Address gaps** in content mix, timing, or audience relevance.  
+2. **Align with goals** (${calendarInputs.marketingGoals?.join(', ') || 'unspecified goals'}) and **platform best practices**.  
+3. **Include data/logic** (e.g., "Video performs 3x better on [Platform] for [Audience]").  
+4. **Be executable** (1-2 steps max).  
+
+**Output Format (Strict JSON)**:  
+{
+  "tips": [
+    {
+      "action": "[Concrete action]",
+      "platform": "[Platform/Channel]",
+      "reason": "[Data, trend, or audience behavior justifying this]"
+    },
+    {
+      "action": "[Concrete action]",
+      "platform": "[Platform/Channel]",
+      "reason": "[Data, trend, or audience behavior justifying this]"
+    },
+    {
+      "action": "[Concrete action]",
+      "platform": "[Platform/Channel]",
+      "reason": "[Data, trend, or audience behavior justifying this]"
+    }
+  ]
+}  
+
+**Rules**:  
+- Only output JSON. No commentary.  
+- Prioritize gaps in frequency/content type/platform mix.  
+- Use generic benchmarks if audience-specific data is missing (e.g., "LinkedIn articles gain 2x more shares than text posts").  
+- Include at least one cross-platform repurposing tip.  
 `;
 exports.calendarSuggestionPrompt = calendarSuggestionPrompt;
 const imageGenerationPrompt = (theme, audience, contentType) => {
-    return `Generate an image that visually represents the following social media post content, capturing the tone, mood, and authenticity of the message. The image should align with the visual style and audience expectations of the [PLATFORM], using the inputs below:
-   - **Theme**: ${theme}
-   - **Audience**: ${audience}
-   - **Content Type**: ${contentType}
-   The image should feel native to the platform, and avoid overly generic or stock photo aesthetics. Depending on the content, create either:
-   - A **candid, real-life**, or behind-the-scenes style image if the content is personal.
-   - A **sleek and minimal** design if the content is professional.
+    return `Create a realistic or high-quality 3D-rendered image that represents the following marketing content for social media.
+
+  The visual should match the tone and content strategy used on [PLATFORM], and be suitable for direct use in a post — **no surreal, abstract, fantasy, or overly stylized effects**.
+  
+  Details:
+  - 🎯 **Theme**: ${theme}
+  - 🧑‍🤝‍🧑 **Target Audience**: ${audience}
+  - 📢 **Content Type**: ${contentType}
+  - 📲 **Platform Style**: [PLATFORM] (e.g., Instagram = casual & vivid, LinkedIn = professional & minimal, etc.)
+  
+  Image requirements:
+  - Use **real-world environments, realistic people or objects**, and **natural lighting**
+  - If applicable, simulate a **lifestyle photo, event moment, or candid snapshot**
+  - If product or brand-focused, use **studio-quality lighting, branding, and polished composition**
+  - The image must feel **authentic**, like it could have been shot by a professional photographer or rendered in high-end 3D software
+  - No watermarks, text, or borders unless specified
+  
+  Make sure the image style matches the expectations and native aesthetic of the selected social platform.
   `;
 };
 exports.imageGenerationPrompt = imageGenerationPrompt;

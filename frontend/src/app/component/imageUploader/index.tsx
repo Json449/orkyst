@@ -111,21 +111,30 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
           <>
             {imageUrl ? (
               <div className="relative group overflow-hidden shadow-lg">
-                <Image
-                  src={imageUrl}
-                  alt="Uploaded"
-                  width={800}
-                  height={500}
-                  className="w-full h-[34vh] object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
-                  <button
-                    onClick={onCloudinaryUpload}
-                    className="bg-white/90 text-gray-800 px-6 py-3 rounded-full font-medium hover:bg-white transition-all transform translate-y-4 group-hover:translate-y-0 shadow-lg flex items-center gap-2"
-                  >
-                    <RefreshIcon fontSize="small" />
-                    Change Image
-                  </button>
+                <div className="relative w-full h-[34vh] overflow-hidden rounded-lg group">
+                  <Image
+                    src={imageUrl}
+                    alt="Uploaded content preview"
+                    fill
+                    sizes="(max-width: 768px) 100vw, 800px"
+                    className="object-cover transition-all duration-500 ease-in-out group-hover:scale-105"
+                    quality={85}
+                    priority={true}
+                  />
+
+                  {/* Overlay hover effect */}
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-500" />
+
+                  {/* Button Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
+                    <button
+                      onClick={onCloudinaryUpload}
+                      className="bg-white/90 text-gray-800 px-6 py-3 rounded-full font-medium hover:bg-white transition-all transform translate-y-4 group-hover:translate-y-0 shadow-lg flex items-center gap-2"
+                    >
+                      <RefreshIcon fontSize="small" />
+                      Change Image
+                    </button>
+                  </div>
                 </div>
               </div>
             ) : (

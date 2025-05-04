@@ -108,10 +108,12 @@ let CalendarService = class CalendarService {
         }
     }
     async addCollaborator(calendarId, createCollaboratorDto) {
+        console.log('calendarid', calendarId, createCollaboratorDto);
         const calendar = await this.calendarModel.findById(calendarId);
         if (!calendar) {
             throw new Error('Calendar not found');
         }
+        console.log('calendar', calendar);
         const user = await this.userModel.findOne({
             email: createCollaboratorDto.email,
         });
@@ -137,14 +139,21 @@ let CalendarService = class CalendarService {
         return savedCollaborator;
     }
     async getCalendarSuggestions(id) {
-        const calendar = await this.calendarModel.findById(id).exec();
+        const calendar = await this.calendarModel
+            .findById(id)
+            .populate({
+            path: 'events',
+            select: '-description',
+        })
+            .exec();
         if (!calendar) {
             throw new Error('No record found');
         }
         if (calendar?.suggestions != null) {
             return JSON.parse(calendar.suggestions);
         }
-        const prompt = (0, utils_1.calendarSuggestionPrompt)(calendar.calendarInputs);
+        const prompt = (0, utils_1.calendarSuggestionPromptv1)(calendar);
+        console.log('sss', prompt);
         try {
             const response = await this.openai.chat.completions.create({
                 model: 'gpt-4o-mini',

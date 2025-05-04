@@ -14,6 +14,7 @@ import {
   CameraAlt,
   VideoLibrary,
   X,
+  Facebook,
 } from "@mui/icons-material";
 import { Tooltip, Chip } from "@mui/material";
 import "./styles.css";
@@ -55,6 +56,12 @@ interface CalendarViewProps {
 }
 
 const eventTypeStyles = {
+  facebook: {
+    backgroundColor: "rgba(24, 119, 242, 0.12)", // Facebook blue with 12% opacity
+    color: "#1877f2", // Official Facebook blue
+    borderColor: "#1877f2",
+    iconColor: "#1877f2",
+  },
   linkedin: {
     backgroundColor: "rgba(0, 119, 181, 0.12)", // Deep LinkedIn blue
     color: "#0077b5",
@@ -116,6 +123,7 @@ const eventTypeIcons = {
   podcast: <Mic style={{ fontSize: "14px" }} />,
   instagram: <CameraAlt style={{ fontSize: "14px" }} />,
   youtube: <VideoLibrary style={{ fontSize: "14px" }} />,
+  facebook: <Facebook style={{ fontSize: "14px" }} />,
   // Add any exact match exceptions here
   "twitter space": <X style={{ fontSize: "14px" }} />,
   "twitter thread": <X style={{ fontSize: "14px" }} />,
@@ -132,6 +140,7 @@ export default function CalendarView({
   const [date, setDate] = useState(new Date());
 
   const priorityOrder = [
+    "facebook",
     "twitter", // Highest priority
     "instagram",
     "youtube",
@@ -274,7 +283,7 @@ export default function CalendarView({
 
     return (
       <div className="flex flex-col mb-4">
-        <div className="flex justify-between items-center mb-2">
+        <div className="flex justify-between items-center">
           <div className="flex items-center space-x-2">
             <button
               onClick={() => toolbar.onNavigate("PREV")}
@@ -284,7 +293,7 @@ export default function CalendarView({
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-5 w-5"
                 viewBox="0 0 20 20"
-                fill="currentColor"
+                fill="grey"
               >
                 <path
                   fillRule="evenodd"
@@ -304,7 +313,7 @@ export default function CalendarView({
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-5 w-5"
                 viewBox="0 0 20 20"
-                fill="currentColor"
+                fill="grey"
               >
                 <path
                   fillRule="evenodd"
@@ -327,7 +336,7 @@ export default function CalendarView({
                 onClick={() => toolbar.onView(viewType)}
                 className={`text-black px-3 py-1 text-sm rounded-lg transition-colors ${
                   toolbar.view === viewType
-                    ? "bg-purple-600 text-white"
+                    ? "bg-[#7a0860] text-white"
                     : "bg-gray-100 hover:bg-gray-200"
                 }`}
               >
@@ -336,7 +345,7 @@ export default function CalendarView({
             ))}
           </div>
         </div>
-        <div className="flex flex-wrap gap-2">
+        {/* <div className="flex flex-wrap gap-2">
           {Object.entries(eventTypeStyles).map(([type, style]) => (
             <div key={type} className="flex items-center">
               <div
@@ -346,7 +355,7 @@ export default function CalendarView({
               <span className="text-xs text-gray-600 capitalize">{type}</span>
             </div>
           ))}
-        </div>
+        </div> */}
       </div>
     );
   };
