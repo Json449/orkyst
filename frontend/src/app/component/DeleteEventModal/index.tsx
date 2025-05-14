@@ -1,5 +1,3 @@
-import { useState } from "react";
-
 export default function DeleteEventModal({
   isOpen,
   onConfirm,
@@ -18,7 +16,7 @@ export default function DeleteEventModal({
         <div className="space-y-4">
           <p className="text-gray-600">
             Are you sure you want to delete{" "}
-            <span className="font-medium">"{eventTitle}"</span>? This action
+            <span className="font-medium">{eventTitle}</span>? This action
             cannot be undone.
           </p>
         </div>

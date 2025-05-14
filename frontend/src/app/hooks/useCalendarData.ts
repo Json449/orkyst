@@ -1,5 +1,5 @@
 // hooks/useCalendarData.ts
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 
 export const useAITipsMutation = () => {
   // const queryClient = useQueryClient();
@@ -15,7 +15,7 @@ export const useAITipsMutation = () => {
       }
       return data?.data?.result || [];
     },
-    onSuccess: (tips, calendarId) => {
+    onSuccess: () => {
       // queryClient.setQueryData(
       //   ["aiTips", `${calendarId + currentUser?.id}`],
       //   tips
@@ -60,7 +60,7 @@ export const useCalendarDetails = () => {
       }
       return res.json();
     },
-    onSuccess: (response, calendarId) => {
+    onSuccess: () => {
       // queryClient.setQueryData(
       //   ["calendar", `${calendarId + currentUser?.id}`],
       //   response

@@ -134,7 +134,6 @@ export default function CalendarView({
   view,
   onViewChange,
   onSelectSlot,
-  showModal,
   handleSelectEvent,
 }: CalendarViewProps) {
   const [date, setDate] = useState(new Date());

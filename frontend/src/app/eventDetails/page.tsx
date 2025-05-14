@@ -758,7 +758,7 @@ function DetailForm() {
       });
       return response.json();
     },
-    onSuccess: (result) => {
+    onSuccess: () => {
       setShowModal(false);
       router.back();
     },
