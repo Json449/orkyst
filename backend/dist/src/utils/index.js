@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.imageGenerationPrompt = exports.calendarSuggestionPrompt = exports.calendarSuggestionPromptv1 = exports.eventSuggestionPrompt = exports.generateCalendarPromptv1 = exports.generateCalendarPrompt = exports.generateAdvancedCalendarPrompt = exports.defaultPrompt = exports.linkedInPrompt = exports.generateDynamicBlogPostPrompt = exports.blogPostPrompt = exports.twitterPrompt = void 0;
+exports.imageGenerationPrompt = exports.calendarSuggestionPrompt = exports.calendarSuggestionPromptv2 = exports.calendarSuggestionPromptv1 = exports.eventSuggestionPrompt = exports.generateCalendarPromptv1 = exports.generateCalendarPrompt = exports.generateAdvancedCalendarPrompt = exports.defaultPrompt = exports.linkedInPrompt = exports.generateDynamicBlogPostPrompt = exports.blogPostPrompt = exports.twitterPrompt = void 0;
 const twitterPrompt = (title, audienceFocus, theme, date) => {
     return `
       You are tasked with creating a concise and engaging Twitter post titled *"${title}"*. The post should educate and inspire ${audienceFocus} about the benefits and relevance of ${theme}. The content must be tailored to Twitter's platform, focusing on brevity, hashtags, mentions, and a strong call-to-action. Ensure the following:
@@ -651,6 +651,79 @@ const calendarSuggestionPromptv1 = (calendar) => {
   `;
 };
 exports.calendarSuggestionPromptv1 = calendarSuggestionPromptv1;
+const calendarSuggestionPromptv2 = (calendar) => {
+    return `
+You are a strategic AI assistant specialized in optimizing marketing content calendars.
+
+Your role is to analyze the campaign data below and provide **precise, creative, and evidence-informed** suggestions that improve performance across platforms while staying true to the campaign’s goals and tone.
+---
+
+📋 CAMPAIGN BRIEF:
+- Audience Type: ${calendar.calendarInputs.whoIsThisFor}
+- Business Type: ${calendar.calendarInputs.businessType}
+- Target Region: ${calendar.calendarInputs.targetAudience}
+- Primary Marketing Goals: ${calendar.calendarInputs.marketingGoals.join(', ')}
+- Platforms in Use: ${calendar.calendarInputs.domains.join(', ')}
+- Posting Frequency: ${calendar.calendarInputs.postingFrequency}
+- Preferred Content Style: ${calendar.calendarInputs.preferredContentType.join(', ')}
+
+🗓️ CONTENT CALENDAR CONTEXT:
+- Month: ${calendar.month}
+- Theme: "${calendar.theme}"
+- Planned Events: ${calendar.events}
+
+🎯 TASK:
+Provide exactly **3 concise and high-impact suggestions** to enhance the calendar’s effectiveness.
+
+Each suggestion must:
+1. Address a visible gap or untapped opportunity
+2. Be actionable in 1–2 lines
+3. Leverage the "${calendar.theme}" theme
+4. Align with audience and business goals
+5. Cover a **different content dimension** (e.g., content type, timing, CTA, regional angle, or engagement style)
+
+If preview content is provided, include 1 tip that directly improves a specific post.
+
+---
+
+🧠 Each tip must include:
+- **title**: A short, clear headline for the recommendation
+- **action**: A 1–2 line concrete action the marketer should take
+- **platform**: The platform/channel it applies to
+- **reason**: A brief explanation of why this action is effective (use trends, data, or behavioral insight)
+- **priority**: Low, Medium, or High
+
+---
+
+**Output Format (Strict JSON, no extra text):**
+{
+  "tips": [
+    {
+      "title": "Leverage Short Reels",
+      "action": "Create 15-sec Reels using trending audio to announce your May giveaway.",
+      "platform": "Instagram",
+      "reason": "Reels with trending audio earn 2x reach over static posts, especially for Gen Z audiences.",
+      "priority": "High"
+    },
+    {
+      "title": "...",
+      "action": "...",
+      "platform": "...",
+      "reason": "...",
+      "priority": "..."
+    },
+    {
+      "title": "...",
+      "action": "...",
+      "platform": "...",
+      "reason": "...",
+      "priority": "..."
+    }
+  ]
+}
+`;
+};
+exports.calendarSuggestionPromptv2 = calendarSuggestionPromptv2;
 const calendarSuggestionPrompt = (calendarInputs) => `
 Analyze the following content calendar strategy and provide 3 precise optimization suggestions.  
 

@@ -4,19 +4,18 @@ import { cookies } from "next/headers";
 
 export async function POST(request: Request) {
   // Destructure the request body
-  const { comment, eventId, text } = await request.json();
+  const payload = await request.json();
+  console.log("ceck", payload);
   const _cookies = await cookies(); // Get cookies
   const accessToken = _cookies.get("access_token")?.value;
 
   // Get the cookies handler
   // Construct the URL for the login API
-  const url = `${process.env.BASE_URL}/calendar/add/events`;
-
+  const url = `${process.env.BASE_URL}/calendar/events/add`;
+  console.log("asdasd", url);
   // Create the request body
   const body = {
-    comment,
-    text,
-    eventId,
+    ...payload,
   };
 
   try {
@@ -28,6 +27,7 @@ export async function POST(request: Request) {
       },
     });
     const { data, status } = rawResponse;
+    console.log("sasdsaadasd", data, status);
 
     // Check if login is successful
     if (data?.status === 200 || data?.status == 201) {

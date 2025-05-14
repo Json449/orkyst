@@ -1,5 +1,6 @@
 import { CalendarService } from './calendar.service';
 import { CreateCollaboratorDto } from './dto/create-collaborator.dto';
+import { CreateEventDto } from './dto/create-event-dto';
 export declare class CalendarController {
     private readonly calendarService;
     constructor(calendarService: CalendarService);
@@ -22,7 +23,19 @@ export declare class CalendarController {
     }> & {
         __v: number;
     }) | null>;
-    revertVersion(payload: any): Promise<{
+    addEvents(payload: CreateEventDto): Promise<{
+        status: string;
+        message: string;
+        data: any;
+    }>;
+    editEvents(eventId: string, payload: CreateEventDto): Promise<{
+        status: string;
+        message: string;
+        data: any;
+    }>;
+    deleteEvents(eventId: string, payload: {
+        calendarId: string;
+    }): Promise<{
         status: string;
         message: string;
         data: any;

@@ -108,12 +108,10 @@ let CalendarService = class CalendarService {
         }
     }
     async addCollaborator(calendarId, createCollaboratorDto) {
-        console.log('calendarid', calendarId, createCollaboratorDto);
         const calendar = await this.calendarModel.findById(calendarId);
         if (!calendar) {
             throw new Error('Calendar not found');
         }
-        console.log('calendar', calendar);
         const user = await this.userModel.findOne({
             email: createCollaboratorDto.email,
         });
@@ -152,8 +150,7 @@ let CalendarService = class CalendarService {
         if (calendar?.suggestions != null) {
             return JSON.parse(calendar.suggestions);
         }
-        const prompt = (0, utils_1.calendarSuggestionPromptv1)(calendar);
-        console.log('sss', prompt);
+        const prompt = (0, utils_1.calendarSuggestionPromptv2)(calendar);
         try {
             const response = await this.openai.chat.completions.create({
                 model: 'gpt-4o-mini',
@@ -355,6 +352,7 @@ let CalendarService = class CalendarService {
             let description = (0, jsonrepair_1.jsonrepair)(response?.choices[0]?.message?.content);
             description = JSON.parse(description);
             description = description.html;
+            console.log('sssss', description);
             const updatedEvent = await this.eventModel
                 .findByIdAndUpdate(id, { description }, { new: true })
                 .exec();
@@ -416,27 +414,49 @@ let CalendarService = class CalendarService {
             throw new Error('Failed to add feedback');
         }
     }
-    async revertEventVersion(payload) {
-        const { eventId, version } = payload;
+    async addEvents(payload) {
         try {
-            const selectedVersion = await this.versionModel.findOne({
-                eventId,
-                version: Number(version),
-            });
-            if (!selectedVersion) {
-                throw new Error('Version not found');
-            }
-            const event = await this.eventModel.findById(eventId);
-            if (!event) {
-                throw new Error('Event not found');
-            }
-            event.set(selectedVersion.changes);
-            await event.save();
-            return { message: 'Event reverted successfully', event };
+            const addEvent = new this.eventModel(payload);
+            const newEvent = await addEvent.save();
+            await this.calendarModel.findByIdAndUpdate(payload.calendarId, { $push: { events: newEvent._id } }, { new: true });
+            return { message: 'Event created successfully', event: newEvent };
         }
         catch (error) {
-            console.error('Error reverting event:', error);
-            throw new Error('Failed to revert event');
+            console.error('Error creating event:', error);
+            throw new Error('Failed to create event');
+        }
+    }
+    async editEvent(payload, eventId) {
+        try {
+            const updatedEvent = await this.eventModel.findByIdAndUpdate(eventId, { $set: payload }, { new: true });
+            if (!updatedEvent) {
+                throw new Error('Event not found');
+            }
+            return {
+                message: 'Event updated successfully',
+                event: updatedEvent,
+            };
+        }
+        catch (error) {
+            console.error('Error edit event:', error);
+            throw new Error('Failed to edit event');
+        }
+    }
+    async deleteEvents(eventId, payload) {
+        try {
+            const updatedEvent = await this.eventModel.findByIdAndDelete(eventId);
+            if (!updatedEvent) {
+                throw new Error('Event not found');
+            }
+            await this.calendarModel.findByIdAndUpdate(payload.calendarId, { $pull: { events: eventId } }, { new: true });
+            return {
+                message: 'Event deleted successfully',
+                event: updatedEvent,
+            };
+        }
+        catch (error) {
+            console.error('Error delete event:', error);
+            throw new Error('Failed to delete event');
         }
     }
     async updateEvent(payload) {

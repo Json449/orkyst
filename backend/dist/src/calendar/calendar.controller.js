@@ -17,6 +17,7 @@ const common_1 = require("@nestjs/common");
 const calendar_service_1 = require("./calendar.service");
 const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
 const create_collaborator_dto_1 = require("./dto/create-collaborator.dto");
+const create_event_dto_1 = require("./dto/create-event-dto");
 let CalendarController = class CalendarController {
     constructor(calendarService) {
         this.calendarService = calendarService;
@@ -45,9 +46,10 @@ let CalendarController = class CalendarController {
     async generateBlogPostContent(id) {
         return this.calendarService.generateBlogPostContent(id);
     }
-    async revertVersion(payload) {
+    async addEvents(payload) {
         try {
-            const result = await this.calendarService.revertEventVersion(payload);
+            console.log('wowwww', payload);
+            const result = await this.calendarService.addEvents(payload);
             return {
                 status: 'success',
                 message: result.message,
@@ -58,6 +60,38 @@ let CalendarController = class CalendarController {
             throw new common_1.HttpException({
                 status: 'error',
                 message: error.message || 'Failed to revert event version',
+            }, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    async editEvents(eventId, payload) {
+        try {
+            const result = await this.calendarService.editEvent(payload, eventId);
+            return {
+                status: 'success',
+                message: result.message,
+                data: result.event,
+            };
+        }
+        catch (error) {
+            throw new common_1.HttpException({
+                status: 'error',
+                message: error.message || 'Failed to edit event',
+            }, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    async deleteEvents(eventId, payload) {
+        try {
+            const result = await this.calendarService.deleteEvents(eventId, payload);
+            return {
+                status: 'success',
+                message: result.message,
+                data: result.event,
+            };
+        }
+        catch (error) {
+            throw new common_1.HttpException({
+                status: 'error',
+                message: error.message || 'Failed to delete event',
             }, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -162,12 +196,28 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], CalendarController.prototype, "generateBlogPostContent", null);
 __decorate([
-    (0, common_1.Post)('event/revert-version'),
+    (0, common_1.Post)('events/add'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [create_event_dto_1.CreateEventDto]),
     __metadata("design:returntype", Promise)
-], CalendarController.prototype, "revertVersion", null);
+], CalendarController.prototype, "addEvents", null);
+__decorate([
+    (0, common_1.Put)('events/:eventId'),
+    __param(0, (0, common_1.Param)('eventId')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, create_event_dto_1.CreateEventDto]),
+    __metadata("design:returntype", Promise)
+], CalendarController.prototype, "editEvents", null);
+__decorate([
+    (0, common_1.Delete)('events/:eventId'),
+    __param(0, (0, common_1.Param)('eventId')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], CalendarController.prototype, "deleteEvents", null);
 __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Get)('suggestions/:id'),

@@ -361,11 +361,7 @@ export default function CalendarView({
   };
 
   return (
-    <div
-      className={`bg-white rounded-xl shadow-sm p-4 ${
-        showModal ? "pointer-events-none opacity-90" : ""
-      }`}
-    >
+    <div className={`bg-white rounded-xl shadow-sm p-4`}>
       <div className="h-[70vh]">
         <Calendar
           localizer={localizer}

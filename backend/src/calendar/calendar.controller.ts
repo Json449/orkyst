@@ -9,10 +9,12 @@ import {
   HttpException,
   HttpStatus,
   Put,
+  Delete,
 } from '@nestjs/common';
 import { CalendarService } from './calendar.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { CreateCollaboratorDto } from './dto/create-collaborator.dto';
+import { CreateEventDto } from './dto/create-event-dto';
 
 @Controller('calendar')
 export class CalendarController {
@@ -59,11 +61,36 @@ export class CalendarController {
     return this.calendarService.generateBlogPostContent(id);
   }
 
-  @Post('event/revert-version')
-  async revertVersion(@Body() payload: any) {
+  // @Post('event/revert-version')
+  // async revertVersion(@Body() payload: any) {
+  //   try {
+  //     // Call the service method to revert the event version
+  //     const result = await this.calendarService.revertEventVersion(payload);
+
+  //     // Return success response
+  //     return {
+  //       status: 'success',
+  //       message: result.message,
+  //       data: result.event,
+  //     };
+  //   } catch (error) {
+  //     // Handle errors and return appropriate HTTP status code
+  //     throw new HttpException(
+  //       {
+  //         status: 'error',
+  //         message: error.message || 'Failed to revert event version',
+  //       },
+  //       HttpStatus.INTERNAL_SERVER_ERROR,
+  //     );
+  //   }
+  // }
+
+  @Post('events/add')
+  async addEvents(@Body() payload: CreateEventDto) {
     try {
+      console.log('wowwww', payload);
       // Call the service method to revert the event version
-      const result = await this.calendarService.revertEventVersion(payload);
+      const result = await this.calendarService.addEvents(payload);
 
       // Return success response
       return {
@@ -77,6 +104,54 @@ export class CalendarController {
         {
           status: 'error',
           message: error.message || 'Failed to revert event version',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Put('events/:eventId')
+  async editEvents(
+    @Param('eventId') eventId: string,
+    @Body() payload: CreateEventDto,
+  ) {
+    try {
+      const result = await this.calendarService.editEvent(payload, eventId);
+      return {
+        status: 'success',
+        message: result.message,
+        data: result.event,
+      };
+    } catch (error) {
+      // Handle errors and return appropriate HTTP status code
+      throw new HttpException(
+        {
+          status: 'error',
+          message: error.message || 'Failed to edit event',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Delete('events/:eventId')
+  async deleteEvents(
+    @Param('eventId') eventId: string,
+    @Body() payload: { calendarId: string },
+  ) {
+    try {
+      const result = await this.calendarService.deleteEvents(eventId, payload);
+      return {
+        status: 'success',
+        message: result.message,
+        data: result.event,
+      };
+    } catch (error) {
+      // Handle errors and return appropriate HTTP status code
+      throw new HttpException(
+        {
+          status: 'error',
+          message: error.message || 'Failed to delete event',
         },
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
@@ -158,7 +233,10 @@ export class CalendarController {
   @UseGuards(JwtAuthGuard)
   async getJobStatus(@Request() req, @Param('jobId') jobId: string) {
     try {
-      const job = await this.calendarService.getJobStatus(jobId, req.user.userId);
+      const job = await this.calendarService.getJobStatus(
+        jobId,
+        req.user.userId,
+      );
       return {
         status: job.status,
         progress: job.progress,

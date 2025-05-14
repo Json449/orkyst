@@ -8,5 +8,6 @@ export declare const generateCalendarPrompt: (input: any, currentMonth: any, cur
 export declare const generateCalendarPromptv1: (input: any, currentMonth: any, currentYear: any) => string;
 export declare const eventSuggestionPrompt: (event: any) => string;
 export declare const calendarSuggestionPromptv1: (calendar: any) => string;
+export declare const calendarSuggestionPromptv2: (calendar: any) => string;
 export declare const calendarSuggestionPrompt: (calendarInputs: any) => string;
 export declare const imageGenerationPrompt: (theme: any, audience: any, contentType: any) => string;

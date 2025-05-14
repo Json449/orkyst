@@ -11,7 +11,7 @@ import { AddFeedbackDto } from './dto/add-feedback-dto';
 import { VersionHistory } from './schemas/versionhistory.schema';
 import {
   calendarSuggestionPrompt,
-  calendarSuggestionPromptv1,
+  calendarSuggestionPromptv2,
   defaultPrompt,
   eventSuggestionPrompt,
   generateCalendarPrompt,
@@ -26,6 +26,7 @@ import { CreateCollaboratorDto } from './dto/create-collaborator.dto';
 import { UserDocument } from 'src/users/schemas/user.schema';
 import { JobDocument } from './schemas/job.schema';
 import { v4 as uuidv4 } from 'uuid';
+import { CreateEventDto } from './dto/create-event-dto';
 
 @Injectable()
 export class CalendarService {
@@ -81,13 +82,11 @@ export class CalendarService {
     calendarId: string,
     createCollaboratorDto: CreateCollaboratorDto,
   ) {
-    console.log('calendarid', calendarId, createCollaboratorDto);
     // Validate calendar exists
     const calendar = await this.calendarModel.findById(calendarId);
     if (!calendar) {
       throw new Error('Calendar not found');
     }
-    console.log('calendar', calendar);
     // Verify the user exists
     const user = await this.userModel.findOne({
       email: createCollaboratorDto.email,
@@ -143,8 +142,7 @@ export class CalendarService {
       return JSON.parse(calendar.suggestions);
     }
     // Generate the prompt for AI tips based on the calendar data
-    const prompt = calendarSuggestionPromptv1(calendar);
-    console.log('sss', prompt);
+    const prompt = calendarSuggestionPromptv2(calendar);
     try {
       // Call the OpenAI API to generate tips
       const response: any = await this.openai.chat.completions.create({
@@ -394,6 +392,7 @@ export class CalendarService {
       let description: any = jsonrepair(response?.choices[0]?.message?.content);
       description = JSON.parse(description);
       description = description.html;
+      console.log('sssss', description);
       const updatedEvent = await this.eventModel
         .findByIdAndUpdate(
           id,
@@ -516,34 +515,71 @@ export class CalendarService {
     }
   };
 
-  async revertEventVersion(
-    payload: any,
+  async addEvents(
+    payload: CreateEventDto,
   ): Promise<{ message: string; event?: any }> {
-    const { eventId, version } = payload;
     try {
       // Find the selected version
-      const selectedVersion = await this.versionModel.findOne({
-        eventId,
-        version: Number(version),
-      });
-      if (!selectedVersion) {
-        throw new Error('Version not found');
-      }
+      const addEvent = new this.eventModel(payload);
+      const newEvent: any = await addEvent.save();
+      await this.calendarModel.findByIdAndUpdate(
+        payload.calendarId,
+        { $push: { events: newEvent._id } },
+        { new: true },
+      );
+      return { message: 'Event created successfully', event: newEvent };
+    } catch (error) {
+      console.error('Error creating event:', error);
+      throw new Error('Failed to create event');
+    }
+  }
 
-      // Find the event
-      const event = await this.eventModel.findById(eventId);
-      if (!event) {
+  async editEvent(
+    payload: CreateEventDto,
+    eventId: string,
+  ): Promise<{ message: string; event?: any }> {
+    try {
+      // Find the selected version
+      const updatedEvent = await this.eventModel.findByIdAndUpdate(
+        eventId,
+        { $set: payload },
+        { new: true }, // Return the updated document
+      );
+      if (!updatedEvent) {
         throw new Error('Event not found');
       }
-
-      // Revert the event to the selected version
-      event.set(selectedVersion.changes); // Apply the changes from the selected version
-      await event.save();
-
-      return { message: 'Event reverted successfully', event };
+      return {
+        message: 'Event updated successfully',
+        event: updatedEvent,
+      };
     } catch (error) {
-      console.error('Error reverting event:', error);
-      throw new Error('Failed to revert event');
+      console.error('Error edit event:', error);
+      throw new Error('Failed to edit event');
+    }
+  }
+
+  async deleteEvents(
+    eventId: string,
+    payload: { calendarId: string },
+  ): Promise<{ message: string; event?: any }> {
+    try {
+      // Find the selected version
+      const updatedEvent = await this.eventModel.findByIdAndDelete(eventId);
+      if (!updatedEvent) {
+        throw new Error('Event not found');
+      }
+      await this.calendarModel.findByIdAndUpdate(
+        payload.calendarId,
+        { $pull: { events: eventId } },
+        { new: true },
+      );
+      return {
+        message: 'Event deleted successfully',
+        event: updatedEvent,
+      };
+    } catch (error) {
+      console.error('Error delete event:', error);
+      throw new Error('Failed to delete event');
     }
   }
 

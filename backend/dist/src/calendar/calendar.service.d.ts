@@ -9,6 +9,7 @@ import { CollaboratorDocument } from './schemas/collaborator.schema';
 import { CreateCollaboratorDto } from './dto/create-collaborator.dto';
 import { UserDocument } from 'src/users/schemas/user.schema';
 import { JobDocument } from './schemas/job.schema';
+import { CreateEventDto } from './dto/create-event-dto';
 export declare class CalendarService {
     private readonly collaboratorModel;
     private readonly calendarModel;
@@ -61,7 +62,17 @@ export declare class CalendarService {
         aiPrompt: any;
         cloudinaryUrl: any;
     }, eventId: any) => Promise<any>;
-    revertEventVersion(payload: any): Promise<{
+    addEvents(payload: CreateEventDto): Promise<{
+        message: string;
+        event?: any;
+    }>;
+    editEvent(payload: CreateEventDto, eventId: string): Promise<{
+        message: string;
+        event?: any;
+    }>;
+    deleteEvents(eventId: string, payload: {
+        calendarId: string;
+    }): Promise<{
         message: string;
         event?: any;
     }>;

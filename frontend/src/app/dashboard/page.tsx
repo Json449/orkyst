@@ -1,5 +1,5 @@
 "use client";
-import { useState, useCallback, useMemo, useEffect } from "react";
+import { useState, useCallback, useMemo, useEffect, useRef } from "react";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import CalendarView from "../component/calendar";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -15,10 +15,7 @@ import Image from "next/image";
 import AddCollaboratorModal from "../component/AddCollaboratorModal";
 import "./styles.css";
 import { plurals } from "@/utils";
-interface AiTip {
-  description: string;
-  // Add any other properties that aiTips might contain
-}
+import AddEventModal from "../component/AddEventModal";
 interface Collaborator {
   // Define properties of a collaborator (e.g., name, role, etc.)
   name: string;
@@ -93,31 +90,37 @@ export default function CalendarPage() {
   const [view, setView] = useState<"month" | "week" | "day">("month");
   const [newEvent, setNewEvent] = useState({ title: "", start: "", end: "" });
   const [showModal, setShowModal] = useState(false);
+  const [copyTextIndex, setCopyTextIndex] = useState(null);
+  const [selectedSlotInfo, setSelectedSlotInfo] = useState(null);
   const [calendar, setCalendar] = useState<Calendar | null>(null);
-  const [aiTips, setAITips] = useState<AiTip[]>([]);
+  const [aiTips, setAITips] = useState<any[]>([]);
   const [collaboratorModalOpen, setCollaboratorModalOpen] = useState(false);
   const router = useRouter();
-  const [selectedCalendarId, setSelectedCalendarId] = useState<string | null>(
-    null
-  );
   const { mutate: calendarDetailsMutate } = useCalendarDetails();
   const { mutate: aiTipsMutate } = useAITipsMutation();
   const queryClient = useQueryClient();
-  console.log("09090", aiTips);
   // Data fetching
   const { data: profile } = useProfile();
   const { data: calendarList = [], isLoading: calendarListLoading } =
     useCalendarList();
+  const textRef = useRef(null);
+
+  const handleCopy = (index: number) => {
+    if (textRef.current) {
+      setCopyTextIndex(index);
+      const text = textRef.current.innerText;
+      navigator.clipboard.writeText(text).then(() => {});
+    }
+  };
 
   const handleCalendarDetails = useCallback(
     (calendarId: string) => {
       calendarDetailsMutate(calendarId, {
         onSuccess: (response) => {
           setCalendar(response?.data);
-          setSelectedCalendarId(calendarId);
+          queryClient.setQueryData(["calendarId"], calendarId);
           aiTipsMutate(calendarId, {
             onSuccess: (result) => {
-              console.log("asdasd", result, "Asd", result.tips);
               setAITips(result);
             },
           });
@@ -127,17 +130,17 @@ export default function CalendarPage() {
         },
       });
     },
-    [calendarDetailsMutate, aiTipsMutate]
+    [calendarDetailsMutate]
   );
 
   useEffect(() => {
     if (calendarList?.length > 0) {
-      const savedCalendarId = selectedCalendarId;
-      const calendarIdToUse = savedCalendarId || calendarList[0]._id;
-      if (!savedCalendarId) {
-        setSelectedCalendarId(calendarIdToUse);
+      const calendarIdToUse = calendarList[0]._id;
+      const calendarId = queryClient.getQueryData(["calendarId"]);
+      if (!calendarId) {
+        queryClient.setQueryData(["calendarId"], calendarIdToUse);
       }
-      handleCalendarDetails(calendarIdToUse);
+      handleCalendarDetails(calendarId ?? calendarIdToUse);
     }
   }, [calendarList]);
 
@@ -161,11 +164,8 @@ export default function CalendarPage() {
 
   const handleSelectSlot = useCallback(
     (slotInfo: { start: Date; end: Date }) => {
-      setNewEvent({
-        title: "",
-        start: slotInfo.start.toISOString(),
-        end: slotInfo.end.toISOString(),
-      });
+      console.log("slo", slotInfo.start.toISOString());
+      setSelectedSlotInfo(slotInfo);
       setShowModal(true);
     },
     []
@@ -180,31 +180,32 @@ export default function CalendarPage() {
   );
 
   const addEventMutation = useMutation({
-    mutationFn: async (eventData: {
-      title: string;
-      start: string;
-      end: string;
-    }) => {
-      const response = await fetch("/api/events", {
+    mutationFn: async (eventData: any) => {
+      const payload = {
+        calendarId: calendar?._id,
+        date: selectedSlotInfo.start.toISOString(),
+        ...eventData,
+      };
+      console.log("eee", payload);
+      const response = await fetch("/api/events/add", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(eventData),
+        body: JSON.stringify(payload),
       });
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["calendarEvents"] });
+      handleCalendarDetails(calendar._id);
       setShowModal(false);
     },
   });
 
-  const handleAddEvent = useCallback(() => {
-    if (!newEvent.title || !newEvent.start || !newEvent.end) {
-      alert("Please fill in all fields.");
-      return;
-    }
-    addEventMutation.mutate(newEvent);
-  }, [newEvent, addEventMutation]);
+  const handleAddEvent = useCallback(
+    (data) => {
+      addEventMutation.mutate(data);
+    },
+    [addEventMutation]
+  );
 
   const handleSelectEvent = useCallback(
     (event: Event) => {
@@ -332,6 +333,7 @@ export default function CalendarPage() {
           aiTips.map((item: any, index: number) => (
             <div
               key={index}
+              ref={textRef}
               className="relative bg-white p-4 rounded-xl border border-gray-100 hover:border-purple-200 transition-all duration-300 shadow-xs hover:shadow-md group overflow-hidden"
             >
               {/* Platform badge */}
@@ -344,16 +346,25 @@ export default function CalendarPage() {
               {/* Tip content with expandable animation */}
               <div className="pr-8">
                 <h4 className="font-semibold text-purple-800 mb-1.5 text-sm">
-                  {item.action}
+                  {item.title}
                 </h4>
                 <p className="text-gray-600 text-sm line-clamp-2 group-hover:line-clamp-none transition-all duration-300">
+                  {item.action}
+                </p>
+                <p className="text-gray-600 text-sm line-clamp-2 group-hover:line-clamp-none transition-all duration-300">
                   {item.reason}
+                </p>
+                <p className="text-gray-600 text-sm line-clamp-2 group-hover:line-clamp-none transition-all duration-300">
+                  {item.high}
                 </p>
               </div>
 
               {/* Action buttons */}
               <div className="mt-3 flex justify-end space-x-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                <button className="text-xs font-medium text-purple-600 hover:text-purple-800 flex items-center px-2.5 py-1 rounded-md hover:bg-purple-50 transition-colors">
+                <button
+                  onClick={() => handleCopy(index)}
+                  className="text-xs font-medium text-purple-600 hover:text-purple-800 flex items-center px-2.5 py-1 rounded-md hover:bg-purple-50 transition-colors"
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className="h-3.5 w-3.5 mr-1.5"
@@ -363,22 +374,7 @@ export default function CalendarPage() {
                     <path d="M7 9a2 2 0 012-2h6a2 2 0 012 2v6a2 2 0 01-2 2H9a2 2 0 01-2-2V9z" />
                     <path d="M5 3a2 2 0 00-2 2v6a2 2 0 002 2V5h8a2 2 0 00-2-2H5z" />
                   </svg>
-                  Copy
-                </button>
-                <button className="text-xs font-medium text-gray-500 hover:text-gray-700 flex items-center px-2.5 py-1 rounded-md hover:bg-gray-100 transition-colors">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-3.5 w-3.5 mr-1.5"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  Apply
+                  {copyTextIndex == index ? "Copied" : "Copy"}
                 </button>
               </div>
 
@@ -508,9 +504,19 @@ export default function CalendarPage() {
       </div>
     );
   };
+  const closeModal = () => {
+    setShowModal(false);
+  };
 
   return (
     <div className="w-full h-full">
+      {showModal && (
+        <AddEventModal
+          isOpen={showModal}
+          onSave={handleAddEvent}
+          onClose={closeModal}
+        />
+      )}
       <Header
         editor={false}
         handleApproveChanges={() => {}}

@@ -22,7 +22,12 @@ import {
   CameraAlt,
   VideoLibrary,
   X,
+  MoreVert,
 } from "@mui/icons-material";
+import { Menu, MenuItem } from "@mui/material";
+import AddEventModal from "../component/AddEventModal";
+import { useMutation } from "@tanstack/react-query";
+import DeleteEventModal from "../component/DeleteEventModal";
 
 const eventTypeIcons = {
   linkedin: <LinkedIn style={{ fontSize: "44px", color: "black" }} />,
@@ -494,6 +499,30 @@ function DetailForm() {
   const [pendingChanges, setPendingChanges] = useState<PendingChanges>();
   const { mutate: eventDetailMutate, isPending: isEventLoading } =
     useEventDetailsMutation();
+  const [showModal, setShowModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+
+  const handleClick = (event: any) => {
+    event.stopPropagation();
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleEditEvent = (event) => {
+    event.stopPropagation();
+    setShowModal(true);
+    handleClose();
+  };
+
+  const handleDeleteEvent = (event) => {
+    event.stopPropagation();
+    handleClose();
+    setShowDeleteModal(true);
+  };
 
   const router = useRouter();
   const serializedEvent = searchParams.get("collaborators");
@@ -684,8 +713,87 @@ function DetailForm() {
   const goBack = () => {
     router.replace("/dashboard");
   };
+
+  const editEventMutation = useMutation({
+    mutationFn: async (eventData: any) => {
+      const payload = {
+        calendarId: eventDetails.calendarId,
+        date: eventDetails.date,
+        eventId: eventDetails._id,
+        description: null,
+        ...eventData,
+      };
+      console.log("eee", payload);
+      const response = await fetch("/api/events/edit", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      return response.json();
+    },
+    onSuccess: (result) => {
+      setShowModal(false);
+      console.log("dsadasd", result.data.data);
+      const serializedCollaborators = encodeURIComponent(
+        JSON.stringify(collaborators ?? [])
+      );
+      router.push(
+        `/eventDetails?eventId=${result.data.data?._id}&collaborators=${serializedCollaborators}&&event_type=${result.data.data.type}`
+      );
+      handleEventDetail(result.data.data?._id);
+    },
+  });
+
+  const deleteEventMutation = useMutation({
+    mutationFn: async () => {
+      const payload = {
+        calendarId: eventDetails.calendarId,
+        eventId: eventDetails._id,
+      };
+      console.log("eee", payload);
+      const response = await fetch("/api/events/delete", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      return response.json();
+    },
+    onSuccess: (result) => {
+      setShowModal(false);
+      router.back();
+    },
+  });
+
+  const handleEditEventAPI = async (data) => {
+    editEventMutation.mutate(data);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+  };
+
   return (
     <div className="flex flex-col h-screen bg-white w-full">
+      <DeleteEventModal
+        isOpen={showDeleteModal}
+        onConfirm={() => deleteEventMutation.mutate()}
+        onCancel={() => setShowDeleteModal(false)}
+        eventTitle={eventDetails?.title}
+      />
+      {showModal && (
+        <AddEventModal
+          isOpen={showModal}
+          onSave={handleEditEventAPI}
+          isEdit={true}
+          onClose={closeModal}
+          state={{
+            title: eventDetails.title,
+            audienceFocus: eventDetails.audienceFocus,
+            type: eventDetails.type,
+            theme: eventDetails.theme,
+          }}
+        />
+      )}
       <Header
         handleApproveChanges={handleApproveChanges}
         // editor={true}
@@ -758,7 +866,7 @@ function DetailForm() {
                 </p>
               )}
             </div>
-            <div className="flex gap-4">
+            <div className="flex gap-4 items-center">
               <button className="w-[157px] h-[40px] bg-[#7a0860] text-white text-[16px] font-medium rounded-xl hover:bg-[#5c0648] transition-colors disabled:opacity-70">
                 <span className="flex items-center justify-center">
                   Approve
@@ -770,6 +878,28 @@ function DetailForm() {
               >
                 Save Changes
               </button>
+              <MoreVert
+                style={{
+                  cursor: "pointer",
+                  color: "black",
+                  height: "30px",
+                  width: "30px",
+                }}
+                onClick={handleClick}
+              />
+              <Menu
+                onClick={(e) => e.stopPropagation()}
+                id="basic-menu"
+                anchorEl={anchorEl}
+                open={open}
+                onClose={handleClose}
+                MenuListProps={{
+                  "aria-labelledby": "basic-button",
+                }}
+              >
+                <MenuItem onClick={handleEditEvent}>Edit</MenuItem>
+                <MenuItem onClick={handleDeleteEvent}>Delete</MenuItem>
+              </Menu>
             </div>
           </div>
           {!event_type?.toLowerCase().startsWith("blog") && (

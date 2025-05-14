@@ -30,3 +30,7 @@
     background-color: transparent !important;
     cursor: pointer;
 }
+
+.rbc-day-bg {
+    cursor: pointer;
+}

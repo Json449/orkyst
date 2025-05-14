@@ -2,35 +2,36 @@ import { NextResponse } from "next/server";
 import axios from "axios";
 import { cookies } from "next/headers";
 
-export async function POST(request: Request) {
+export async function PUT(request: Request) {
   // Destructure the request body
-  const { comment, eventId, text } = await request.json();
+  const payload = await request.json();
+  console.log("ceck", payload);
   const _cookies = await cookies(); // Get cookies
   const accessToken = _cookies.get("access_token")?.value;
 
   // Get the cookies handler
   // Construct the URL for the login API
-  const url = `${process.env.BASE_URL}/calendar/add/events`;
-
+  const url = `${process.env.BASE_URL}/calendar/events/${payload.eventId}`;
+  console.log("ceck", payload);
   // Create the request body
+  delete payload.eventId;
   const body = {
-    comment,
-    text,
-    eventId,
+    ...payload,
   };
 
   try {
     // Make the POST request using axios
-    const rawResponse = await axios.post(url, body, {
+    const rawResponse = await axios.put(url, body, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
         "Content-Type": "application/json",
       },
     });
     const { data, status } = rawResponse;
+    console.log("sasdsaadasd", data, status);
 
     // Check if login is successful
-    if (data?.status === 200 || data?.status == 201) {
+    if (status === 200 || status == 201) {
       return NextResponse.json({ success: true, data }, { status });
     } else {
       // If login failed, return error response

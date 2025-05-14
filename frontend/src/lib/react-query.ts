@@ -6,12 +6,12 @@ const APP_VERSION = process.env.NEXT_PUBLIC_APP_VERSION || "1.0";
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      gcTime: 60 * 60 * 1000, // 1 hours
+      staleTime: 0, // Immediately stale (no caching)
+      gcTime: 0, // No garbage collection (no cache storage)
       retry: 2,
-      refetchOnWindowFocus: true, // true in prod
-      refetchOnReconnect: true,
-      refetchOnMount: true,
+      refetchOnWindowFocus: false, // No refetch on window focus
+      refetchOnReconnect: false, // No refetch on reconnect
+      refetchOnMount: true, // Always refetch on mount
     },
     mutations: {
       retry: 1,
