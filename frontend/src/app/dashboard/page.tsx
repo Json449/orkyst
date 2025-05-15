@@ -111,9 +111,8 @@ export default function CalendarPage() {
 
   const { data: calendarList = [], isLoading: calendarListLoading } =
     useCalendarList();
-  const { data: calendar, error: calendarError } =
-    useCalendarDetails(currentCalendarId);
-  const { data: aiTips, error: aiTipsError } = useAITips(currentCalendarId);
+  const { data: calendar } = useCalendarDetails(currentCalendarId);
+  const { data: aiTips } = useAITips(currentCalendarId);
 
   const handleCopy = (index: number) => {
     if (textRef.current) {
