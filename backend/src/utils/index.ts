@@ -271,7 +271,7 @@ export const generateAdvancedCalendarPrompt = (
        ${input.domains?.join(', ') || 'Not specified'}
     
     6. **Posting Frequency:** 
-       ${input.postingFrequency?.join(', ') || 'Not specified'}
+       ${input.postingFrequency || 'Not specified'}
     
     7. **Preferred Content Types:** 
        ${input.preferredContentType?.join(', ') || 'Not specified'}
@@ -379,7 +379,7 @@ export const generateCalendarPrompt = (input, currentMonth, currentYear) => {
     Answer: ${input.domains?.join(', ')}
  
  6. **How often would you like to post? **
-    Answer: ${input.postingFrequency?.join(', ')}
+    Answer: ${input.postingFrequency}
  
  7. **What are your primary marketing goals?**
     Answer: ${input.marketingGoals?.join(', ')}
@@ -425,6 +425,7 @@ export const generateCalendarPrompt = (input, currentMonth, currentYear) => {
 };
 
 export const generateCalendarPromptv1 = (input, currentMonth, currentYear) => {
+  console.log('input', input.postingFrequency);
   return `
   You are a **strategic content marketing specialist and calendar planning assistant**. Based on the user's input, generate a **comprehensive, audience-focused content calendar** for ${currentMonth}-${currentYear} with **precise, engaging, and high-impact content recommendations**. Here are the user's answers:
   
@@ -451,7 +452,7 @@ export const generateCalendarPromptv1 = (input, currentMonth, currentYear) => {
      Answer: ${input.domains?.join(', ')}
   
   6. **How often would you like to post? **
-     Answer: ${input.postingFrequency?.join(', ')}
+     Answer: ${input.postingFrequency}
   
   7. **What are your primary marketing goals?**
      Answer: ${input.marketingGoals?.join(', ')}
@@ -602,7 +603,7 @@ export const calendarSuggestionPromptv1 = (calendar) => {
   - Target Region: ${calendar.calendarInputs.targetAudience}
   - Primary Marketing Goals: ${calendar.calendarInputs.marketingGoals.join(', ')}
   - Platforms in Use: ${calendar.calendarInputs.domains.join(', ')}
-  - Posting Frequency: ${calendar.calendarInputs.postingFrequency[0]}
+  - Posting Frequency: ${calendar.calendarInputs.postingFrequency}
   - Preferred Content Style: ${calendar.calendarInputs.preferredContentType.join(', ')}
   
   ---
@@ -741,7 +742,7 @@ Analyze the following content calendar strategy and provide 3 precise optimizati
 - **Target Audience**: ${calendarInputs.targetAudience || 'Not specified'}  
 - **Goals**: ${calendarInputs.marketingGoals?.join(', ') || 'Not specified'}  
 - **Platforms**: ${calendarInputs.domains?.join(', ') || 'Not specified'}  
-- **Frequency**: ${calendarInputs.postingFrequency?.join(', ') || 'Not specified'}  
+- **Frequency**: ${calendarInputs.postingFrequency || 'Not specified'}  
 - **Content Types**: ${calendarInputs.preferredContentType?.join(', ') || 'Not specified'}  
 
 **Task**:  

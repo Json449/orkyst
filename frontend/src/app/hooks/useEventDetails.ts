@@ -11,9 +11,7 @@ export const useEventDetailsMutation = () => {
       }
       return data;
     },
-    onSuccess: () => {
-      // queryClient.setQueryData(["events", eventId], data);
-    },
+    onSuccess: () => {},
     onError: (error: Error) => {
       console.log("Error fetching AI tips:", error?.message);
     },

@@ -30,10 +30,10 @@ export const useAuth = () => {
       return response.json();
     },
     onSuccess: (response) => {
-      // queryClient.setQueryData(["currentUser"], {
-      //   id: response.data.result.sub,
-      //   isVerified: response.data.result.isVerified,
-      // });
+      queryClient.setQueryData(["currentUser"], {
+        id: response.data.result.sub,
+        isVerified: response.data.result.isVerified,
+      });
       // Handle verification flow
       if (response.data.result.isVerified) {
         router.push("/dashboard");

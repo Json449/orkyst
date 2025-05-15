@@ -230,32 +230,27 @@ function FormData() {
   // Step 4: Posting Frequency and Content Type
   const Step4 = () => (
     <div className="space-y-8">
-      <div>
-        <h3 className="text-[#5A5A5A] text-lg font-medium mb-4">
-          How often do you want to post?
-        </h3>
-
+      <select
+        value={formData.postingFrequency[0] || ""} // Assuming single selection
+        onChange={(e) => {
+          // Handle single selection
+          setFormData({
+            ...formData,
+            postingFrequency: e.target.value ? [e.target.value] : [],
+          });
+        }}
+        className="w-full p-2 border border-gray-300 rounded-md focus:ring-[#7a0860] focus:border-[#7a0860] text-[#5A5A5A]"
+      >
         {[
           "Light (1-2 times per week)",
           "Medium (3-4 times per week)",
-          "Heavy (daily or multiple time per day)",
+          "Heavy (daily or multiple times per day)",
         ].map((frequency) => (
-          <div key={frequency} className="flex items-center mb-2">
-            <input
-              type="checkbox"
-              id={frequency}
-              name="postingFrequency"
-              value={frequency}
-              checked={formData.postingFrequency.includes(frequency)}
-              onChange={handleCheckboxChange}
-              className="h-5 w-5 rounded border-gray-300 text-[#7a0860] focus:ring-[#7a0860]"
-            />
-            <label htmlFor={frequency} className="ml-2 text-[#5A5A5A]">
-              {frequency}
-            </label>
-          </div>
+          <option key={frequency} value={frequency}>
+            {frequency}
+          </option>
         ))}
-      </div>
+      </select>
 
       <div>
         <h3 className="text-[#5A5A5A] text-lg font-medium mb-4">

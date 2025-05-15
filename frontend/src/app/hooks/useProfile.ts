@@ -15,6 +15,12 @@ export const useProfile = () => {
       const data = await res.json();
       return data?.data?.result || [];
     },
-    staleTime: 60 * 60 * 1000, // 1 hour
+    staleTime: 60 * 60 * 1000, // 1 hour (data stays fresh)
+    gcTime: 24 * 60 * 60 * 1000, // 24 hours (cache retention)
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
+    refetchOnMount: false, // Smarter refetching
+    retry: 2,
+    retryDelay: 1000,
   });
 };

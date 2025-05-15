@@ -4,7 +4,7 @@ declare class CalendarInputsDto {
     targetAudience?: string;
     marketingGoals?: string[];
     domains?: string[];
-    postingFrequency?: string[];
+    postingFrequency?: string;
     preferredContentType?: string[];
 }
 export declare class UpdateUserDto {

@@ -8,7 +8,7 @@ import Header from "../component/header";
 import {
   useCalendarList,
   useCalendarDetails,
-  useAITipsMutation,
+  useAITips,
 } from "../hooks/useCalendarData";
 import { useProfile } from "../hooks/useProfile";
 import Image from "next/image";
@@ -92,18 +92,28 @@ export default function CalendarPage() {
   const [showModal, setShowModal] = useState(false);
   const [copyTextIndex, setCopyTextIndex] = useState(null);
   const [selectedSlotInfo, setSelectedSlotInfo] = useState(null);
-  const [calendar, setCalendar] = useState<Calendar | null>(null);
-  const [aiTips, setAITips] = useState<any[]>([]);
   const [collaboratorModalOpen, setCollaboratorModalOpen] = useState(false);
   const router = useRouter();
-  const { mutate: calendarDetailsMutate } = useCalendarDetails();
-  const { mutate: aiTipsMutate } = useAITipsMutation();
   const queryClient = useQueryClient();
+
+  const [currentCalendarId, setCurrentCalendarId] = useState<string | null>(
+    null
+  );
+
+  const handleCalendarSelection = (id: string) => {
+    queryClient.setQueryData(["calendarId"], id);
+    setCurrentCalendarId(id);
+  };
+
   // Data fetching
   const { data: profile } = useProfile();
+  const textRef = useRef(null);
+
   const { data: calendarList = [], isLoading: calendarListLoading } =
     useCalendarList();
-  const textRef = useRef(null);
+  const { data: calendar, error: calendarError } =
+    useCalendarDetails(currentCalendarId);
+  const { data: aiTips, error: aiTipsError } = useAITips(currentCalendarId);
 
   const handleCopy = (index: number) => {
     if (textRef.current) {
@@ -113,40 +123,17 @@ export default function CalendarPage() {
     }
   };
 
-  const handleCalendarDetails = useCallback(
-    (calendarId: string) => {
-      calendarDetailsMutate(calendarId, {
-        onSuccess: (response) => {
-          setCalendar(response?.data);
-          queryClient.setQueryData(["calendarId"], calendarId);
-          aiTipsMutate(calendarId, {
-            onSuccess: (result) => {
-              setAITips(result);
-            },
-          });
-        },
-        onError: (error) => {
-          console.error("Failed:", error.message);
-        },
-      });
-    },
-    [calendarDetailsMutate]
-  );
-
   useEffect(() => {
     if (calendarList?.length > 0) {
-      const calendarIdToUse = calendarList[0]._id;
       const calendarId = queryClient.getQueryData(["calendarId"]);
-      if (!calendarId) {
-        queryClient.setQueryData(["calendarId"], calendarIdToUse);
-      }
-      handleCalendarDetails(calendarId ?? calendarIdToUse);
+      const calendarIdToUse = calendarId ?? calendarList[0]._id;
+      handleCalendarSelection(calendarIdToUse);
     }
   }, [calendarList]);
 
   const transformedEvents = useMemo(
-    () => transformDataForCalendar(calendar?.events),
-    [calendar?.events]
+    () => transformDataForCalendar(calendar?.data?.events),
+    [calendar?.data?.events]
   );
 
   const getAccessToken = useCallback(() => {
@@ -182,7 +169,7 @@ export default function CalendarPage() {
   const addEventMutation = useMutation({
     mutationFn: async (eventData: any) => {
       const payload = {
-        calendarId: calendar?._id,
+        calendarId: calendar?.data?._id,
         date: selectedSlotInfo.start.toISOString(),
         ...eventData,
       };
@@ -195,7 +182,7 @@ export default function CalendarPage() {
       return response.json();
     },
     onSuccess: () => {
-      handleCalendarDetails(calendar._id);
+      handleCalendarSelection(calendar?.data?._id);
       setShowModal(false);
     },
   });
@@ -210,7 +197,7 @@ export default function CalendarPage() {
   const handleSelectEvent = useCallback(
     (event: Event) => {
       const serializedCollaborators = encodeURIComponent(
-        JSON.stringify(calendar?.collaborators ?? [])
+        JSON.stringify(calendar?.data?.collaborators ?? [])
       );
       // Update the URL with eventId and collaborators
       router.push(
@@ -255,7 +242,7 @@ export default function CalendarPage() {
         ) : Array.isArray(calendarList) && calendarList.length > 0 ? (
           calendarList?.map((item: Calendar) => (
             <div
-              onClick={() => handleCalendarDetails(item._id)}
+              onClick={() => handleCalendarSelection(item._id)}
               key={item._id}
               className="mb-3 cursor-pointer bg-white p-3 rounded-lg border border-gray-200 hover:border-blue-300 transition-all duration-200 shadow-sm hover:shadow-md"
             >
@@ -327,10 +314,11 @@ export default function CalendarPage() {
   };
 
   const SuggestionListing = () => {
+    const tips = aiTips?.tips ?? aiTips;
     return (
       <div className="h-[35vh] space-y-3 overflow-y-auto pr-2 custom-scrollbar">
-        {aiTips?.length > 0 ? (
-          aiTips.map((item: any, index: number) => (
+        {tips?.length > 0 ? (
+          tips.map((item: any, index: number) => (
             <div
               key={index}
               ref={textRef}
@@ -450,17 +438,17 @@ export default function CalendarPage() {
         <div className="flex items-center gap-4 mr-10">
           <div className="text-right">
             <p className="text-sm font-medium text-gray-500 mb-1">
-              {`${plurals(calendar?.collaborators, "Collaborator")}`}
+              {`${plurals(calendar?.data?.collaborators, "Collaborator")}`}
             </p>
             <p className="text-xs text-gray-400">
-              {calendar?.collaborators?.length || 0} team{" "}
-              {plurals(calendar?.collaborators, "member")}
+              {calendar?.data?.collaborators?.length || 0} team{" "}
+              {plurals(calendar?.data?.collaborators, "member")}
             </p>
           </div>
 
           <div className="flex items-center">
             <div className="flex -space-x-2">
-              {calendar?.collaborators
+              {calendar?.data?.collaborators
                 ?.slice(0, 5)
                 .map((item: { _id: string; name: string }) => (
                   <div
@@ -474,9 +462,9 @@ export default function CalendarPage() {
                   </div>
                 ))}
 
-              {calendar?.collaborators?.length > 5 && (
+              {calendar?.data?.collaborators?.length > 5 && (
                 <div className="relative group w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 font-medium text-xs border border-gray-200">
-                  +{calendar.collaborators.length - 5}
+                  +{calendar?.data?.collaborators.length - 5}
                   <div className="absolute inset-0 rounded-full bg-white opacity-0 group-hover:opacity-80 transition-opacity"></div>
                 </div>
               )}
@@ -597,7 +585,7 @@ export default function CalendarPage() {
                 </div>
                 <div>
                   <h2 className="text-2xl font-bold text-gray-800 tracking-tight">
-                    {calendar?.theme || "My Calendar"}
+                    {calendar?.data?.theme || "My Calendar"}
                   </h2>
                   <p className="text-sm text-gray-500 flex items-center mt-1">
                     <span className="w-2 h-2 rounded-full bg-green-400 mr-2 animate-pulse"></span>
@@ -670,7 +658,7 @@ export default function CalendarPage() {
       <AddCollaboratorModal
         handleModal={(value: boolean) => handleModal(value)}
         open={collaboratorModalOpen}
-        calendarId={calendar?._id}
+        calendarId={calendar?.data?._id}
       />
     </div>
   );

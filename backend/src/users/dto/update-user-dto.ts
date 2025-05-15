@@ -34,7 +34,7 @@ class CalendarInputsDto {
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
-  postingFrequency?: string[];
+  postingFrequency?: string;
 
   @IsOptional()
   @IsArray()
