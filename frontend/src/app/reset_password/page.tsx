@@ -13,7 +13,6 @@ export default function SetNewPassword() {
     form: "",
   });
   const [isLoading, setIsLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
 
   const validatePassword = (password: string) => {
     // At least 8 characters, 1 uppercase, 1 lowercase, 1 number
@@ -79,49 +78,12 @@ export default function SetNewPassword() {
     } catch (error) {
       setErrors((prev) => ({
         ...prev,
-        form: "An error occurred. Please try again.",
+        form: error,
       }));
     } finally {
       setIsLoading(false);
     }
   };
-
-  if (success) {
-    return (
-      <div className="flex min-h-screen bg-white justify-center items-center p-4">
-        <div className="max-w-md w-full bg-white rounded-xl border-2 border-primary p-8 text-center">
-          <div className="mb-6">
-            <svg
-              className="w-20 h-20 mx-auto text-green-500"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M5 13l4 4L19 7"
-              />
-            </svg>
-          </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">
-            Password Reset Successful!
-          </h1>
-          <p className="text-gray-600 mb-8">
-            Your password has been updated successfully. You can now sign in
-            with your new password.
-          </p>
-          <Link
-            href="/login"
-            className="inline-block w-full px-6 py-3 bg-primary text-white font-medium rounded-lg hover:bg-primary-dark transition-colors"
-          >
-            Back to Sign In
-          </Link>
-        </div>
-      </div>
-    );
-  }
 
   const PasswordResetSuccessContent = () => {
     return (

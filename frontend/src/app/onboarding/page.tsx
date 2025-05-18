@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, Suspense, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useJobStatusPollingMutation } from "../hooks/useJobStatusPolling";
 import { statusMessages } from "@/utils";
@@ -35,17 +35,7 @@ function FormData() {
     preferredContentType: [] as string[],
   });
   const [errors, setErrors] = useState<FormErrors>({});
-  const [touched, setTouched] = useState({
-    whoIsThisFor: false,
-    businessType: false,
-    targetAudience: false,
-    marketingGoals: false,
-    domains: false,
-    postingFrequency: false,
-    preferredContentType: false,
-  });
   const [isLoading, setIsLoading] = useState(false);
-  const searchParams = useSearchParams();
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentJobId, setCurrentJobId] = useState<string | null>(null);
 
@@ -103,21 +93,15 @@ function FormData() {
     return Object.keys(newErrors).length === 0;
   };
 
-  console.log("asdasda", formData);
-
   const handleInputChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
-    let { name, value } = event.target;
-
+    const { name, value } = event.target;
     setFormData((prevState) => ({ ...prevState, [name]: value }));
-    setTouched((prev) => ({ ...prev, [name]: true }));
   };
 
   const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, checked } = event.target;
-    setTouched((prev) => ({ ...prev, [name]: true }));
-
     setFormData((prevState) => {
       if (checked) {
         return {
@@ -228,7 +212,6 @@ function FormData() {
           name="whoIsThisFor"
           value={formData.whoIsThisFor}
           onChange={handleInputChange}
-          onBlur={() => setTouched((prev) => ({ ...prev, whoIsThisFor: true }))}
           className={`w-full h-[60px] px-5 py-3 rounded-lg bg-[#F2EFEF] text-[#8D8D8D] text-[16px] font-open-sans leading-normal outline-none transition-all duration-200 focus:ring-2 ${
             errors.whoIsThisFor ? "focus:ring-red-500" : "focus:ring-[#7a0860]"
           } focus:bg-[#F8F7F7] placeholder-[#8D8D8D]`}
@@ -247,7 +230,6 @@ function FormData() {
           name="businessType"
           value={formData.businessType}
           onChange={handleInputChange}
-          onBlur={() => setTouched((prev) => ({ ...prev, businessType: true }))}
           className={`w-full h-[60px] px-5 py-3 rounded-lg bg-[#F2EFEF] text-[#8D8D8D] text-[16px] font-open-sans leading-normal outline-none transition-all duration-200 focus:ring-2 ${
             errors.businessType ? "focus:ring-red-500" : "focus:ring-[#7a0860]"
           } focus:bg-[#F8F7F7]`}
@@ -274,9 +256,6 @@ function FormData() {
           name="targetAudience"
           value={formData.targetAudience}
           onChange={handleInputChange}
-          onBlur={() =>
-            setTouched((prev) => ({ ...prev, targetAudience: true }))
-          }
           className={`w-full h-[60px] px-5 py-3 rounded-lg bg-[#F2EFEF] text-[#8D8D8D] text-[16px] font-open-sans leading-normal outline-none transition-all duration-200 focus:ring-2 ${
             errors.targetAudience
               ? "focus:ring-red-500"
@@ -368,9 +347,6 @@ function FormData() {
           name="postingFrequency"
           value={formData.postingFrequency}
           onChange={handleInputChange}
-          onBlur={() =>
-            setTouched((prev) => ({ ...prev, postingFrequency: true }))
-          }
           className={`w-full p-2 border ${
             errors.postingFrequency ? "border-red-500" : "border-gray-300"
           } rounded-md focus:ring-[#7a0860] focus:border-[#7a0860] text-[#5A5A5A] h-[60px]`}

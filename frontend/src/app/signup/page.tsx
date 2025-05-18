@@ -128,11 +128,6 @@ export default function SignUpForm() {
     setShowPassword((prev) => !prev);
   };
 
-  const isFormValid =
-    validateFullname(userDetails.fullname) &&
-    validateEmail(userDetails.email) &&
-    validatePassword(userDetails.password);
-
   const signupForm = () => (
     <div className="flex flex-col items-center lg:justify-start justify-center bg-white h-[100vh] lg:h-auto lg:min-w-[560px]">
       <Image

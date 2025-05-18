@@ -57,7 +57,7 @@ export default function LoginForm() {
     }
   }, [loginState, touched]);
 
-  const handleSubmit = async (isAutoLogin = false) => {
+  const handleSubmit = async () => {
     // Validate all fields before submission
     const isEmailValid = validateEmail(loginState.email);
     const isPasswordValid = validatePassword(loginState.password);

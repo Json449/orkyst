@@ -11,7 +11,6 @@ export default function ForgotPasswordForm() {
     form: "",
   });
   const [isLoading, setIsLoading] = useState(false);
-  const [successMessage, setSuccessMessage] = useState("");
   const router = useRouter();
 
   const validateEmail = (email: string) => {
@@ -66,7 +65,7 @@ export default function ForgotPasswordForm() {
     } catch (error) {
       setErrors((prev) => ({
         ...prev,
-        form: "An error occurred. Please try again.",
+        form: error,
       }));
     } finally {
       setIsLoading(false);
@@ -114,12 +113,12 @@ export default function ForgotPasswordForm() {
 
           <div className="w-full mt-8 border border-2 p-[50px] rounded-xl border-primary">
             <h1 className="text-center text-[#080a0b] text-[32px] font-bold leading-8 mb-8">
-              Forgot Password
+              {` Forgot Password`}
             </h1>
 
             <p className="text-[#5A5A5A] text-sm text-center mb-6">
-              Enter your email address and we'll send you a link to reset your
-              password
+              {`Enter your email address and we'll send you a link to reset your
+              password`}
             </p>
 
             <form onSubmit={handleSubmit}>
@@ -141,49 +140,41 @@ export default function ForgotPasswordForm() {
                   <p className="mt-1 text-sm text-red-600">{errors.email}</p>
                 )}
               </div>
-
-              {successMessage ? (
-                <div className="mt-4 p-3 bg-green-50 text-green-700 rounded-lg text-center">
-                  {successMessage}
-                </div>
-              ) : (
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                  className={`text-base rounded-xl w-full p-3.5 font-medium mt-6 ${
-                    isLoading ? "bg-primary/80" : "bg-primary"
-                  } text-white hover:bg-primary-dark transition-colors`}
-                >
-                  {isLoading ? (
-                    <span className="flex items-center justify-center">
-                      <svg
-                        className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                      >
-                        <circle
-                          className="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                        ></circle>
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                        ></path>
-                      </svg>
-                      Sending...
-                    </span>
-                  ) : (
-                    "Send Code"
-                  )}
-                </button>
-              )}
-
+              <button
+                type="submit"
+                disabled={isLoading}
+                className={`text-base rounded-xl w-full p-3.5 font-medium mt-6 ${
+                  isLoading ? "bg-primary/80" : "bg-primary"
+                } text-white hover:bg-primary-dark transition-colors`}
+              >
+                {isLoading ? (
+                  <span className="flex items-center justify-center">
+                    <svg
+                      className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    Sending...
+                  </span>
+                ) : (
+                  "Send Code"
+                )}
+              </button>
               {errors.form && (
                 <div className="mt-4 p-3 bg-red-50 text-red-600 rounded-lg text-center">
                   {errors.form}
