@@ -9,6 +9,8 @@ import { CollaboratorSchema } from './schemas/collaborator.schema';
 import { FeedbackSchema } from './schemas/feedback.schema';
 import { UserSchema } from 'src/users/schemas/user.schema';
 import { JobSchema } from './schemas/job.schema';
+import { JwtModule } from '@nestjs/jwt';
+import { JwtStrategy } from '@/auth/strategies/jwt.strategy';
 
 @Module({
   imports: [
@@ -22,9 +24,13 @@ import { JobSchema } from './schemas/job.schema';
       { name: 'Collaborator', schema: CollaboratorSchema },
       { name: 'Feedback', schema: FeedbackSchema },
     ]),
+    JwtModule.register({
+      secret: process.env.JWT_SECRET_KEY, // Replace with environment variable
+      signOptions: { expiresIn: '2h' }, // Token expiration time
+    }),
   ],
   controllers: [CalendarController],
-  providers: [CalendarService],
+  providers: [CalendarService, JwtStrategy],
   exports: [CalendarService],
 })
 export class CalendarModule {}

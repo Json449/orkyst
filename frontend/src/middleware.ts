@@ -1,8 +1,8 @@
 // middleware.ts
 import { NextResponse } from "next/server";
-import { jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import type { NextRequest } from "next/server";
+import { decodeToken } from "./utils";
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
@@ -36,22 +36,22 @@ export async function middleware(req: NextRequest) {
   const publicPaths = ["/", "/signup"];
   const _cookies = await cookies();
   const accessTokenFromCookie = _cookies.get("access_token")?.value;
+  console.log("accessTokenFromCookie", accessTokenFromCookie);
 
   if (accessTokenFromCookie) {
     try {
-      const secret = new TextEncoder().encode("your_secret_key");
-      await jwtVerify(accessTokenFromCookie, secret);
-
-      if (publicPaths.includes(pathname)) {
-        return NextResponse.redirect(new URL("/dashboard", req.url));
+      const payload: any = await decodeToken(accessTokenFromCookie);
+      console.log("data nowwwws", payload);
+      if (payload?.access) {
+        if (publicPaths.includes(pathname)) {
+          return NextResponse.redirect(new URL("/dashboard", req.url));
+        }
+        return NextResponse.next({
+          request: { headers: requestHeaders },
+        });
       }
-
-      return NextResponse.next({
-        request: { headers: requestHeaders },
-      });
     } catch (error) {
-      console.log(error);
-      // Your existing error handling...
+      console.log("errorrss", error);
     }
   }
 

@@ -17,6 +17,7 @@ const auth_controller_1 = require("./auth.controller");
 const local_strategy_1 = require("./strategies/local.strategy");
 const jwt_strategy_1 = require("./strategies/jwt.strategy");
 const user_schema_1 = require("../users/schemas/user.schema");
+const calendar_module_1 = require("../calendar/calendar.module");
 let AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule;
@@ -25,9 +26,10 @@ exports.AuthModule = AuthModule = __decorate([
         imports: [
             users_module_1.UsersModule,
             passport_1.PassportModule,
+            calendar_module_1.CalendarModule,
             mongoose_1.MongooseModule.forFeature([{ name: 'User', schema: user_schema_1.UserSchema }]),
             jwt_1.JwtModule.register({
-                secret: 'your-secret-key',
+                secret: process.env.JWT_SECRET_KEY,
                 signOptions: { expiresIn: '2h' },
             }),
         ],

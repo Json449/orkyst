@@ -48,7 +48,6 @@ let CalendarController = class CalendarController {
     }
     async addEvents(payload) {
         try {
-            console.log('wowwww', payload);
             const result = await this.calendarService.addEvents(payload);
             return {
                 status: 'success',
@@ -147,13 +146,8 @@ let CalendarController = class CalendarController {
     }
     async getJobStatus(req, jobId) {
         try {
-            const job = await this.calendarService.getJobStatus(jobId, req.user.userId);
-            return {
-                status: job.status,
-                progress: job.progress,
-                result: job.result,
-                error: job.error,
-            };
+            const job = await this.calendarService.getJobStatus(jobId, req.user);
+            return job;
         }
         catch (error) {
             throw new common_1.HttpException({

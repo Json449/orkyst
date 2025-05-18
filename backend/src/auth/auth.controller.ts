@@ -8,13 +8,13 @@ import {
   Headers,
   HttpStatus,
   HttpException,
-  Patch,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { CreateUserDto } from './dto/create-user-dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
-import { UpdateUserDto } from '@/users/dto/update-user-dto';
+import { ForgotPasswordDto } from './dto/forgot-password-dto';
+import { ResetPasswordDto } from './dto/reset-password-dto';
 
 @Controller('auth')
 export class AuthController {
@@ -27,9 +27,7 @@ export class AuthController {
       const response = await this.authService.signup(createUserDto);
       return {
         success: true,
-        data: {
-          access_token: response?.result.access_token,
-        },
+        ...response.result,
         status: HttpStatus.CREATED,
       };
     } catch (error) {
@@ -44,20 +42,40 @@ export class AuthController {
     }
   }
 
+  @Post('forgot-password')
+  async forgotPassword(@Body() forgotPassword: ForgotPasswordDto) {
+    try {
+      const response = await this.authService.forgotPassword(forgotPassword);
+      return {
+        success: true,
+        access_token: response?.result.access_token,
+        status: HttpStatus.OK,
+      };
+    } catch (error) {
+      throw new HttpException(
+        {
+          success: false,
+          error: error.message,
+          status: error.status || HttpStatus.BAD_REQUEST,
+        },
+        error.status || HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
   @UseGuards(JwtAuthGuard)
   @Post('verify-email')
   async verifyEmail(@Request() req, @Body() body: { code: string }) {
     try {
       const response = await this.authService.verifyEmail(req.user, body.code);
+      console.log('response', response);
       return {
         success: true,
-        data: {
-          access_token: response.access_token,
-        },
+        access_token: response.access_token,
+        verifiedUser: response.verifiedUser,
         status: HttpStatus.OK,
       };
     } catch (error) {
-      console.log(':asdasdsad', error);
       throw new HttpException(
         {
           success: false,
@@ -81,6 +99,26 @@ export class AuthController {
       };
     } catch (error) {
       // If error occurs, handle it gracefully
+      return {
+        result: error.response?.data || { error: 'Unknown error occurred' },
+        status: error.status || 500,
+      };
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('reset-password')
+  async resetPassword(@Request() req, @Body() payload: any) {
+    try {
+      const loginResponse = await this.authService.resetPassword(
+        payload,
+        req.user,
+      );
+      return {
+        result: loginResponse.result,
+        status: loginResponse.status,
+      };
+    } catch (error) {
       return {
         result: error.response?.data || { error: 'Unknown error occurred' },
         status: error.status || 500,

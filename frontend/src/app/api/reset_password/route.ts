@@ -3,31 +3,34 @@ import axios from "axios";
 import { cookies } from "next/headers";
 
 export async function POST(request: Request) {
-  const { email, password } = await request.json();
+  const { password } = await request.json();
   const _cookies = await cookies();
-  const url = `${process.env.BASE_URL}/auth/login`;
-
+  const access_token = _cookies.get("access_token")?.value;
+  const url = `${process.env.BASE_URL}/auth/reset-password`;
   try {
-    const response = await axios.post(url, { email, password });
+    if (!access_token) {
+      return NextResponse.json(
+        {
+          success: false,
+          data: { error: "Unauthorized: No access token provided" },
+        },
+        { status: 401 }
+      );
+    }
+    const response = await axios.post(
+      url,
+      { newPassword: password },
+      {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
     const { data, status } = response;
 
     if (data?.status === 200) {
       // Set cookies only if the user is verified
-      if (data?.result?.isVerified) {
-        _cookies.set("access_token", data.result.access_token, {
-          maxAge: 30 * 86400,
-          path: "/",
-          sameSite: "strict",
-        });
-        if (data.result.refresh_token) {
-          _cookies.set("refresh_token", data.result.refresh_token, {
-            maxAge: 30 * 86400,
-            path: "/",
-            sameSite: "strict",
-            httpOnly: true,
-          });
-        }
-      }
       return NextResponse.json({ success: true, data }, { status });
     }
 

@@ -20,7 +20,7 @@ export declare const CalendarSchema: mongoose.Schema<any, mongoose.Model<any, an
         targetAudience: string;
         marketingGoals: string[];
         domains: string[];
-        postingFrequency: string[];
+        postingFrequency: string;
         preferredContentType: string[];
     };
     month: string;
@@ -40,7 +40,7 @@ export declare const CalendarSchema: mongoose.Schema<any, mongoose.Model<any, an
         targetAudience: string;
         marketingGoals: string[];
         domains: string[];
-        postingFrequency: string[];
+        postingFrequency: string;
         preferredContentType: string[];
     };
     month: string;
@@ -60,7 +60,7 @@ export declare const CalendarSchema: mongoose.Schema<any, mongoose.Model<any, an
         targetAudience: string;
         marketingGoals: string[];
         domains: string[];
-        postingFrequency: string[];
+        postingFrequency: string;
         preferredContentType: string[];
     };
     month: string;
@@ -80,7 +80,7 @@ export interface ICalendarInputs {
     targetAudience?: string;
     marketingGoals?: string[];
     domains?: string[];
-    postingFrequency?: string[];
+    postingFrequency?: string;
     preferredContentType?: string[];
 }
 export interface CalendarDocument extends Document {

@@ -24,7 +24,8 @@ export const useAuth = () => {
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || "Login failed");
+        console.log("asdasda", error);
+        throw new Error(error?.data?.error || "Login failed");
       }
 
       return response.json();
@@ -32,7 +33,6 @@ export const useAuth = () => {
     onSuccess: (response) => {
       queryClient.setQueryData(["currentUser"], {
         id: response.data.result.sub,
-        isVerified: response.data.result.isVerified,
       });
       // Handle verification flow
       if (response.data.result.isVerified) {

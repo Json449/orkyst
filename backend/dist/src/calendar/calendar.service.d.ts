@@ -10,6 +10,7 @@ import { CreateCollaboratorDto } from './dto/create-collaborator.dto';
 import { UserDocument } from 'src/users/schemas/user.schema';
 import { JobDocument } from './schemas/job.schema';
 import { CreateEventDto } from './dto/create-event-dto';
+import { JwtService } from '@nestjs/jwt';
 export declare class CalendarService {
     private readonly collaboratorModel;
     private readonly calendarModel;
@@ -19,8 +20,9 @@ export declare class CalendarService {
     private readonly versionModel;
     private readonly jobModel;
     private configService;
+    private readonly jwtService;
     private openai;
-    constructor(collaboratorModel: Model<CollaboratorDocument>, calendarModel: Model<CalendarDocument>, userModel: Model<UserDocument>, eventModel: Model<EventDocument>, feedbackModel: Model<FeedbackDocument>, versionModel: Model<VersionHistory>, jobModel: Model<JobDocument>, configService: ConfigService);
+    constructor(collaboratorModel: Model<CollaboratorDocument>, calendarModel: Model<CalendarDocument>, userModel: Model<UserDocument>, eventModel: Model<EventDocument>, feedbackModel: Model<FeedbackDocument>, versionModel: Model<VersionHistory>, jobModel: Model<JobDocument>, configService: ConfigService, jwtService: JwtService);
     getCalendarDetails(calendarId: string): Promise<CalendarDocument>;
     addCollaborator(calendarId: string, createCollaboratorDto: CreateCollaboratorDto): Promise<import("mongoose").Document<unknown, {}, CollaboratorDocument> & CollaboratorDocument & Required<{
         _id: unknown;
@@ -84,10 +86,10 @@ export declare class CalendarService {
         success: boolean;
         tips: any;
     } | undefined>;
-    getJobStatus(jobId: string, userId: string): Promise<{
+    getJobStatus(jobId: string, user: any): Promise<{
         status: "pending" | "processing" | "completed" | "failed";
         progress: number;
-        result: any;
+        access_token: string;
         error: string | undefined;
     }>;
 }

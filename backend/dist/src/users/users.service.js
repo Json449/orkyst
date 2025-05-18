@@ -47,6 +47,19 @@ let UsersService = class UsersService {
         await this.mailService.sendVerificationEmail(email, verificationCode);
         return newUser.save();
     }
+    async forgotPassword(email) {
+        const existingUser = await this.findUserByEmail(email);
+        if (!existingUser) {
+            throw new common_1.ConflictException('User with this email does not exist');
+        }
+        const verificationCode = this.generateVerificationCode();
+        const verificationCodeExpires = new Date(Date.now() + 24 * 60 * 60 * 1000);
+        existingUser.verificationCode = verificationCode;
+        existingUser.verificationCodeExpires = verificationCodeExpires;
+        await existingUser.save();
+        await this.mailService.sendVerificationEmail(email, verificationCode);
+        return existingUser;
+    }
     async findUserByEmail(email) {
         return this.userModel.findOne({ email }).exec();
     }

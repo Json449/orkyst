@@ -32,8 +32,7 @@ class CalendarInputsDto {
   domains?: string[];
 
   @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
+  @IsString()
   postingFrequency?: string;
 
   @IsOptional()

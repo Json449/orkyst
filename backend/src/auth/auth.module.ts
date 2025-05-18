@@ -8,14 +8,16 @@ import { AuthController } from './auth.controller';
 import { LocalStrategy } from './strategies/local.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { UserSchema } from '../users/schemas/user.schema';
+import { CalendarModule } from '@/calendar/calendar.module';
 
 @Module({
   imports: [
     UsersModule,
     PassportModule,
+    CalendarModule,
     MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
     JwtModule.register({
-      secret: 'your-secret-key', // Replace with environment variable
+      secret: process.env.JWT_SECRET_KEY, // Replace with environment variable
       signOptions: { expiresIn: '2h' }, // Token expiration time
     }),
   ],

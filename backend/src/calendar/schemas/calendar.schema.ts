@@ -25,8 +25,8 @@ const CalendarInputsSchema = new mongoose.Schema(
       default: [],
     },
     postingFrequency: {
-      type: [String],
-      default: [],
+      type: String,
+      default: '',
     },
     preferredContentType: {
       type: [String],
@@ -89,7 +89,7 @@ export interface ICalendarInputs {
   targetAudience?: string;
   marketingGoals?: string[];
   domains?: string[];
-  postingFrequency?: string[];
+  postingFrequency?: string;
   preferredContentType?: string[];
 }
 

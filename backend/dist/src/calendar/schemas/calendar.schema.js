@@ -24,8 +24,8 @@ const CalendarInputsSchema = new mongoose.Schema({
         default: [],
     },
     postingFrequency: {
-        type: [String],
-        default: [],
+        type: String,
+        default: '',
     },
     preferredContentType: {
         type: [String],

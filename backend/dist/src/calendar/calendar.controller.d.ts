@@ -71,7 +71,7 @@ export declare class CalendarController {
     getJobStatus(req: any, jobId: string): Promise<{
         status: "pending" | "processing" | "completed" | "failed";
         progress: number;
-        result: any;
+        access_token: string;
         error: string | undefined;
     }>;
 }

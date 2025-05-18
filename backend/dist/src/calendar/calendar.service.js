@@ -21,8 +21,9 @@ const mongoose_2 = require("@nestjs/mongoose");
 const jsonrepair_1 = require("jsonrepair");
 const utils_1 = require("../utils");
 const uuid_1 = require("uuid");
+const jwt_1 = require("@nestjs/jwt");
 let CalendarService = class CalendarService {
-    constructor(collaboratorModel, calendarModel, userModel, eventModel, feedbackModel, versionModel, jobModel, configService) {
+    constructor(collaboratorModel, calendarModel, userModel, eventModel, feedbackModel, versionModel, jobModel, configService, jwtService) {
         this.collaboratorModel = collaboratorModel;
         this.calendarModel = calendarModel;
         this.userModel = userModel;
@@ -31,6 +32,7 @@ let CalendarService = class CalendarService {
         this.versionModel = versionModel;
         this.jobModel = jobModel;
         this.configService = configService;
+        this.jwtService = jwtService;
         this.getPrompt = (title, audienceFocus, theme, date, type) => {
             switch (type) {
                 case 'Blog Post':
@@ -260,7 +262,7 @@ let CalendarService = class CalendarService {
                 ],
                 response_format: { type: 'json_object' },
                 max_tokens: 3000,
-                temperature: 0.5,
+                temperature: 0.3,
             });
             await this.updateJob(jobId, { progress: 50 });
             const calendarData = await this.validateCalendarResponse(response?.choices[0]?.message?.content);
@@ -523,18 +525,26 @@ let CalendarService = class CalendarService {
             console.log(e);
         }
     }
-    async getJobStatus(jobId, userId) {
+    async getJobStatus(jobId, user) {
         try {
             const job = await this.jobModel.findOne({
                 jobId,
-                userId: userId,
+                userId: user.userId,
             });
             if (!job)
                 throw new Error('Job not found');
+            let access_token = '';
+            if (job.status == 'completed') {
+                const payload = { email: user.email, sub: user.userId, access: true };
+                access_token = this.jwtService.sign(payload, {
+                    secret: process.env.JWT_SECRET_KEY,
+                    expiresIn: '2h',
+                });
+            }
             return {
                 status: job.status,
                 progress: job.progress,
-                result: job.result,
+                access_token: access_token,
                 error: job.error,
             };
         }
@@ -560,6 +570,7 @@ exports.CalendarService = CalendarService = __decorate([
         mongoose_1.Model,
         mongoose_1.Model,
         mongoose_1.Model,
-        config_1.ConfigService])
+        config_1.ConfigService,
+        jwt_1.JwtService])
 ], CalendarService);
 //# sourceMappingURL=calendar.service.js.map

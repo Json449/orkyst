@@ -11,6 +11,7 @@ const common_1 = require("@nestjs/common");
 const passport_1 = require("@nestjs/passport");
 let JwtAuthGuard = class JwtAuthGuard extends (0, passport_1.AuthGuard)('jwt') {
     handleRequest(err, user, info) {
+        console.log('check', user);
         return user;
     }
 };

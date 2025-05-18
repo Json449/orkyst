@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import axios from "axios";
+import { cookies } from "next/headers";
 
 export async function GET(req: NextRequest) {
   // Get jobId from query parameters
   const jobId = req.nextUrl.searchParams.get("jobId");
 
   // Get access token from Authorization header
-  const authHeader = req.headers.get("Authorization");
-  const accessToken = authHeader?.split(" ")[1]; // Extract token from "Bearer <token>"
+  const _cookies = await cookies();
+  const access_token = _cookies.get("access_token")?.value;
 
   try {
     // Validate required parameters
@@ -18,7 +19,7 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    if (!accessToken) {
+    if (!access_token) {
       return NextResponse.json(
         { success: false, error: "Unauthorized: No access token provided" },
         { status: 401 }
@@ -29,11 +30,22 @@ export async function GET(req: NextRequest) {
 
     const response = await axios.get(url, {
       headers: {
-        Authorization: `Bearer ${accessToken}`,
+        Authorization: `Bearer ${access_token}`,
         "Content-Type": "application/json",
       },
       validateStatus: () => true, // Ensure all responses are passed to the caller
     });
+    const { data, status } = response;
+    console.log("view nowsss", data);
+    if (data?.status === "completed") {
+      _cookies.set("access_token", data.access_token, {
+        maxAge: 30 * 86400,
+        path: "/",
+        sameSite: "strict",
+      });
+      // Set cookies only if the user is verified
+      return NextResponse.json({ success: true, data }, { status });
+    }
 
     // Forward the exact response from the backend
     return NextResponse.json(

@@ -10,11 +10,12 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(private jwtService: JwtService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: 'your_secret_key', // JWT secret key (same as in AuthModule)
+      secretOrKey: process.env.JWT_SECRET_KEY ?? '', // JWT secret key (same as in AuthModule)
     });
   }
 
   async validate(payload: any) {
+    console.log('payload', payload);
     return { userId: payload.sub, email: payload.email };
   }
 }

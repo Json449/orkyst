@@ -1,3 +1,5 @@
+import { jwtVerify } from "jose";
+
 export function timeAgo(timestamp: string): string {
   const now = new Date(); // Current time
   const past = new Date(timestamp); // Convert the timestamp to a Date object
@@ -54,4 +56,16 @@ export const plurals = (value: any, name: string) => {
     return `${name}s`;
   }
   return name;
+};
+
+export const decodeToken = async (accessTokenFromCookie: string) => {
+  try {
+    console.log("payload", process.env.JWT_SECRET_KEY);
+    const secret = new TextEncoder().encode(process.env.JWT_SECRET_KEY);
+    const { payload }: any = await jwtVerify(accessTokenFromCookie, secret);
+    console.log("payload", payload);
+    return payload;
+  } catch (err) {
+    console.log("decode token error", err);
+  }
 };

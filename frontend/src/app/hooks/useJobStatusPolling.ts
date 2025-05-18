@@ -1,15 +1,12 @@
 import { useMutation } from "@tanstack/react-query";
 
-export const useJobStatusPollingMutation = (access_token: {
-  access_token: string;
-}) => {
+export const useJobStatusPollingMutation = () => {
   return useMutation({
     mutationFn: async (jobId: string) => {
       const url = `/api/jobStatus?jobId=${jobId}`;
       const res = await fetch(url, {
         method: "GET",
         headers: {
-          Authorization: `Bearer ${access_token.access_token}`,
           "Content-Type": "application/json",
         },
       });

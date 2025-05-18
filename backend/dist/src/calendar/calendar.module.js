@@ -18,6 +18,8 @@ const collaborator_schema_1 = require("./schemas/collaborator.schema");
 const feedback_schema_1 = require("./schemas/feedback.schema");
 const user_schema_1 = require("../users/schemas/user.schema");
 const job_schema_1 = require("./schemas/job.schema");
+const jwt_1 = require("@nestjs/jwt");
+const jwt_strategy_1 = require("../auth/strategies/jwt.strategy");
 let CalendarModule = class CalendarModule {
 };
 exports.CalendarModule = CalendarModule;
@@ -34,9 +36,13 @@ exports.CalendarModule = CalendarModule = __decorate([
                 { name: 'Collaborator', schema: collaborator_schema_1.CollaboratorSchema },
                 { name: 'Feedback', schema: feedback_schema_1.FeedbackSchema },
             ]),
+            jwt_1.JwtModule.register({
+                secret: process.env.JWT_SECRET_KEY,
+                signOptions: { expiresIn: '2h' },
+            }),
         ],
         controllers: [calendar_controller_1.CalendarController],
-        providers: [calendar_service_1.CalendarService],
+        providers: [calendar_service_1.CalendarService, jwt_strategy_1.JwtStrategy],
         exports: [calendar_service_1.CalendarService],
     })
 ], CalendarModule);

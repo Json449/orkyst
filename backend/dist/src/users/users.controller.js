@@ -23,9 +23,9 @@ let UsersController = class UsersController {
     }
     async getProfile(req) {
         const email = req.user.email;
-        let resposne = await this.usersService.findUserByEmail(email);
+        let response = await this.usersService.findUserByEmail(email);
         return {
-            result: resposne,
+            result: response,
             status: 200,
         };
     }

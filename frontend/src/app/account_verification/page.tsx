@@ -1,20 +1,16 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 
 function VerificationContent() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [digits, setDigits] = useState(["", "", "", "", "", ""]);
   const [activeIndex, setActiveIndex] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
-  const serializedEvent = searchParams.get("access_token");
-  const accessToken = serializedEvent
-    ? JSON.parse(decodeURIComponent(serializedEvent))
-    : null;
 
   useEffect(() => {
     // Focus the first input on mount
@@ -79,7 +75,6 @@ function VerificationContent() {
 
     const body = {
       code: verificationCode,
-      access_token: accessToken?.access_token,
     };
 
     try {
@@ -91,24 +86,15 @@ function VerificationContent() {
         body: JSON.stringify(body),
       });
 
-      const data = await response.json();
-
+      const { data } = await response.json();
       if (!response.ok) {
         throw new Error(data?.error || "Verification failed");
       }
-
-      if (!data.success) {
-        setError(data?.error || "Verification failed");
-        return;
+      if (data.verifiedUser) {
+        router.replace(`/reset_password`);
+      } else {
+        router.replace(`/onboarding`);
       }
-
-      const serializedResponse = encodeURIComponent(
-        JSON.stringify({
-          access_token: data.data.access_token,
-        })
-      );
-
-      router.replace(`/onboarding?access_token=${serializedResponse}`);
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "An unknown error occurred"
@@ -171,11 +157,17 @@ function VerificationContent() {
             </div>
 
             <p className="font-inter text-center text-[#080a0b] text-base font-medium leading-6 mb-6">
-            {" Can't find your code? Check your spam folder."}
+              {" Can't find your code? Check your spam folder."}
             </p>
           </>
         )}
-
+        <div className="mt-6 text-center">
+          <Link href="/login">
+            <span className="text-[#5CA0C2] hover:underline cursor-pointer text-sm">
+              Back to Sign In
+            </span>
+          </Link>
+        </div>
         {error && (
           <p className="text-sm text-red-600 mb-4 text-center animate-shake">
             {error}

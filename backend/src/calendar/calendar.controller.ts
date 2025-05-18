@@ -88,7 +88,6 @@ export class CalendarController {
   @Post('events/add')
   async addEvents(@Body() payload: CreateEventDto) {
     try {
-      console.log('wowwww', payload);
       // Call the service method to revert the event version
       const result = await this.calendarService.addEvents(payload);
 
@@ -233,16 +232,8 @@ export class CalendarController {
   @UseGuards(JwtAuthGuard)
   async getJobStatus(@Request() req, @Param('jobId') jobId: string) {
     try {
-      const job = await this.calendarService.getJobStatus(
-        jobId,
-        req.user.userId,
-      );
-      return {
-        status: job.status,
-        progress: job.progress,
-        result: job.result,
-        error: job.error,
-      };
+      const job = await this.calendarService.getJobStatus(jobId, req.user);
+      return job;
     } catch (error) {
       // Handle errors and return appropriate HTTP status code
       throw new HttpException(

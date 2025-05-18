@@ -18,6 +18,7 @@ const auth_service_1 = require("./auth.service");
 const local_auth_guard_1 = require("./guards/local-auth.guard");
 const create_user_dto_1 = require("./dto/create-user-dto");
 const jwt_auth_guard_1 = require("./guards/jwt-auth.guard");
+const forgot_password_dto_1 = require("./dto/forgot-password-dto");
 let AuthController = class AuthController {
     constructor(authService) {
         this.authService = authService;
@@ -27,9 +28,7 @@ let AuthController = class AuthController {
             const response = await this.authService.signup(createUserDto);
             return {
                 success: true,
-                data: {
-                    access_token: response?.result.access_token,
-                },
+                ...response.result,
                 status: common_1.HttpStatus.CREATED,
             };
         }
@@ -41,19 +40,35 @@ let AuthController = class AuthController {
             }, error.status || common_1.HttpStatus.BAD_REQUEST);
         }
     }
-    async verifyEmail(req, body) {
+    async forgotPassword(forgotPassword) {
         try {
-            const response = await this.authService.verifyEmail(req.user, body.code);
+            const response = await this.authService.forgotPassword(forgotPassword);
             return {
                 success: true,
-                data: {
-                    access_token: response.access_token,
-                },
+                access_token: response?.result.access_token,
                 status: common_1.HttpStatus.OK,
             };
         }
         catch (error) {
-            console.log(':asdasdsad', error);
+            throw new common_1.HttpException({
+                success: false,
+                error: error.message,
+                status: error.status || common_1.HttpStatus.BAD_REQUEST,
+            }, error.status || common_1.HttpStatus.BAD_REQUEST);
+        }
+    }
+    async verifyEmail(req, body) {
+        try {
+            const response = await this.authService.verifyEmail(req.user, body.code);
+            console.log('response', response);
+            return {
+                success: true,
+                access_token: response.access_token,
+                verifiedUser: response.verifiedUser,
+                status: common_1.HttpStatus.OK,
+            };
+        }
+        catch (error) {
             throw new common_1.HttpException({
                 success: false,
                 error: error.message || 'Verification failed',
@@ -64,6 +79,21 @@ let AuthController = class AuthController {
     async login(req) {
         try {
             const loginResponse = await this.authService.login(req.user);
+            return {
+                result: loginResponse.result,
+                status: loginResponse.status,
+            };
+        }
+        catch (error) {
+            return {
+                result: error.response?.data || { error: 'Unknown error occurred' },
+                status: error.status || 500,
+            };
+        }
+    }
+    async resetPassword(req, payload) {
+        try {
+            const loginResponse = await this.authService.resetPassword(payload, req.user);
             return {
                 result: loginResponse.result,
                 status: loginResponse.status,
@@ -115,6 +145,13 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "signup", null);
 __decorate([
+    (0, common_1.Post)('forgot-password'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [forgot_password_dto_1.ForgotPasswordDto]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "forgotPassword", null);
+__decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Post)('verify-email'),
     __param(0, (0, common_1.Request)()),
@@ -131,6 +168,15 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "login", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.Post)('reset-password'),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "resetPassword", null);
 __decorate([
     (0, common_1.Post)('refresh-token'),
     __param(0, (0, common_1.Headers)('authorization')),

@@ -3,9 +3,25 @@ import React, { useState, Suspense, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { useJobStatusPollingMutation } from "../hooks/useJobStatusPolling";
-import { useUpdateTokenMutation } from "../hooks/useUpdateToken";
 import { statusMessages } from "@/utils";
 import "./styles.css";
+
+interface FormErrors {
+  whoIsThisFor?: string;
+  businessType?: string;
+  targetAudience?: string;
+  marketingGoals?: string;
+  domains?: string;
+  postingFrequency?: string;
+  preferredContentType?: string;
+  form?: string;
+}
+
+const frequency = {
+  "Light (1-2 times per week)": "twice or single post per week",
+  "Medium (3-4 times per week)": "three to four post per week",
+  "Heavy (daily or multiple times per day)": "daily or twice post per day",
+};
 
 function FormData() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -15,26 +31,92 @@ function FormData() {
     targetAudience: "",
     marketingGoals: [] as string[],
     domains: [] as string[],
-    postingFrequency: [] as string[],
+    postingFrequency: "",
     preferredContentType: [] as string[],
   });
-  const [errors, setErrors] = useState<any>(false);
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [touched, setTouched] = useState({
+    whoIsThisFor: false,
+    businessType: false,
+    targetAudience: false,
+    marketingGoals: false,
+    domains: false,
+    postingFrequency: false,
+    preferredContentType: false,
+  });
   const [isLoading, setIsLoading] = useState(false);
   const searchParams = useSearchParams();
-  const serializedEvent = searchParams.get("access_token");
-  const access_token: Event | null = serializedEvent
-    ? JSON.parse(decodeURIComponent(serializedEvent))
-    : null;
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentJobId, setCurrentJobId] = useState<string | null>(null);
 
-  const handleInputChange = (event: any) => {
-    const { name, value } = event.target;
+  // Validation functions
+  const validateStep1 = () => {
+    const newErrors: FormErrors = {};
+
+    if (!formData.whoIsThisFor.trim()) {
+      newErrors.whoIsThisFor = "Please specify who this is for";
+    }
+
+    if (!formData.businessType) {
+      newErrors.businessType = "Please select a business type";
+    }
+
+    if (!formData.targetAudience.trim()) {
+      newErrors.targetAudience = "Please describe your target audience";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const validateStep2 = () => {
+    if (formData.marketingGoals.length === 0) {
+      setErrors({
+        marketingGoals: "Please select at least one marketing goal",
+      });
+      return false;
+    }
+    return true;
+  };
+
+  const validateStep3 = () => {
+    if (formData.domains.length === 0) {
+      setErrors({ domains: "Please select at least one domain" });
+      return false;
+    }
+    return true;
+  };
+
+  const validateStep4 = () => {
+    const newErrors: FormErrors = {};
+
+    if (!formData.postingFrequency) {
+      newErrors.postingFrequency = "Please select a posting frequency";
+    }
+
+    if (formData.preferredContentType.length === 0) {
+      newErrors.preferredContentType =
+        "Please select at least one content type";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  console.log("asdasda", formData);
+
+  const handleInputChange = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    let { name, value } = event.target;
+
     setFormData((prevState) => ({ ...prevState, [name]: value }));
+    setTouched((prev) => ({ ...prev, [name]: true }));
   };
 
   const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, checked } = event.target;
+    setTouched((prev) => ({ ...prev, [name]: true }));
 
     setFormData((prevState) => {
       if (checked) {
@@ -45,7 +127,7 @@ function FormData() {
       } else {
         return {
           ...prevState,
-          [name]: prevState[name as keyof typeof prevState].filter(
+          [name]: prevState[name as keyof typeof prevState]?.filter(
             (item: string) => item !== value
           ),
         };
@@ -54,7 +136,23 @@ function FormData() {
   };
 
   const nextStep = () => {
-    setCurrentStep((prev) => prev + 1);
+    let isValid = true;
+
+    switch (currentStep) {
+      case 1:
+        isValid = validateStep1();
+        break;
+      case 2:
+        isValid = validateStep2();
+        break;
+      case 3:
+        isValid = validateStep3();
+        break;
+    }
+
+    if (isValid) {
+      setCurrentStep((prev) => prev + 1);
+    }
   };
 
   const prevStep = () => {
@@ -62,16 +160,21 @@ function FormData() {
   };
 
   const generateCalendar = async () => {
-    const url = "/api/generateCalendar";
+    if (!validateStep4()) return;
+
     setIsLoading(true);
-    setErrors(null);
+    setErrors({});
     try {
-      const response = await fetch(url, {
+      const payload = {
+        ...formData,
+        postingFrequency: frequency[formData.postingFrequency],
+      };
+      const response = await fetch("/api/generateCalendar", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ calendarInputs: formData, access_token }),
+        body: JSON.stringify({ calendarInputs: payload }),
       });
 
       const result = await response.json();
@@ -79,11 +182,10 @@ function FormData() {
         setCurrentJobId(result.data.result.jobId);
         setIsGenerating(true);
       } else {
-        setErrors(result?.data?.error || "Something went wrong");
+        setErrors({ form: result?.data?.error || "Something went wrong" });
       }
     } catch (error: any) {
-      console.log("err", error);
-      setErrors(error);
+      setErrors({ form: error.message || "An error occurred" });
     } finally {
       setIsLoading(false);
     }
@@ -126,9 +228,15 @@ function FormData() {
           name="whoIsThisFor"
           value={formData.whoIsThisFor}
           onChange={handleInputChange}
-          className="w-full h-[60px] px-5 py-3 rounded-lg bg-[#F2EFEF] text-[#8D8D8D] text-[16px] font-open-sans leading-normal outline-none transition-all duration-200 focus:ring-2 focus:ring-[#7a0860] focus:bg-[#F8F7F7] placeholder-[#8D8D8D]"
+          onBlur={() => setTouched((prev) => ({ ...prev, whoIsThisFor: true }))}
+          className={`w-full h-[60px] px-5 py-3 rounded-lg bg-[#F2EFEF] text-[#8D8D8D] text-[16px] font-open-sans leading-normal outline-none transition-all duration-200 focus:ring-2 ${
+            errors.whoIsThisFor ? "focus:ring-red-500" : "focus:ring-[#7a0860]"
+          } focus:bg-[#F8F7F7] placeholder-[#8D8D8D]`}
           placeholder="Company, brand or other"
         />
+        {errors.whoIsThisFor && (
+          <p className="mt-1 text-sm text-red-600">{errors.whoIsThisFor}</p>
+        )}
       </div>
 
       <div className="relative">
@@ -138,8 +246,11 @@ function FormData() {
         <select
           name="businessType"
           value={formData.businessType}
-          onChange={(e) => handleInputChange(e as any)}
-          className="w-full h-[60px] px-5 py-3 rounded-lg bg-[#F2EFEF] text-[#8D8D8D] text-[16px] font-open-sans leading-normal outline-none transition-all duration-200 focus:ring-2 focus:ring-[#7a0860] focus:bg-[#F8F7F7]"
+          onChange={handleInputChange}
+          onBlur={() => setTouched((prev) => ({ ...prev, businessType: true }))}
+          className={`w-full h-[60px] px-5 py-3 rounded-lg bg-[#F2EFEF] text-[#8D8D8D] text-[16px] font-open-sans leading-normal outline-none transition-all duration-200 focus:ring-2 ${
+            errors.businessType ? "focus:ring-red-500" : "focus:ring-[#7a0860]"
+          } focus:bg-[#F8F7F7]`}
         >
           <option value="">Select a business type</option>
           <option value="B2B">B2B</option>
@@ -149,6 +260,9 @@ function FormData() {
           <option value="SaaS">SaaS</option>
           <option value="Other">Other</option>
         </select>
+        {errors.businessType && (
+          <p className="mt-1 text-sm text-red-600">{errors.businessType}</p>
+        )}
       </div>
 
       <div className="relative">
@@ -160,9 +274,19 @@ function FormData() {
           name="targetAudience"
           value={formData.targetAudience}
           onChange={handleInputChange}
-          className="w-full h-[60px] px-5 py-3 rounded-lg bg-[#F2EFEF] text-[#8D8D8D] text-[16px] font-open-sans leading-normal outline-none transition-all duration-200 focus:ring-2 focus:ring-[#7a0860] focus:bg-[#F8F7F7] placeholder-[#8D8D8D]"
+          onBlur={() =>
+            setTouched((prev) => ({ ...prev, targetAudience: true }))
+          }
+          className={`w-full h-[60px] px-5 py-3 rounded-lg bg-[#F2EFEF] text-[#8D8D8D] text-[16px] font-open-sans leading-normal outline-none transition-all duration-200 focus:ring-2 ${
+            errors.targetAudience
+              ? "focus:ring-red-500"
+              : "focus:ring-[#7a0860]"
+          } focus:bg-[#F8F7F7] placeholder-[#8D8D8D]`}
           placeholder="Describe your target audience"
         />
+        {errors.targetAudience && (
+          <p className="mt-1 text-sm text-red-600">{errors.targetAudience}</p>
+        )}
       </div>
     </div>
   );
@@ -196,6 +320,9 @@ function FormData() {
           </label>
         </div>
       ))}
+      {errors.marketingGoals && (
+        <p className="mt-2 text-sm text-red-600">{errors.marketingGoals}</p>
+      )}
     </div>
   );
 
@@ -224,33 +351,45 @@ function FormData() {
           </div>
         )
       )}
+      {errors.domains && (
+        <p className="mt-2 text-sm text-red-600">{errors.domains}</p>
+      )}
     </div>
   );
 
   // Step 4: Posting Frequency and Content Type
   const Step4 = () => (
     <div className="space-y-8">
-      <select
-        value={formData.postingFrequency[0] || ""} // Assuming single selection
-        onChange={(e) => {
-          // Handle single selection
-          setFormData({
-            ...formData,
-            postingFrequency: e.target.value ? [e.target.value] : [],
-          });
-        }}
-        className="w-full p-2 border border-gray-300 rounded-md focus:ring-[#7a0860] focus:border-[#7a0860] text-[#5A5A5A]"
-      >
-        {[
-          "Light (1-2 times per week)",
-          "Medium (3-4 times per week)",
-          "Heavy (daily or multiple times per day)",
-        ].map((frequency) => (
-          <option key={frequency} value={frequency}>
-            {frequency}
-          </option>
-        ))}
-      </select>
+      <div>
+        <label className="block text-[#5A5A5A] text-sm font-medium mb-1">
+          Posting Frequency
+        </label>
+        <select
+          name="postingFrequency"
+          value={formData.postingFrequency}
+          onChange={handleInputChange}
+          onBlur={() =>
+            setTouched((prev) => ({ ...prev, postingFrequency: true }))
+          }
+          className={`w-full p-2 border ${
+            errors.postingFrequency ? "border-red-500" : "border-gray-300"
+          } rounded-md focus:ring-[#7a0860] focus:border-[#7a0860] text-[#5A5A5A] h-[60px]`}
+        >
+          <option value="">Select posting frequency</option>
+          {[
+            "Light (1-2 times per week)",
+            "Medium (3-4 times per week)",
+            "Heavy (daily or multiple times per day)",
+          ].map((frequency) => (
+            <option key={frequency} value={frequency}>
+              {frequency}
+            </option>
+          ))}
+        </select>
+        {errors.postingFrequency && (
+          <p className="mt-1 text-sm text-red-600">{errors.postingFrequency}</p>
+        )}
+      </div>
 
       <div>
         <h3 className="text-[#5A5A5A] text-lg font-medium mb-4">
@@ -275,21 +414,19 @@ function FormData() {
             </div>
           )
         )}
+        {errors.preferredContentType && (
+          <p className="mt-1 text-sm text-red-600">
+            {errors.preferredContentType}
+          </p>
+        )}
       </div>
     </div>
   );
 
   return (
     <div className="flex w-full flex-col bg-white h-[100vh]">
-      {isGenerating && currentJobId && (
-        <ProgressTracker jobId={currentJobId} access_token={access_token} />
-      )}
-      <div
-        className={`flex h-screen bg-[#ffffff] 
-        
-        `}
-      >
-        {" "}
+      {isGenerating && currentJobId && <ProgressTracker jobId={currentJobId} />}
+      <div className={`flex h-screen bg-[#ffffff]`}>
         <div className="py-5 lg:min-w-[50%] relative lg:flex flex-col items-center justify-center w-full px-[54px]">
           <Image
             src="/logo.svg"
@@ -316,12 +453,6 @@ function FormData() {
             {currentStep === 2 && Step2()}
             {currentStep === 3 && Step3()}
             {currentStep === 4 && Step4()}
-
-            {errors && (
-              <div className="mt-4 p-3 bg-red-50 text-red-600 rounded-lg">
-                {errors}
-              </div>
-            )}
 
             <div className="flex justify-between gap-5 mt-8">
               {currentStep > 1 ? (
@@ -410,13 +541,11 @@ function FormData() {
   );
 }
 
-function ProgressTracker({ jobId, access_token }) {
+function ProgressTracker({ jobId }) {
   const [progress, setProgress] = useState(0);
   const [status, setStatus] = useState("Initializing calendar generation...");
   const router = useRouter();
-  const { mutate: jobPollingMutate } =
-    useJobStatusPollingMutation(access_token);
-  const { mutate: updateTokenMutate } = useUpdateTokenMutation();
+  const { mutate: jobPollingMutate } = useJobStatusPollingMutation();
 
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
@@ -429,14 +558,7 @@ function ProgressTracker({ jobId, access_token }) {
           if (!isMounted) return;
 
           if (data.status === "completed") {
-            updateTokenMutate(access_token, {
-              onSuccess: () => {
-                router.replace("/dashboard");
-              },
-              onError: (error) => {
-                console.error("Token update failed:", error);
-              },
-            });
+            router.replace("/dashboard");
           }
           if (data.status === "failed") {
             setStatus(`Error: ${data.error}`);

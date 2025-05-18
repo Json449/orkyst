@@ -1,26 +1,34 @@
 import { HttpStatus } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/create-user-dto';
+import { ForgotPasswordDto } from './dto/forgot-password-dto';
 export declare class AuthController {
     private readonly authService;
     constructor(authService: AuthService);
     signup(createUserDto: CreateUserDto): Promise<{
+        status: HttpStatus;
+        access_token: string;
+        id: unknown;
         success: boolean;
-        data: {
-            access_token: string;
-        };
+    }>;
+    forgotPassword(forgotPassword: ForgotPasswordDto): Promise<{
+        success: boolean;
+        access_token: string;
         status: HttpStatus;
     }>;
     verifyEmail(req: any, body: {
         code: string;
     }): Promise<{
         success: boolean;
-        data: {
-            access_token: string;
-        };
+        access_token: string;
+        verifiedUser: boolean;
         status: HttpStatus;
     }>;
     login(req: any): Promise<{
+        result: any;
+        status: any;
+    }>;
+    resetPassword(req: any, payload: any): Promise<{
         result: any;
         status: any;
     }>;
@@ -28,6 +36,7 @@ export declare class AuthController {
         result: {
             email: any;
             sub: any;
+            access: boolean;
             access_token: string;
             isVerified: any;
         };

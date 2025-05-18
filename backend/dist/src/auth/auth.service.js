@@ -32,9 +32,9 @@ let AuthService = class AuthService {
         return result;
     }
     async login(user) {
-        const payload = { email: user.email, sub: user._id };
+        const payload = { email: user.email, sub: user._id, access: true };
         const accessToken = this.jwtService.sign(payload, {
-            secret: 'your_secret_key',
+            secret: process.env.JWT_SECRET_KEY,
             expiresIn: '2h',
         });
         return {
@@ -46,6 +46,20 @@ let AuthService = class AuthService {
             status: 200,
         };
     }
+    async resetPassword(payload, user) {
+        const { newPassword } = payload;
+        const existingUser = await this.usersService.findUserByEmail(user.email);
+        if (!existingUser) {
+            throw new common_1.ConflictException('User with this email already exists');
+        }
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        existingUser.password = hashedPassword;
+        await existingUser.save();
+        return {
+            result: { success: true },
+            status: 200,
+        };
+    }
     async signup(createUserDto) {
         const { email, password, fullname } = createUserDto;
         const existingUser = await this.usersService.findUserByEmail(email);
@@ -53,15 +67,38 @@ let AuthService = class AuthService {
             throw new common_1.ConflictException('User with this email already exists');
         }
         const newUser = await this.usersService.createUser(email, password, fullname);
-        const payload = { email: newUser.email, sub: newUser._id };
+        const payload = { email: newUser.email, sub: newUser._id, access: false };
         const accessToken = this.jwtService.sign(payload, {
-            secret: 'your_secret_key',
+            secret: process.env.JWT_SECRET_KEY,
             expiresIn: '2h',
         });
         return {
-            result: { access_token: accessToken },
+            result: { access_token: accessToken, id: newUser._id },
             status: 201,
         };
+    }
+    async forgotPassword(forgotPassword) {
+        try {
+            const { email } = forgotPassword;
+            const existingUser = await this.usersService.forgotPassword(email);
+            const payload = {
+                email: existingUser.email,
+                sub: existingUser._id,
+                access: false,
+            };
+            const accessToken = this.jwtService.sign(payload, {
+                secret: process.env.JWT_SECRET_KEY,
+                expiresIn: '2h',
+            });
+            return {
+                result: { access_token: accessToken },
+                status: 201,
+            };
+        }
+        catch (e) {
+            console.log(e);
+            throw new common_1.HttpException(e.message, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
     async verifyEmail(user, code) {
         try {
@@ -69,18 +106,24 @@ let AuthService = class AuthService {
             if (!currentUser) {
                 throw new common_1.HttpException('User not found', common_1.HttpStatus.NOT_FOUND);
             }
+            console.log('currentUser', currentUser);
             if (code !== currentUser.verificationCode) {
                 throw new common_1.HttpException('Invalid verification code', common_1.HttpStatus.BAD_REQUEST);
             }
+            const verifiedUser = currentUser.isVerified ?? false;
             currentUser.isVerified = true;
             currentUser.verificationCode = '';
             await currentUser.save();
-            const payload = { email: currentUser.email, sub: currentUser._id };
+            const payload = {
+                email: currentUser.email,
+                sub: currentUser._id,
+                access: false,
+            };
             const accessToken = this.jwtService.sign(payload, {
-                secret: 'your_secret_key',
+                secret: process.env.JWT_SECRET_KEY,
                 expiresIn: '2h',
             });
-            return { access_token: accessToken };
+            return { access_token: accessToken, verifiedUser: verifiedUser };
         }
         catch (error) {
             if (error instanceof common_1.HttpException) {
@@ -90,16 +133,16 @@ let AuthService = class AuthService {
         }
     }
     async generateRefreshToken(user) {
-        const payload = { email: user.email, sub: user._id };
+        const payload = { email: user.email, sub: user._id, access: false };
         return this.jwtService.sign(payload, {
-            secret: 'your_secret_key',
+            secret: process.env.JWT_SECRET_KEY,
             expiresIn: '7d',
         });
     }
     async validateRefreshToken(refreshToken) {
         try {
             const payload = this.jwtService.verify(refreshToken, {
-                secret: 'your_secret_key',
+                secret: process.env.JWT_SECRET_KEY,
             });
             return { email: payload.email, sub: payload.sub };
         }

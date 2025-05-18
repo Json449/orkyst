@@ -1,13 +1,14 @@
 import { NextResponse } from "next/server";
 import axios from "axios";
+import { cookies } from "next/headers";
 
 export async function POST(request: Request) {
   try {
     const body = await request.json(); // Get request body
     // Retrieve the access token from cookies
-    const access_token = body.access_token;
-
-    if (!access_token.access_token) {
+    const _cookies = await cookies();
+    const access_token = _cookies.get("access_token")?.value;
+    if (!access_token) {
       return NextResponse.json(
         { success: false, data: { error: "Unauthorized: No access token" } },
         { status: 401 }
@@ -19,7 +20,7 @@ export async function POST(request: Request) {
     // Make the PATCH request with Authorization header
     const rawResponse = await axios.put(url, body, {
       headers: {
-        Authorization: `Bearer ${access_token.access_token}`,
+        Authorization: `Bearer ${access_token}`,
         "Content-Type": "application/json",
       },
     });

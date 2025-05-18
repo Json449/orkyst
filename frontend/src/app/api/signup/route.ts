@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 import axios, { HttpStatusCode } from "axios";
+import { cookies } from "next/headers";
 
 export async function POST(request: Request) {
   // Destructure the request body
   const { email, password, fullname } = await request.json();
-
+  const _cookies = await cookies();
   // Construct the URL for the login API
   const url = `${process.env.BASE_URL}/auth/signup`;
 
@@ -18,9 +19,14 @@ export async function POST(request: Request) {
   try {
     // Make the POST request using axios
     const response = await axios.post(url, body);
+    const { data, status } = response;
     // Check if login is successful
-    if (response?.data?.status == HttpStatusCode.Created) {
-      // Set cookies with the access token and other user details
+    if (status == HttpStatusCode.Created) {
+      _cookies.set("access_token", data.access_token, {
+        maxAge: 30 * 86400,
+        path: "/",
+        sameSite: "strict",
+      });
       return NextResponse.json(response.data);
     } else {
       // If login failed, return error response

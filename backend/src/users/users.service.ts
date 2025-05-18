@@ -48,6 +48,22 @@ export class UsersService {
     return newUser.save();
   }
 
+  async forgotPassword(email: string): Promise<UserDocument> {
+    // Check if the user already exists
+    const existingUser = await this.findUserByEmail(email);
+    if (!existingUser) {
+      throw new ConflictException('User with this email does not exist');
+    }
+    const verificationCode = this.generateVerificationCode();
+    const verificationCodeExpires = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    // Hash the password and create the user
+    existingUser.verificationCode = verificationCode;
+    existingUser.verificationCodeExpires = verificationCodeExpires;
+    await existingUser.save();
+    await this.mailService.sendVerificationEmail(email, verificationCode);
+    return existingUser;
+  }
+
   async findUserByEmail(email: string): Promise<UserDocument | null> {
     return this.userModel.findOne({ email }).exec();
   }

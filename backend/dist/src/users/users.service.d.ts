@@ -10,6 +10,7 @@ export declare class UsersService {
     constructor(userModel: Model<UserDocument>, calendarService: CalendarService, mailService: MailService);
     generateVerificationCode: () => string;
     createUser(email: string, password: string, fullname: string): Promise<UserDocument>;
+    forgotPassword(email: string): Promise<UserDocument>;
     findUserByEmail(email: string): Promise<UserDocument | null>;
     findUserById(id: string): Promise<UserDocument | null>;
     updateUser(userId: string, updateUserDto: Partial<UpdateUserDto>): Promise<UserDocument>;

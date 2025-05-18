@@ -491,7 +491,7 @@ const generateCalendarPromptv1 = (input, currentMonth, currentYear) => {
   - **Repurposing Opportunities**: Suggestions for adapting this content for other channels.
   
   ### **Calendar Structure Guidelines:**
-  - Maintain the **posting frequency** according to the user's preference.
+  - Maintain the **posting frequency** according to the user's preference I need minimum 45 post data in response.
   - Ensure content is evenly distributed throughout the month.
   - Create thematic clusters that build upon each other.
   - Balance promotional content with educational and engagement-focused content.

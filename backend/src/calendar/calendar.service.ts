@@ -10,11 +10,9 @@ import { FeedbackDocument } from './schemas/feedback.schema';
 import { AddFeedbackDto } from './dto/add-feedback-dto';
 import { VersionHistory } from './schemas/versionhistory.schema';
 import {
-  calendarSuggestionPrompt,
   calendarSuggestionPromptv2,
   defaultPrompt,
   eventSuggestionPrompt,
-  generateCalendarPrompt,
   generateCalendarPromptv1,
   generateDynamicBlogPostPrompt,
   imageGenerationPrompt,
@@ -27,6 +25,7 @@ import { UserDocument } from 'src/users/schemas/user.schema';
 import { JobDocument } from './schemas/job.schema';
 import { v4 as uuidv4 } from 'uuid';
 import { CreateEventDto } from './dto/create-event-dto';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class CalendarService {
@@ -47,6 +46,7 @@ export class CalendarService {
     @InjectModel('Job')
     private readonly jobModel: Model<JobDocument>,
     private configService: ConfigService,
+    private readonly jwtService: JwtService,
   ) {
     this.openai = new OpenAI({
       apiKey: this.configService.get<string>('OPENAI_API_KEY'),
@@ -275,7 +275,7 @@ export class CalendarService {
         ],
         response_format: { type: 'json_object' },
         max_tokens: 3000, // Increase token limit for more detailed responses
-        temperature: 0.5, // Lower temperature for more focused and precise responses
+        temperature: 0.3, // Lower temperature for more focused and precise responses
       });
       await this.updateJob(jobId, { progress: 50 });
       const calendarData = await this.validateCalendarResponse(
@@ -667,17 +667,25 @@ export class CalendarService {
     }
   }
 
-  async getJobStatus(jobId: string, userId: string) {
+  async getJobStatus(jobId: string, user: any) {
     try {
       const job = await this.jobModel.findOne({
         jobId,
-        userId: userId,
+        userId: user.userId,
       });
       if (!job) throw new Error('Job not found');
+      let access_token = '';
+      if (job.status == 'completed') {
+        const payload = { email: user.email, sub: user.userId, access: true }; // JWT payload
+        access_token = this.jwtService.sign(payload, {
+          secret: process.env.JWT_SECRET_KEY, // Ensure this matches the secret in the strategy
+          expiresIn: '2h', // Access token expires in 2 hours
+        });
+      }
       return {
         status: job.status,
         progress: job.progress,
-        result: job.result,
+        access_token: access_token,
         error: job.error,
       };
     } catch (e) {
