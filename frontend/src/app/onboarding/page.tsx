@@ -5,6 +5,8 @@ import Image from "next/image";
 import { useJobStatusPollingMutation } from "../hooks/useJobStatusPolling";
 import { statusMessages } from "@/utils";
 import "./styles.css";
+import { useQueryClient } from "@tanstack/react-query";
+import { useCalendarList } from "../hooks/useCalendarData";
 
 interface FormErrors {
   whoIsThisFor?: string;
@@ -522,6 +524,8 @@ function ProgressTracker({ jobId }) {
   const [status, setStatus] = useState("Initializing calendar generation...");
   const router = useRouter();
   const { mutate: jobPollingMutate } = useJobStatusPollingMutation();
+  const { refetch } = useCalendarList();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
@@ -534,6 +538,11 @@ function ProgressTracker({ jobId }) {
           if (!isMounted) return;
 
           if (data.status === "completed") {
+            // Invalidate by query key (forces refetch)
+            queryClient.invalidateQueries({
+              queryKey: ["calendarList"], // Partial match (invalidates all "calendarList" queries)
+            });
+            await refetch();
             router.replace("/dashboard");
           }
           if (data.status === "failed") {

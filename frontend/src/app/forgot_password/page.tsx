@@ -117,7 +117,7 @@ export default function ForgotPasswordForm() {
             </h1>
 
             <p className="text-[#5A5A5A] text-sm text-center mb-6">
-              {`Enter your email address and we'll send you a link to reset your
+              {`Enter your email address and we'll send you a code to reset your
               password`}
             </p>
 

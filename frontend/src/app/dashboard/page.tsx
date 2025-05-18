@@ -218,12 +218,7 @@ export default function CalendarPage() {
   };
 
   const handleAddCalendar = () => {
-    const serializedResponse = encodeURIComponent(
-      JSON.stringify({
-        access_token: getAccessToken(),
-      })
-    );
-    router.replace(`/onboarding?access_token=${serializedResponse}`);
+    router.push(`/onboarding`);
   };
 
   const CalendarListing = () => {
