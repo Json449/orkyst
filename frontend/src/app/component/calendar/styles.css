@@ -34,3 +34,7 @@
 .rbc-day-bg {
     cursor: pointer;
 }
+
+.rbc-row-content {
+    overflow-y: auto;
+}
