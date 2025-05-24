@@ -11,6 +11,7 @@ import { UserSchema } from 'src/users/schemas/user.schema';
 import { JobSchema } from './schemas/job.schema';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from '@/auth/strategies/jwt.strategy';
+import { CloudinaryService } from 'src/cloudinary.service';
 
 @Module({
   imports: [
@@ -30,7 +31,7 @@ import { JwtStrategy } from '@/auth/strategies/jwt.strategy';
     }),
   ],
   controllers: [CalendarController],
-  providers: [CalendarService, JwtStrategy],
+  providers: [CalendarService, JwtStrategy, CloudinaryService],
   exports: [CalendarService],
 })
 export class CalendarModule {}

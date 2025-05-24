@@ -781,10 +781,10 @@ Generate 3 actionable suggestions to improve this calendar. Each must:
 `;
 
 export const imageGenerationPrompt = (theme, audience, contentType) => {
-  return `Create a realistic or high-quality 3D-rendered image that represents the following marketing content for social media.
+  return `Create a realistic, high-quality image that represents the following marketing content for social media.
 
-  The visual should match the tone and content strategy used on [PLATFORM], and be suitable for direct use in a post — **no surreal, abstract, fantasy, or overly stylized effects**.
-  
+  The visual should closely resemble a professional photograph or a natural, real-world scenario, focusing on authenticity. Avoid any surreal, abstract, fantasy, or overly stylized effects.
+
   Details:
   - 🎯 **Theme**: ${theme}
   - 🧑‍🤝‍🧑 **Target Audience**: ${audience}
@@ -792,12 +792,11 @@ export const imageGenerationPrompt = (theme, audience, contentType) => {
   - 📲 **Platform Style**: [PLATFORM] (e.g., Instagram = casual & vivid, LinkedIn = professional & minimal, etc.)
   
   Image requirements:
-  - Use **real-world environments, realistic people or objects**, and **natural lighting**
-  - If applicable, simulate a **lifestyle photo, event moment, or candid snapshot**
-  - If product or brand-focused, use **studio-quality lighting, branding, and polished composition**
-  - The image must feel **authentic**, like it could have been shot by a professional photographer or rendered in high-end 3D software
-  - No watermarks, text, or borders unless specified
-  
-  Make sure the image style matches the expectations and native aesthetic of the selected social platform.
-  `;
+  - Use **real-world environments**, **realistic people** or **objects**, and **natural lighting** to create a genuine look.
+  - If applicable, simulate a **lifestyle photo**, **event moment**, or **candid snapshot** that could easily be taken by a photographer in a natural setting.
+  - If product or brand-focused, use **studio-quality lighting** and **polished composition** to ensure it appears authentic and professional.
+  - The image must feel **authentic** and **natural**, as if it was captured by a skilled photographer or shot in a high-end photo studio.
+  - Avoid **watermarks**, **text**, or **borders** unless otherwise specified.
+
+  Ensure that the image style matches the expectations and visual aesthetic of the chosen platform, while maintaining its realistic appeal.`;
 };

@@ -34,7 +34,6 @@ export default function AddEventModal({
   const handleSubmit = () => {
     const newErrors = {};
     Object.entries(formData).forEach(([key, value]) => {
-      console.log("sssss", formData, value);
       if (!value.trim()) newErrors[key] = "This field is required.";
     });
 

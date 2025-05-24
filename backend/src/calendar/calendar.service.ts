@@ -26,6 +26,7 @@ import { JobDocument } from './schemas/job.schema';
 import { v4 as uuidv4 } from 'uuid';
 import { CreateEventDto } from './dto/create-event-dto';
 import { JwtService } from '@nestjs/jwt';
+import { CloudinaryService } from '@/cloudinary.service';
 
 @Injectable()
 export class CalendarService {
@@ -47,6 +48,7 @@ export class CalendarService {
     private readonly jobModel: Model<JobDocument>,
     private configService: ConfigService,
     private readonly jwtService: JwtService,
+    private readonly cloudinaryService: CloudinaryService,
   ) {
     this.openai = new OpenAI({
       apiKey: this.configService.get<string>('OPENAI_API_KEY'),
@@ -493,16 +495,25 @@ export class CalendarService {
           );
         }
         const response = await this.openai.images.generate({
-          model: 'dall-e-3', // Specify the model (dall-e-3 or any available model)
-          prompt: prompt, // The prompt describing the image
-          n: 1, // Number of images to generate
-          size: '1024x1024', // Image size
-          response_format: 'url', // Return the
+          model: 'dall-e-3',
+          prompt: prompt,
+          n: 1,
+          size: '1024x1024',
+          response_format: 'url',
         });
+
+        // Get the temporary DALL-E URL
+        const dalleImageUrl = response.data[0].url;
+        // Upload to Cloudinary using the URL directly
+        const cloudinaryUrl = await this.cloudinaryService.uploadImageFromUrl(
+          dalleImageUrl ?? '', // Pass the URL string directly
+          `events/${eventId}/artwork`,
+          `event-${eventId}-artwork`,
+        );
         await this.eventModel.findByIdAndUpdate(eventId, {
-          artwork: response.data[0].url,
+          artwork: cloudinaryUrl,
         });
-        return response.data[0].url;
+        return cloudinaryUrl;
       } else {
         await this.eventModel.findByIdAndUpdate(eventId, {
           artwork: body.cloudinaryUrl,

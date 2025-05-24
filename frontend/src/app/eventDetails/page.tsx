@@ -493,6 +493,7 @@ function DetailForm() {
   const [loading, setLoading] = useState(false);
   const [generateImageLoading, setGenerateImageLoading] = useState(false);
   const [content, setContent] = useState("");
+  const [tmpFileSelected, setTmpFileSelected] = useState(false);
   const [eventDetails, setEventDetails] = useState<Event | null>(null);
   const { data: profile = [] } = useProfile();
   const [showSaveModal, setShowSaveModal] = useState(false);
@@ -584,6 +585,7 @@ function DetailForm() {
             artwork: imageUrl?.data?.result,
           }));
           setImageUrl(imageUrl?.data?.result);
+          setTmpFileSelected(false);
         }
       } catch (error) {
         console.error("Error fetching event details:", error);
@@ -604,6 +606,7 @@ function DetailForm() {
             artwork: response?.data?.artwork || imageUrl?.data?.result,
           }));
           setImageUrl(response?.data?.artwork || imageUrl?.data?.result);
+          setTmpFileSelected(false);
         },
         onError: (error) => {
           console.error("Failed:", error.message);
@@ -743,6 +746,11 @@ function DetailForm() {
       handleEventDetail(result.data.data?._id);
     },
   });
+
+  const handleSelectFile = (url: string, showTmp: boolean) => {
+    setTmpFileSelected(showTmp);
+    setImageUrl(url);
+  };
 
   const deleteEventMutation = useMutation({
     mutationFn: async () => {
@@ -905,7 +913,11 @@ function DetailForm() {
           {!event_type?.toLowerCase().startsWith("blog") && (
             <ImageUploader
               generateImageLoading={generateImageLoading}
-              setImageUrl={setImageUrl}
+              setImageUrl={(url, showTmp = true) =>
+                handleSelectFile(url, showTmp)
+              }
+              artworkUrl={eventDetails?.artwork}
+              tmpFileSelected={tmpFileSelected}
               imageUrl={imageUrl}
               onGenerateAI={(prompt) => fetchImage(eventDetails, prompt, null)}
               onCloudinaryUpload={handleImageUpload}
